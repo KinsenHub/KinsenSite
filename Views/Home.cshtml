@@ -71,6 +71,33 @@
     }
 </section>
 
+@*---------------Feature Cards---------------*@
+@if (featureCardsBlock != null && featureCardsBlock.Any())
+{
+    <h2 class="featureTitle">Επιλέξτε ανάμεσα σε ποικιλία κατηγοριών</h2>
+
+    <div class="features-container">
+        @foreach (var card in featureCardsBlock)
+        {
+            var content = card.Content;
+            var icon = content.Value<string>("icon"); 
+            var description = content.Value<string>("description");
+            var targetSlug = content.Value<string>("targetSlug") ?? "";
+
+            <a href="/πωλήσεις-μεταχειρισμένων?carType=@targetSlug" onclick="selectCategory('@targetSlug')" class="feature-card-link">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <p>@Html.Raw(icon)</p>
+                    </div>
+                    <div class="feature-description">
+                        <p>@Html.Raw(description)</p>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+}
+
 @*------------------Carousel-------------------*@
 <h2 class="prosfores" style="color:#39c0c3; font-weight:bold">Ανακαλύψτε τις Προσφορές σε ποικιλία μοντέλων</h2>
 <div class="d-flex justify-content-center mt-5 container-xl">
@@ -196,33 +223,6 @@
         </div>
     }
 </section>
-
-@*---------------Feature Cards---------------*@
-@if (featureCardsBlock != null && featureCardsBlock.Any())
-{
-    <h2 class="featureTitle">Επιλέξτε ανάμεσα σε ποικιλία κατηγοριών</h2>
-
-    <div class="features-container">
-        @foreach (var card in featureCardsBlock)
-        {
-            var content = card.Content;
-            var icon = content.Value<string>("icon"); 
-            var description = content.Value<string>("description");
-            var targetSlug = content.Value<string>("targetSlug") ?? "";
-
-            <a href="/πωλήσεις-μεταχειρισμένων?carType=@targetSlug" onclick="selectCategory('@targetSlug')" class="feature-card-link">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <p>@Html.Raw(icon)</p>
-                    </div>
-                    <div class="feature-description">
-                        <p>@Html.Raw(description)</p>
-                    </div>
-                </div>
-            </a>
-        }
-    </div>
-}
 
 @*---------------4 Steps------------------*@
 @* <section class="steps-section">
