@@ -1,0 +1,522 @@
+﻿@using Umbraco.Cms.Core.Models.Blocks;
+@using Umbraco.Cms.Core.Models;
+@using Umbraco.Cms.Web.Common
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Extensions
+@using System.Text;
+
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var usedCarTitle = Model.Value<string>("usedCarTitle");
+	var carCardBlock = Model.Value<IEnumerable<BlockListItem>>("carCardBlock");
+	
+	// ----------- Μάρκες και Logos------------
+	// helper για consistent σύγκριση (αγνοεί κενά/σημεία στίξης, όλα κεφαλαία)
+    string Norm(string? s)
+        => new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+
+    // Βρες τον φάκελο Logos στα Media
+    var logosFolder = Umbraco.MediaAtRoot()
+        .FirstOrDefault(x => x.Name.Equals("Logos", StringComparison.InvariantCultureIgnoreCase));
+
+    // Map: Normalized όνομα → Url εικόνας
+    var brandLogos = logosFolder?.Children
+        .ToDictionary(m => Norm(m.Name), m => m.Url(), StringComparer.InvariantCulture)
+        ?? new Dictionary<string, string>(StringComparer.InvariantCulture);
+
+    // Μάζεψε τις μάρκες από τα blocks
+    var brandsRaw = carCardBlock
+        .Select(b => b.Content.Value<string>("maker"))
+        .Where(s => !string.IsNullOrWhiteSpace(s))
+        .ToList();
+
+    // Original display names (κρατάμε την πρώτη φορά που γράφτηκε)
+    var brandDisplayNames = brandsRaw
+        .GroupBy(s => Norm(s!))
+        .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
+
+    // Counts ανά μάρκα (δυναμικά)
+    var brandCounts = brandsRaw
+        .GroupBy(s => Norm(s!))
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+
+    // Τελική λίστα (normalized keys)
+    var allBrands = brandCounts.Keys.OrderBy(k => k).ToList();
+
+	//----------------Καύσιμο---------------
+	string Normalize(string? s)
+        => new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+
+    // Μάζεψε τα καύσιμα από τα blocks
+    var fuelRaw = carCardBlock
+        .Select(b => b.Content.Value<string>("fuel"))
+        .Where(s => !string.IsNullOrWhiteSpace(s))
+        .ToList();
+
+	// Original display names (κρατάμε την πρώτη φορά που γράφτηκε)
+    var fuelDisplayNames = fuelRaw
+        .GroupBy(s => Normalize(s!))
+        .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
+
+	 // Counts ανά καύσιμο (δυναμικά)
+    var fuelCounts = fuelRaw
+        .GroupBy(s => Normalize(s!))
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+
+	// Τελική λίστα (normalized keys)
+    var allFuels = fuelCounts.Keys.OrderBy(k => k).ToList();
+
+
+	//------------Κιβώτιο ταχυτήτων----------------
+	string Norma(string? s)
+        => new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+
+    // Μάζεψε τα κιβώτια από τα blocks
+    var transmissionTypeRaw = carCardBlock
+        .Select(b => b.Content.Value<string>("transmissionType"))
+        .Where(s => !string.IsNullOrWhiteSpace(s))
+        .ToList();
+
+	// Original display names (κρατάμε την πρώτη φορά που γράφτηκε)
+    var transmissionTypelDisplayNames = transmissionTypeRaw
+        .GroupBy(s => Norma(s!))
+        .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
+
+	 // Counts ανά κιβώτιο (δυναμικά)
+    var transmissionTypeCounts = transmissionTypeRaw
+        .GroupBy(s => Norma(s!))
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+
+	// Τελική λίστα (normalized keys)
+    var allTransmissionTypes = transmissionTypeCounts.Keys.OrderBy(k => k).ToList();
+
+	//----------------------Χρώμα--------------------
+	string Normal(string? s)
+        => new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+
+    // Μάζεψε τα χρώματα από τα blocks
+    var colorRaw = carCardBlock
+        .Select(b => b.Content.Value<string>("color"))
+        .Where(s => !string.IsNullOrWhiteSpace(s))
+        .ToList();
+
+	// Original display names (κρατάμε την πρώτη φορά που γράφτηκε)
+    var colorNames = colorRaw
+        .GroupBy(s => Normal(s!))
+        .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
+
+	 // Counts ανά χρώμα (δυναμικά)
+    var colorCounts = colorRaw
+        .GroupBy(s => Normal(s!))
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+
+	// Τελική λίστα (normalized keys)
+    var allColors = colorCounts.Keys.OrderBy(k => k).ToList();
+
+
+	//--------------------Τύπος Αυτοκινήτου-------------------
+	string Normalized(string? s)
+		=> new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+
+	// Μάζεψε τους τύπους από τα blocks
+	var typeOfCarRaw = carCardBlock
+		.Select(b => b.Content.Value<string>("typeOfCar"))
+		.Where(s => !string.IsNullOrWhiteSpace(s))
+		.ToList();
+
+	// Original display names
+	var typeOfCarNames = typeOfCarRaw
+		.GroupBy(s => Normalized(s!))
+		.ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
+
+	// Counts
+	var typeOfCarCounts = typeOfCarRaw
+		.GroupBy(s => Normalized(s!))
+		.ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+
+	// Τελική λίστα
+	var allTypeOfCars = typeOfCarCounts.Keys.OrderBy(k => k).ToList();
+
+	//--------------------Προσφορές (Offer Types)-------------------
+    string N(string? s)
+        => new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+
+    // Μάζεψε τα Offer Types από τα blocks
+    var offerTypeRaw = carCardBlock
+        .Select(b => b.Content.Value<string>("typeOfDiscount"))
+        .Where(s => !string.IsNullOrWhiteSpace(s))
+        .ToList();
+
+    // Original display names
+    var offerTypeNames = offerTypeRaw
+        .GroupBy(s => N(s!))
+        .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
+
+    // Counts
+    var offerTypeCounts = offerTypeRaw
+        .GroupBy(s => N(s!))
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+
+    // Τελική λίστα
+    var allOfferTypes = offerTypeCounts.Keys.OrderBy(k => k).ToList();
+
+    var carPages = Model.ChildrenOfType("carPage");
+
+    // Κατάσταση χρήστη
+    var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
+}
+
+
+<div class="usedCars-container">
+	<!-- Mobile toggle button -->
+	<button id="toggleSidebarBtn" class="filter-dropdown-toggle d-block d-md-none">
+	<i class="fas fa-filter"></i> Φίλτρα
+	</button>
+
+	<div class="sidebar-close-btn d-block d-md-none text-end mb-3">
+		<button id="closeSidebarBtn" class="btn btn-sm btn-outline-danger">
+			<i class="fas fa-times"></i> Κλείσιμο
+		</button>
+	</div>
+	<div class="filters-container">
+
+		<aside class="sidebar" id="filterSidebar">
+			<div class="filter-static-header">
+				<h2 class="filter-title"></h2>
+				<button onclick="clearAllFilters()" class="clear-filters-btn">
+					<i class="fa-solid fa-arrows-rotate"></i> Καθαρισμός Φίλτρων
+				</button>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">Τιμή <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+				<div class="filter-content">
+					<div class="input-group">
+						<label>Από:</label>
+						<input type="number" id="minPriceInput"  placeholder="π.χ. 5000" />
+						<label>Έως:</label>
+						<input type="number" id="maxPriceInput" placeholder="π.χ. 20000" />
+					</div>
+					<div class="checkbox-columns">
+						<div class="checkbox-pair">
+							@foreach (var key in allOfferTypes)
+							{
+								var name = offerTypeNames[key];   // Original display name
+								var count = offerTypeCounts[key]; // Count
+								<label>
+									<input type="checkbox" class="offerTypeCheckbox" value="@name" />
+									@name (@count)
+								</label>
+							}
+						</div>
+
+						<div class="price-order-wrapper">
+							<select id="priceOrderSelect" class="form-select">
+							<option value="asc">Αύξουσα τιμή</option>
+							<option value="desc">Φθίνουσα τιμή</option>
+							</select>
+						</div>
+					</div>
+				</div>  
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">
+					Κατασκευαστής <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+				</button>
+
+				<div class="filter-content">
+					<div class="twoColumns-grid">
+						@foreach (var normBrand in allBrands)
+						{
+							var displayName = brandDisplayNames[normBrand];
+							var count = brandCounts[normBrand];
+							brandLogos.TryGetValue(normBrand, out var logoUrl);
+
+							<label>
+								<input type="checkbox" class="brandCheckbox" value="@normBrand" />
+								@if (!string.IsNullOrWhiteSpace(logoUrl))
+								{
+									<img src="@logoUrl" alt="@displayName logo" width="20" height="20" />
+								}
+								<span>
+									@displayName
+									(<span class="brand-count">@count</span>)
+								</span>
+							</label>
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">Χρονολογία <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+				<div class="filter-content">
+					<div class="input-group">
+						<label> Από:</label>
+						<input type="number"
+						id="minYearInput"
+						name="minYear"
+						min="2000"
+						max="@DateTime.Now.Year"
+						placeholder="π.χ. 2010" />
+
+						<label>Έως:</label>
+						<input type="number"
+						id="maxYearInput"
+						name="maxYear"
+						min="2000"
+						max="@DateTime.Now.Year"
+						placeholder="π.χ. 2025" />
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">Χιλιόμετρα <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+				<div class="filter-content">
+					<div class="input-group">
+						<label for="minKlmInput">Από:</label>
+						<input type="number"
+						id="minKlmInput"
+						name="minKm"
+						min="0"
+						max="200000"
+						placeholder="π.χ. 50000" />
+
+						<label for="maxKlmInput">Έως:</label>
+						<input type="number"
+						id="maxKlmInput"
+						name="maxKm"
+						min="0"
+						max="200000"
+						placeholder="π.χ. 150000" />
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">
+					Καύσιμο <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+				</button>
+
+				<div class="filter-content">
+					<div class="twoColumns-grid">
+						@foreach (var normFuel in allFuels)
+						{
+							var displayNameFuels = fuelDisplayNames[normFuel];
+							var countF = fuelCounts[normFuel];
+
+							<label>
+								<input type="checkbox" class="fuelCheckbox" value="@normFuel" />
+								<span>
+									@displayNameFuels
+									(<span class="fuel-count">@countF</span>)
+								</span>
+							</label>
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">Κυβικά (cc) <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+				<div class="filter-content">
+					<div class="input-group">
+						<label>Από:</label>
+						<input type="number" id="minCcInput" name="minCc" min="600" max="6000" placeholder="π.χ. 1400" />
+						
+						<label>Έως:</label>
+						<input type="number" id="maxCcInput" name="maxCc" min="600" max="6000" placeholder="π.χ. 2000" />
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">Ιπποδύναμη (Bhp) <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+				<div class="filter-content">
+					<div class="input-group">
+						<label>Από:</label>
+						<input type="number" id="minHpInput" name="minHp" min="100" max="1000" placeholder="π.χ. 100" />
+						
+						<label>Έως:</label>
+						<input type="number" id="maxHpInput" name="maxHp" min="100" max="1000" placeholder="π.χ. 400" />
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">
+					Κιβώτιο Ταχυτήτων <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+				</button>
+
+				<div class="filter-content">
+					<div class="twoColumns-grid">
+						@foreach (var normTransmission in allTransmissionTypes)
+						{
+							var displayNameTransmissions = transmissionTypelDisplayNames[normTransmission];
+							var countT = transmissionTypeCounts[normTransmission];
+
+							<label>
+								<input type="checkbox" class="transmissionCheckbox" value="@normTransmission" />
+								<span>
+									@displayNameTransmissions
+									(<span class="transmission-count">@countT</span>)
+								</span>
+							</label>
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">
+					Χρώμα <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+				</button>
+
+				<div class="filter-content">
+					<div class="twoColumns-grid">
+						@foreach (var normColor in allColors)
+						{
+							var displayNameColor = colorNames[normColor];
+							var countC = colorCounts[normColor];
+
+							<label>
+								<input type="checkbox" class="colorCheckbox" value="@normColor" />
+								<span>
+									@displayNameColor
+									(<span class="color-count">@countC</span>)
+								</span>
+							</label>
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-item">
+				<button class="filter-toggle">
+					Τύπος Αυτοκινήτου <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+				</button>
+
+				<div class="filter-content">
+					<div class="twoColumns-grid">
+						@foreach (var normType in allTypeOfCars)
+						{
+							var displayNameType = typeOfCarNames[normType];
+							var countType = typeOfCarCounts[normType];
+
+							<label>
+								<input type="checkbox" class="carTypeCheckbox" value="@normType" />
+								<span>
+									@displayNameType
+									(<span class="carType-count">@countType</span>)
+								</span>
+							</label>
+						}
+					</div>
+				</div>
+			</div>
+
+			@* <button onclick="getSelectedFilters()" class="results-btn">Αποτελέσματα</button> *@
+		</aside>
+
+	</div>
+
+    <div class="carsAndPaginationOUTER">
+		<div class="carsAndPagination">
+			<div id="displayCars" class="displayCars">
+				<div class="noResultsMsg text-center fw-bold fs-5 p-4" style="display: none;">
+					Δεν βρέθηκαν αυτοκίνητα για τα φίλτρα που επιλέξατε. <i class="fa-solid fa-ban"></i>
+				</div>
+				@if (carCardBlock != null && carCardBlock.Any())
+				{	
+					var validCards = carCardBlock
+					.Where(b =>
+					{
+						var c = b.Content;
+						string T(string a) => (c.Value<string>(a) ?? "").Trim();
+
+						var maker   = T("maker");
+						var model   = T("model");           
+						var price   = T("price");
+						var km      = T("km");
+						var cc      = T("cc");
+						var pic     = c.Value<MediaWithCrops>("carPic");
+
+						// Κριτήριο: πρέπει να έχει ΜΑRKΑ + ΜΟΝΤΕΛΟ ΚΑΙ (τουλάχιστον μία τιμή ή εικόνα)
+						var hasTitle = !string.IsNullOrWhiteSpace(maker) && !string.IsNullOrWhiteSpace(model);
+						var hasAnySpecOrPic = !string.IsNullOrWhiteSpace(price) || !string.IsNullOrWhiteSpace(km) ||
+											!string.IsNullOrWhiteSpace(cc) || pic != null;
+
+						return hasTitle && hasAnySpecOrPic;
+					})
+					.ToList();
+
+					@foreach (var card in validCards)
+					{
+						var car = card.Content;
+						var carID = car.Value<string>("carID");
+						var carPic = car.Value<MediaWithCrops>("carPic");
+						var maker = car.Value<string>("maker");
+						var modelo = car.Value<string>("model");
+						var yearRelease = car.Value<string>("yearRelease");
+						var price = car.Value<string>("price");
+						var km = car.Value<string>("km");
+						var cc = car.Value<string>("cc");
+						var hp = car.Value<string>("hp");
+						var typeOfDiscount = car.Value<string>("typeOfDiscount");
+						var typeOfFuel = car.Value<string>("fuel");
+						var transmission = car.Value<string>("transmissionType");
+						var color = car.Value<string>("color");
+						var typeOfCar = car.Value<string>("typeOfCar");
+ 						
+						<div class="cardCar" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
+							<a href="/carDetails/"
+								class="cardCarLink" 
+								data-car-id="@carID" 
+								onclick="storeCarId(event, '@carID')"
+								style="text-decoration: none; color: inherit;">
+							
+								@if (!string.IsNullOrWhiteSpace(typeOfDiscount))
+								{
+									<span class="discount-badge">@typeOfDiscount</span>
+								}
+
+								<img src="@carPic?.Url()" class="card-img-top car-image" />
+								<div class="card-body d-flex flex-column justify-content-between text-center p-3">
+									<div>
+										<h4 class="maker-title fw-semibold mb-2">@maker <span class="card-title">@modelo</span></h4>
+										<p class="car-year">@yearRelease</p>
+										<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@price €</p>
+										<p class="text-muted mb-0">
+											<i class="fa-solid fa-road"></i><span class="klm">&nbsp; @km </span>km &nbsp;&nbsp;
+											<i class="fa fa-wrench"></i><span class="cc">&nbsp; @cc</span>cc &nbsp;&nbsp;
+											<i class="fa-solid fa-gas-pump"></i><span class="fuel">&nbsp; @typeOfFuel</span>
+										</p>
+										<p class="transmission" style="display:none">@transmission</p>
+										<p class="typeOfColor" style="display:none">@color</p>
+										<p class="hp" style="display:none">@hp</p>
+										<p class="typeOfCar" style="display:none">@typeOfCar</p>
+									</div>
+								</div>
+							</a>
+						</div>
+					}
+				}
+			</div>
+		<div class="pagination-wrapper">
+			<nav class="mt-4 w-100">
+				<ul id="paginationControls" class="pagination justify-content-center flex-wrap"></ul>
+			</nav>
+		</div>
+		</div>
+	</div>
+</div>
+
+<script src="~/js/usedCarSalesFilters.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+

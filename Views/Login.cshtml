@@ -1,0 +1,23 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Microsoft.AspNetCore.Http
+@using Umbraco.Cms.Core.Security
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var isAuthenticated = Context.User?.Identity?.IsAuthenticated ?? false;
+}
+
+
+@if (!isAuthenticated)
+{
+    @Html.Partial("Partials/Login")
+}
+else
+{
+    @await Html.PartialAsync("Partials/LoginStatus")
+}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<link rel="stylesheet" href="@Url.Content("~/css/umbraco-starterkit-blockgrid.css")" />

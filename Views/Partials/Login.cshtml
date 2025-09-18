@@ -1,0 +1,113 @@
+﻿    @inject Umbraco.Cms.Core.Security.IMemberManager MemberManager
+    @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+    @inject Umbraco.Cms.Core.Security.IMemberManager MemberManager 
+    @* είναι η "γέφυρα" για να κάνεις login, logout, να πάρεις τον τρέχοντα χρήστη*@
+
+    @{
+        Layout = null;
+        ViewData["Title"] = "Member Login"; // Ο τίτλος της σελίδας
+
+        // ✅ Correct way to check if a user is logged in
+        var member = await MemberManager.GetCurrentMemberAsync(); // Επιστρέφει ένα αντικείμενο Member με το ID, UserName, Email etc του χρήστη.
+        var isMemberLoggedIn = member != null;
+        System.Diagnostics.Debug.WriteLine(member);
+    }
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+    @if (isMemberLoggedIn) //Εάν είναι ήδη συνδεδεμένος, επέστρεψε στην αρχική
+    {
+        <div class="alert alert-info">Έχετε ήδη συνδεθεί. <a href="/">Επιστροφή στην αρχική</a></div>
+    }
+    else
+    {
+        <div class="login-wrapper">
+            <div class="login-box">
+                <img src="~/media/kinsenLogo.png" alt="Kinsen Logo" class="login-logo" />
+                <h2 class="login-title">Είσοδος Συνεργάτη</h2>
+
+            <div class="loginForm">
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Κωδικός</label>
+                        <input type="password" id="password" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" id="rememberMe" class="form-check-input">
+                        <label class="form-check-label" for="exampleCheck1">&nbsp; Να με θυμάσαι</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Σύνδεση</button>
+                    <p id="loginMessage" class="mt-2"></p>
+                </div>
+            </div>
+        </div>
+    }
+
+@*-------------------------------------------------*@
+<script>
+    document.addEventListener("DOMContentLoaded", function () { //Βεβαιώνεται ότι το DOM φορτώθηκε πριν τρέξει ο κώδικας
+
+        const loginForm = document.querySelector(".loginForm");
+        const loginBtn = document.querySelector(".btn-primary");
+    
+        if (loginForm && loginBtn) {
+            loginBtn.addEventListener("click", async function (event) {
+                event.preventDefault(); // 👈 Χωρίς αυτό, η σελίδα θα έκανε refresh
+                /* Σε μια <form>, όταν πατήσεις submit (είτε με Enter είτε με submit button), ο browser στέλνει τα δεδομένα 
+                στον server και φορτώνει εκ νέου τη σελίδα – αυτό είναι η προεπιλεγμένη συμπεριφορά.
+                Με την event.preventDefault() Θέλουμε να χειριστούμε εμείς την αποστολή (π.χ. μέσω fetch() ή axios)
+                Θέλουμε single-page behavior (χωρίς ανανέωση)
+                Θέλουμε να κάνουμε έλεγχο εγκυρότητας (validation) πρώτα */
+                
+
+                const email = document.getElementById("email").value.trim();
+                const password = document.getElementById("password").value;
+                const rememberMe = document.getElementById("rememberMe").checked;
+                const loginMessage = document.getElementById("loginMessage");
+
+                try { // ------------Fetch προς API---------------
+                    /* Κάνει POST request στο custom API controller /umbraco/api/member/login
+                    Στέλνει JSON body με email & password */
+                    const response = await fetch("@Url.Content("~/umbraco/api/member/login")", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        loginMessage.style.color = "green";
+                        loginMessage.textContent = "Συνδεθήκατε επιτυχώς!";
+                        localStorage.setItem("loggedInEmail", email);
+                        localStorage.setItem("loggedInGroup", data.group);
+                        setTimeout(() => {
+                            window.location.href = "/home"; 
+                        }, 1000);
+                        localStorage.clear();
+                    } else {
+                        loginMessage.style.color = "red";
+                        loginMessage.textContent = data.message || "Λάθος στοιχεία.";
+                    }
+
+                } catch (error) {
+                    loginMessage.style.color = "red";
+                    loginMessage.textContent = "Σφάλμα κατά τη σύνδεση.";
+                    console.error("Login Error", error);
+                }
+            });
+        }
+        else {
+            console.log("Δεν πραγματοποιήθηκε το Login");
+        }
+    });
+</script>

@@ -1,0 +1,55 @@
+﻿@using Umbraco.Cms.Core.Models.Blocks;
+@using Umbraco.Cms.Core.Models; 
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var contactTitle = Model.Value<string>("contactTitle");
+  var contactImg = Model.Value<MediaWithCrops>("contactImg");
+}
+
+@if (contactImg != null)
+{
+	<div class="warranty-img-wrapper text-center my-3">
+    <img src="@contactImg.Url()" alt="Warranty Image" class="warranty-img img-fluid shadow" />
+  </div>
+}
+
+<div class="d-flex flex-column align-items-center">
+  <div class="contact-container">
+    <div class="contact-left">
+      <h2 class="contact-title">@contactTitle</h2>
+
+      <form id="contactForm" class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first-name">Όνομα</label>
+            <input type="text" id="first-name" placeholder="" />
+          </div>
+          <div class="form-group">
+            <label for="last-name">Επίθετο</label>
+            <input type="text" id="last-name" placeholder="" />
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="message">Μήνυμα</label>
+          <textarea id="message" rows="6" placeholder=""></textarea>
+        </div>
+
+        <button type="button" id="contactSubmit" class="submit-btn">Αποστολή</button>
+        <p id="contactStatus" class="mt-2 small"></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="~/js/contactPage.js"></script>
+
+
+

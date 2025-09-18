@@ -1,0 +1,431 @@
+body {
+  min-height: 100%; /* ✅ Αντικατάστησε το height με min-height */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* το κρατάμε αν θες να κόβει μόνο το οριζόντιο */
+  overflow-y: auto !important; /* ✅ Εξαναγκασμός scroll */
+}
+
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* ✅ όχι 95vh */
+}
+
+.main-content {
+  flex: 1;
+}
+
+.hero-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9; /* ή 21/9, 3/1 κ.λπ. */
+  overflow: hidden;
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-title {
+  color: white;
+  font-size: 4rem;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  padding: 0 1rem;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+}
+
+/* Stats Item */
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 6rem;
+  font-weight: bold;
+  color: #001858;
+}
+
+.stat-label {
+  margin-top: 10px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.stat-suffix {
+  font-size: 0.3em;
+  margin-left: 4px;
+  vertical-align: baseline;
+  position: relative;
+  top: 0.2em;
+  opacity: 0.8;
+}
+
+.stats-paragr {
+  max-width: 60%;
+  margin: 50px auto; /* auto για να μπει στο κέντρο */
+  color: #001858;
+  font-family: "Open Sans", sans-serif;
+  text-align: left;
+  font-size: 3rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/*--------Καρουζέλ---------*/
+.prosfores {
+  margin-top: 20px;
+  color: #001858;
+  font-size: 2.5rem;
+  /* text-shadow: 0 0 10px rgba(0, 0, 0, 0.7); */
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+}
+
+.d-flex.justify-content-center.mt-5 {
+  margin-bottom: 2rem;
+}
+
+.carousel-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9; /* ενιαίο κάδρο για όλα τα slides */
+  max-height: 580px; /* κόφτης για πολύ ψηλές οθόνες */
+  background: #fff; /* ή #f8f9fa */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+}
+
+:root {
+  --car-zoom: 1.7;
+} /* ↑ παίξε 1.05–1.25 */
+
+.carousel-media img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transform: scale(var(--car-zoom));
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+/* λίγο μικρότερο κάδρο σε κινητά */
+@media (max-width: 768px) {
+  .carousel-media {
+    aspect-ratio: 4 / 3;
+    max-height: 420px;
+  }
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 3rem !important;
+  height: 3rem;
+  background-size: 100% 100%;
+  filter: brightness(0) invert(0) !important;
+}
+
+/* Photo Trilogy */
+/* .hero-video {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+} */
+
+.gallery-bg {
+  background-color: #023859 !important;
+  width: 100%;
+  padding: 3rem 0;
+}
+
+.photo-trilogy-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.main-photo {
+  flex: 2;
+}
+
+.main-photo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.side-photos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.side-photos img {
+  width: 100%;
+  height: 40%;
+  flex: 1;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.gallery-bg {
+  background-color: #000;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* wrapper for text blocks under gallery */
+.trilogy-text-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.trilogy-text-block {
+  max-width: 500px;
+  flex: 1 1 300px;
+  color: #fff;
+  background-color: transparent;
+  padding: 1rem;
+  text-align: center;
+}
+
+.trilogy-text-block h3 {
+  font-size: 2.4rem !important;
+  /* font-weight: 600; */
+  font-family: "Open Sans", sans-serif;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.trilogy-text-block p {
+  font-size: 1.4rem !important;
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.6;
+  margin-top: 0;
+  text-align: left;
+  line-height: 2;
+  font-weight: light;
+}
+
+/* Feature Card */
+.featureTitle {
+  font-size: 30px;
+  margin-top: 70px;
+  color: #002e4d;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.features-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3rem;
+  margin: 3rem auto;
+  max-width: 1400px;
+  padding: 0 1rem;
+}
+
+.feature-card {
+  background-color: #ffffff;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  border: none !important; /* 1px solid #007c91; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  /* box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1); */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 1.5rem;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  color: #002e4d;
+  margin-bottom: 1rem;
+}
+
+.feature-description p {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  color: #002e4d;
+}
+
+.feature-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.feature-card-link:hover .feature-card {
+  box-shadow: 0 0 15px rgba(0, 100, 200, 0.2);
+  transform: scale(1.03);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* FourSteps */
+.steps-section {
+  background-color: #002e4d !important;
+  padding: 50px 20px;
+}
+
+.steps-title {
+  font-size: 1.8rem;
+  margin-bottom: 50px;
+  color: white;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+/*
+.step-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  color: white;
+  font-size: 1.3rem;
+  width: 50%;
+  margin: 0 auto;
+  padding: 5px;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+}
+
+.step-icon {
+  color: white !important;
+  font-size: 2rem;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-icon h4 {
+  margin-left: 30px;
+}
+
+.step-text-header {
+  margin-top: 5%;
+}
+
+.step-text-par {
+  font-size: 1.3rem;
+  margin-left: 40px !important;
+} */
+
+/* Accordion */
+.accordion-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 20px 20px;
+}
+
+.custom-accordion {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.custom-accordion .accordion-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+/* Επικεφαλίδα με βελάκι */
+.custom-accordion .accordion-button {
+  background-color: #ffffff;
+  color: #023859;
+  font-weight: 600;
+  padding: 16px;
+  font-size: 1.1rem;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.custom-accordion .accordion-button:hover {
+  background-color: #eef7fb;
+}
+
+/* Βελάκι */
+.custom-accordion .accordion-button::after {
+  content: "";
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23023859" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M1.646 5.646a.5.5 0 01.708 0L8 11.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z"/></svg>');
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+}
+
+/* Περιστροφή όταν είναι ανοιχτό */
+.custom-accordion .accordion-button:not(.collapsed)::after {
+  transform: rotate(180deg);
+}
+
+/* Περιεχόμενο */
+.custom-accordion .accordion-body {
+  padding: 20px;
+  font-size: 1rem;
+  color: #333;
+  background-color: #ffffff;
+  border-top: 1px solid #ddd;
+}

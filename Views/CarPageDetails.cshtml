@@ -1,0 +1,20 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = null; // δεν φορτώνουμε layout γιατί δε θα δείξουμε περιεχόμενο
+
+    // Έλεγχος αν είναι συνδεδεμένος
+    bool isLoggedIn = User?.Identity?.IsAuthenticated ?? false;
+
+    // Πάρε το query string (π.χ. ?id=123)
+    string query = Context.Request.QueryString.HasValue 
+        ? Context.Request.QueryString.Value 
+        : string.Empty;
+
+    // Φτιάξε το target URL
+    string targetUrl = isLoggedIn 
+        ? $"/carDetailsMember{query}" 
+        : $"/carDetailsVisitor{query}";
+
+    Context.Response.Redirect(targetUrl, permanent: false);
+    return; 
+}

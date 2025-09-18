@@ -1,0 +1,215 @@
+@* ta 2 using einai imports gia to Login*@
+@using System
+@using System.Linq
+@using Umbraco.Extensions
+@using System.Text.Json
+@inject Umbraco.Cms.Core.Security.IMemberManager MemberManager
+@inject Umbraco.Cms.Web.Common.UmbracoHelper UmbracoHelper
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+
+@{
+    var selection = UmbracoHelper.ContentAtRoot()
+        .FirstOrDefault()
+        .Children()
+        .Where(x => x.IsVisible());
+
+    var currentMember = await MemberManager.GetCurrentMemberAsync();
+    var isLoggedIn = Context.User.GetMemberIdentity()?.IsAuthenticated ?? false;
+
+    // ✅ ΠΑΡΕ τους ρόλους από το MemberManager (όχι IsInRole)
+    var roles = currentMember != null ? await MemberManager.GetRolesAsync(currentMember) : Enumerable.Empty<string>();
+    var isCustomer = isLoggedIn && roles.Any(r => r.Equals("Customers", StringComparison.OrdinalIgnoreCase));
+
+    var memberName = currentMember?.Name;
+    var displayName = isLoggedIn ? memberName?.Split(" ").FirstOrDefault() : "Σύνδεση";
+
+    // Αν το node υπάρχει, πάρε το URL του • αλλιώς fallback
+    var shoppingCartNode = selection.FirstOrDefault(x => x.Name() == "shoppingcartcontent");
+    var shoppingCartUrl  = shoppingCartNode?.Url() ?? "/shoppingcartcontent"; 
+
+    // URLs για logout
+    var logoutUrl = Url.Content("~/umbraco/api/member/logout");
+    var redirectAfterLogout = Url.Content("~/login"); // γύρνα στη σελίδα login μετά το logout
+
+    // JSON-safe strings για JS
+    var logoutUrlJson = JsonSerializer.Serialize(logoutUrl);
+    var redirectAfterLogoutJson = JsonSerializer.Serialize(redirectAfterLogout);
+  }
+}
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light w-100 fixed-top">
+  <div class="container-fluid">
+    <a href="/">
+      <img src="~/media/kinsenLogo.png" alt="Kinsen Hellas Logo" class="navbar-logo" />
+    </a>
+    <button
+      type="button"
+      class="navbar-toggler"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarCollapse"
+      aria-controls="navbarCollapse"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent"))
+        {
+            <li class="nav-item mx-4">
+                <a class="nav-link" href="@item.Url()">@item.Name()</a>
+            </li>
+        }
+      </ul>
+
+      <ul class="navbar-nav ms-auto d-flex align-items-center">
+        @if (isLoggedIn && isCustomer)
+        {
+            <li class="nav-item me-3">
+                <button id="offerCartBtn"
+                        class="btn btn-outline-secondary position-relative"
+                        type="button"
+                        title="Καλάθι προσφοράς">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="offerCartCount"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                </button>
+            </li>
+
+            <li class="nav-item">
+                <div class="dropdown">
+                    <button id="nav-login-btn" class="btn dropdown-toggle" style="background-color:#023859 !important; border:none !important; min-width:140px; color:#fff !important;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-user"></i>&nbsp;@displayName
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">Αποσύνδεση</a></li>
+                    </ul>
+                </div>
+            </li>
+        }
+        else
+        {
+          <li class="nav-item">
+              <a href="/login" class="btn btn-secondary"id="nav-login-btn">
+                  <i class="fa-solid fa-user"></i>&nbsp;Σύνδεση
+              </a>
+          </li>
+        }
+      </ul>
+      
+    </div>
+  </div>
+</nav>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('offerCartBtn');
+    if (btn) btn.addEventListener('click', () => {
+      window.location.href = '@shoppingCartUrl';
+    });
+  });
+
+
+  (function () {
+    const SELECTORS = ['#offerCartCount'];
+    function findBadges() { return SELECTORS.flatMap(s => [...document.querySelectorAll(s)]); }
+    function setBadge(n){ findBadges().forEach(el => el && (el.textContent = String(n))); }
+
+    async function fetchCount() {
+        try {
+        const r = await fetch("/umbraco/api/cart/count", { cache: "no-store", credentials: "same-origin" });
+        if (!r.ok) return 0;
+        const { count } = await r.json();
+        return Number.isFinite(count) ? count : 0;
+        } catch { return 0; }
+    }
+
+    function whenBadgeReady(cb){
+        if (findBadges().length) return cb();
+        const obs = new MutationObserver(() => {
+        if (findBadges().length){ obs.disconnect(); cb(); }
+        });
+        obs.observe(document.documentElement, { childList:true, subtree:true });
+    }
+
+    async function syncBadge(){ setBadge(await fetchCount()); }
+
+    // διαθέσιμο global
+    window.updateCartBadgeFromServer = () => whenBadgeReady(syncBadge);
+
+    // load + back/forward (BFCache)
+    document.addEventListener("DOMContentLoaded", () => whenBadgeReady(syncBadge));
+    window.addEventListener("pageshow", () => whenBadgeReady(syncBadge));
+
+    // live update μετά από add/remove
+    window.addEventListener("cart:updated", ev => {
+        const c = ev.detail?.count;
+        if (typeof c === "number") setBadge(c); else whenBadgeReady(syncBadge);
+    });
+  })();
+
+    // 2) Logout handler (μένει ίδιο σε λειτουργία)
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try {
+            const response = await fetch(@Html.Raw(logoutUrlJson), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+              window.location.href = @Html.Raw(redirectAfterLogoutJson);
+            } else {
+              console.error("❌ Αποτυχία Αποσύνδεσης");
+            }
+          } catch (error) {
+            console.error("⚠️ Logout error:", error);
+          }
+        });
+      }
+    });
+</script>
+
+
+
+@* <div class="navbar-bg">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light w-100">
+
+            <!-- Logo + Links -->
+            <div class="d-flex align-items-center mx-4 me-auto">
+                <a href="/">
+                    <img src="~/media/kinsenLogo.png" alt="Kinsen Hellas Logo" class="navbar-logo" />
+                </a>
+
+                <ul class="navbar-nav d-flex flex-row mb-0">
+                    @foreach (var item in selection.Where(x => x.Name() != "Login"))
+                    {
+                        <li class="nav-item mx-4">
+                            <a href="@item.Url()" class="nav-link">@item.Name()</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <!-- LOGIN BUTTON (pushed right) -->
+            <a href="/login/" class="nav-login-btn ms-auto">
+                <i class="fa-solid fa-user"></i>&nbsp;
+                @displayName
+            </a>
+
+        </nav>
+    </div>
+</div> *@
+
+
+
+

@@ -1,0 +1,15 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "FeatureCard.BlockPreview",
+  "version": "0.0.2",
+  "extensions": [
+    {
+      "type": "blockEditorCustomView",
+      "alias": "Title.BlockPreview.FeatureCard",
+      "name": "Title Block Preview (FeatureCard)",
+      "element": "/App_Plugins/FeatureCardPreview/feature-card-preview.js",
+      "elementName": "feature-card-preview",
+      "forContentTypeAlias": "featureCard"
+    }
+  ]
+}

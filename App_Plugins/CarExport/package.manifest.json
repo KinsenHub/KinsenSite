@@ -1,0 +1,20 @@
+{
+  "name": "CarExport",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "CarExportDashboard",
+      "name": "Export Αυτοκινήτων",
+      "element": "car-export-dashboard",
+      "weight": 10,
+      "meta": {
+        "label": "Export Cars",
+        "pathname": "car-export"
+      },
+      "conditions": {
+        "sections": ["content"],
+        "documentTypes": ["usedCarSalesPage"]
+      }
+    }
+  ]
+}

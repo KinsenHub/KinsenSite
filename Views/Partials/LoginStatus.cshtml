@@ -1,0 +1,90 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+
+@using Microsoft.AspNetCore.Http.Extensions
+@using Umbraco.Cms.Web.Common.Models
+@using Umbraco.Cms.Web.Website.Controllers
+@using Umbraco.Extensions
+@using System.Text.Json
+
+@{
+    // Κατάσταση χρήστη
+    var isLoggedIn   = Context.User.GetMemberIdentity()?.IsAuthenticated ?? false;
+    var isCustomer   = Context.User?.IsInRole("Customers") ?? false;
+
+    // ΔΙΚΟ ΣΟΥ: παραμένει για τυχόν χρήση
+    var logoutModel  = new PostRedirectModel { RedirectUrl = null };
+
+    // Μηνύματα υποδοχής
+    var welcomeName    = Context.User?.GetMemberIdentity()?.Name;
+    var justRegistered = Context.Request.Cookies["JustRegistered"];
+
+    // URLs για logout (μένει όπως το θες)
+    var logoutUrl = Url.Content("~/umbraco/api/member/logout");
+    var redirectAfterLogout = "/"; // μετά το logout γύρνα στην αρχική (βάλε "/login" αν το θες)
+
+    // JSON-safe για ασφαλή ένθεση σε <script>
+    var logoutUrlJson            = JsonSerializer.Serialize(logoutUrl);
+    var redirectAfterLogoutJson  = JsonSerializer.Serialize(redirectAfterLogout);
+}
+
+<div class="login-status-wrapper">
+    <div class="login-status">
+        @if (isLoggedIn)
+        {
+            if (!string.IsNullOrEmpty(justRegistered))
+            {
+                <p>Καλώς ήρθες <strong>@welcomeName</strong>!</p>
+                Context.Response.Cookies.Delete("JustRegistered");
+            }
+            else
+            {
+                <p>Welcome to KINSEN HELLAS <strong>@welcomeName</strong>!</p>
+                Context.Response.Cookies.Delete("JustRegistered"); 
+            }
+
+            <button type="button" id="logoutBtn" class="btn btn-danger logoutBtn">Αποσύνδεση</button>
+        }
+        else
+        {
+          <a href="/login" class="btn btn-primary">Σύνδεση</a>
+        }
+    </div>
+</div>
+
+<!-- Flag για εμφάνιση του Members Area στο navbar (δεν φαίνεται στο UI) -->
+<span id="memberAreaFlag" data-allow="@( (isLoggedIn && isCustomer) ? 1 : 0 )" style="display:none;"></span>
+
+<script>
+  (function () {
+    document.addEventListener('DOMContentLoaded', function () {
+      // 1) Αν ο χρήστης είναι logged-in ΚΑΙ Customers, δείξε το κρυφό link στο navbar
+      var flag = document.getElementById('memberAreaFlag');
+      if (flag && flag.getAttribute('data-allow') === '1') {
+        var el = document.getElementById('navMembersArea');
+        if (el) el.style.display = '';
+      }
+
+      // 2) Logout handler (μένει ίδιο σε λειτουργία)
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function (event) {
+          event.preventDefault();
+          try {
+            const response = await fetch(@Html.Raw(logoutUrlJson), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+              window.location.href = @Html.Raw(redirectAfterLogoutJson);
+            } else {
+              console.error('Αποτυχία Αποσύνδεσης');
+            }
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
+        });
+      }
+    });
+  })();
+
+</script>

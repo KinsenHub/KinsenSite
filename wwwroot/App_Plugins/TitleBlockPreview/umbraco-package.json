@@ -1,0 +1,31 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "Title.BlockPreview",
+  "version": "0.0.2",
+  "extensions": [
+    {
+      "type": "blockEditorCustomView",
+      "alias": "Title.BlockPreview.Warranty",
+      "name": "Title Block Preview (Warranty)",
+      "element": "/App_Plugins/TitleBlockPreview/title-block-preview.js",
+      "elementName": "title-block-preview",
+      "forContentTypeAlias": "warrantyCards"
+    },
+    {
+      "type": "blockEditorCustomView",
+      "alias": "Title.BlockPreview.OtherBlock",
+      "name": "Title Block Preview (Other Block)",
+      "element": "/App_Plugins/TitleBlockPreview/title-block-preview.js",
+      "elementName": "title-block-preview",
+      "forContentTypeAlias": "financeCards"
+    },
+    {
+      "type": "blockEditorCustomView",
+      "alias": "Title.BlockPreview.Accordion",
+      "name": "Title Block Preview (Accordion Item)",
+      "element": "/App_Plugins/TitleBlockPreview/title-block-preview.js",
+      "elementName": "title-block-preview",
+      "forContentTypeAlias": "accordionItem"
+    }
+  ]
+}

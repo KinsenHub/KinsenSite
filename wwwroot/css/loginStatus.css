@@ -1,0 +1,16 @@
+.login-status-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh; /* ή 100vh αν δεν έχεις άλλο περιεχόμενο */
+  text-align: center;
+}
+
+.login-status {
+  font-size: 2rem; /* μεγαλύτερο κείμενο */
+}
+
+.login-status p {
+  font-weight: 500;
+  margin-bottom: 20px;
+}

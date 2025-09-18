@@ -1,0 +1,248 @@
+#carDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 1.5rem;
+  /* background-color: purple; */
+  margin: 0 auto;
+}
+
+.custom-carousel {
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.custom-carousel .carousel-item img {
+  width: 100%;
+  height: auto;
+  max-height: 800px !important;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/*----------Τιμή με Προσφορά-----------*/
+.offer-box {
+  background-color: #f5f9fc;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.price-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.price-section .car-title {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
+
+.price-section .price-line {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.price-section .price-value {
+  font-weight: 700;
+  margin: 0 0.25rem;
+  font-size: 1.4rem;
+}
+
+.price-section .vat-label {
+  color: #333;
+}
+
+.upologismos_label {
+  align-content: flex-start;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+/*------DropDown Κουμπί Δόσεων-----*/
+.btn-group {
+  width: 100%;
+}
+
+.custom-dropdown-button {
+  width: 100% !important;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background-color: #fff;
+  border: 2px solid #035171;
+  color: #035171;
+  border-radius: 0.6rem;
+  text-align: left;
+  font-weight: 500;
+}
+
+.custom-dropdown-button:hover,
+.custom-dropdown-button:focus {
+  background-color: #f5f5f5;
+  border-color: #333;
+  color: #000;
+}
+
+#installmentValue {
+  font-weight: bold;
+  color: #111;
+  font-size: 1.1rem;
+}
+
+/*-----------Κουμπί 'Προσθήκη στο καλάθι'--------- */
+.offer-button-container {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.addToCartBtn {
+  width: 100%;
+  background-color: #007c91 !important;
+  color: white;
+  padding: 1rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 1rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.addToCartBtn:hover {
+  background-color: #004c74;
+  cursor: pointer;
+}
+
+/*-----------Κουμπί 'Θέλω Προσφορά'--------- */
+.offer-button-container {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.requestOfferBtn {
+  width: 100%;
+  background-color: #007c91 !important;
+  color: white;
+  padding: 1rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 1rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.requestOfferBtn:hover {
+  background-color: #004c74;
+  cursor: pointer;
+}
+
+/*----------Στοιχεία Αυτοκινήτου---------- */
+
+.car-specs-section {
+  background: #fff;
+  border-radius: 1.5rem;
+  padding: 1rem;
+  margin: 2rem auto;
+  width: 100%;
+  max-width: 1200px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.car-specs-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 στήλες */
+  gap: 1.5rem; /* Περισσότερα κενά */
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  /* padding-top: 1rem; */
+}
+
+.specs-grid > div {
+  background-color: #f5f5f5; /* Απαλό γκρι */
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+}
+
+.specs-item strong {
+  margin-right: 0.5rem;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .specs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*--------ΦΟΡΜΑ 'Θέλω Προσφορά'--------- */
+.custom-offer-modal {
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+}
+
+.modal-content {
+  padding: 1.5rem;
+  background-color: #fff;
+}
+
+.modal-header {
+  border-bottom: none;
+}
+
+.modal-title {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+}
+
+.btn-primary {
+  background-color: #007c91 !important;
+  border-color: #007c91 !important;
+}
+
+#offerForm .form-control {
+  border-radius: 6px;
+  padding: 0.6rem;
+  font-size: 0.95rem;
+}
+
+#offerForm button[type="submit"] {
+  padding: 0.6rem;
+  font-weight: bold;
+}

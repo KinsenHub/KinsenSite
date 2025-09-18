@@ -1,0 +1,96 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage //Χωρίς αυτό, δεν θα μπορείς να χρησιμοποιήσεις Razor syntax με πρόσβαση στα Umbraco δεδομένα.
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="utf-8" />
+    <title>@(ViewData["Title"] as string ?? (Model?.Name + " | kinsen.gr") ?? "Kinsen")</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> <!--Κάνει το site responsive, δηλαδή να φαίνεται καλά σε κινητά κλπ -->
+    <link rel="stylesheet" href="~/css/main.css" />
+    <link rel="stylesheet" href="~/css/navbar.css" />
+    <link rel="stylesheet" href="~/css/footer.css" />
+    <link rel="stylesheet" href="~/css/usedCarSales.css" />
+    <link rel="stylesheet" href="~/css/warranty_Finance.css" />
+    <link rel="stylesheet" href="~/css/contact.css" />
+    <link rel="stylesheet" href="~/css/login.css" />
+    <link rel="stylesheet" href="~/css/loginStatus.css" />
+    <link rel="stylesheet" href="~/css/carDetailsMember.css" />
+    <link rel="stylesheet" href="~/css/carDetailsVisitor.css" />
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    @RenderSection("head", required: false)
+    
+
+</head>
+<body class="@ViewBag.BodyClass">
+    
+    @await Html.PartialAsync("~/Views/Navbar.cshtml")
+    <div class="layout-wrapper ">
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    
+
+        @await Html.PartialAsync("~/Views/Footer.cshtml")
+        @* Αν το πεδίο είναι Rich Text Editor, επιστρέφει αντικείμενο τύπου HtmlEncodedString, για λόγους ασφαλείας.
+        Ωστόσο, όταν το περνάς ως model σε partial, η Razor ViewDataDictionary θέλει ακριβώς τον τύπο string *@
+    </div>
+
+    @RenderSection("scripts", required: false)
+
+    @section scripts {
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    }
+    <script src="~/js/countUpStats.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>AOS.init();</script> @*Animate On Scroll*@
+
+   <script>
+    (function () {
+    const SELECTORS = ['#offerCartCount'];
+    function findBadges() { return SELECTORS.flatMap(s => [...document.querySelectorAll(s)]); }
+    function setBadge(n){ findBadges().forEach(el => el && (el.textContent = String(n))); }
+
+    async function fetchCount() {
+        try {
+        const r = await fetch("/umbraco/api/cart/count", { cache: "no-store", credentials: "same-origin" });
+        if (!r.ok) return 0;
+        const { count } = await r.json();
+        return Number.isFinite(count) ? count : 0;
+        } catch { return 0; }
+    }
+
+    function whenBadgeReady(cb){
+        if (findBadges().length) return cb();
+        const obs = new MutationObserver(() => {
+        if (findBadges().length){ obs.disconnect(); cb(); }
+        });
+        obs.observe(document.documentElement, { childList:true, subtree:true });
+    }
+
+    async function syncBadge(){ setBadge(await fetchCount()); }
+
+    // διαθέσιμο global
+    window.updateCartBadgeFromServer = () => whenBadgeReady(syncBadge);
+
+    // load + back/forward (BFCache)
+    document.addEventListener("DOMContentLoaded", () => whenBadgeReady(syncBadge));
+    window.addEventListener("pageshow", () => whenBadgeReady(syncBadge));
+
+    // live update μετά από add/remove
+    window.addEventListener("cart:updated", ev => {
+        const c = ev.detail?.count;
+        if (typeof c === "number") setBadge(c); else whenBadgeReady(syncBadge);
+    });
+    })();
+    </script>
+
+
+</body>
+</html>

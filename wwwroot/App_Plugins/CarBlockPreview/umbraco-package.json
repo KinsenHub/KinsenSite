@@ -1,0 +1,14 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "name": "Car.BlockPreview",
+  "version": "0.0.1",
+  "extensions": [
+    {
+      "type": "blockEditorCustomView",
+      "alias": "Car.BlockPreview",
+      "name": "Car Block Preview",
+      "element": "/App_Plugins/CarBlockPreview/car-block-preview.js",
+      "forContentTypeAlias": "carCard"
+    }
+  ]
+}

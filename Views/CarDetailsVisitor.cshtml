@@ -1,0 +1,194 @@
+﻿@using Umbraco.Cms.Core.Models.Blocks;
+@using Umbraco.Cms.Core.Models; 
+@using Umbraco.Cms.Web.Common.PublishedModels
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var url = Context.Request.Path.Value; 
+    var segments = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
+    var carID = Context.Request.Query["id"].ToString();
+	var carCarouselBlock = Model.Value<IEnumerable<BlockListItem>>("carCarouselImg");
+	var kinsenLogo = Model.Value<MediaWithCrops>("kinsenLogo");
+
+	// Κατάσταση χρήστη
+    var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
+}
+
+<div id="carDetailsContainer">
+	<script>
+		const carID = sessionStorage.getItem("selectedCarId");
+
+		console.log("carID from Razor:", carID); 
+
+		if (carID) {
+		fetch("/umbraco/api/carapivisitor/getcarbyid", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ id: carID })
+		})
+			.then((response) => {
+				if (!response.ok) throw new Error("Not found");
+				return response.json();
+			})
+			
+			.then(data => {
+				console.log("API RESPONSE:", data);
+				document.getElementById('carDetailsContainer').innerHTML = `	
+					<div class="w-100 mt-5 d-flex justify-content-center">
+						<div id="carouselExampleDark" class="carousel carousel-dark slide shadow-lg custom-carousel"
+							data-bs-ride="carousel">
+							
+							<div class="carousel-indicators">
+								<button type="button"
+										data-bs-target="#carouselExampleDark"
+										data-bs-slide-to="0"
+										class="active"
+										aria-current="true"
+										aria-label="Slide 1"></button>
+							</div>
+
+							<div class="carousel-inner">
+								<div class="carousel-item active">
+									<img src="${data.imageUrl}" class="d-block w-100" style="object-fit: cover;" alt="Car Image" />
+								</div>
+							</div>
+
+							<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Previous</span>
+							</button>
+							<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+								<span class="carousel-control-next-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Next</span>
+							</button>
+						</div>
+					</div>
+
+					<div class="offer-box">
+						<div class="price-section">
+						<span class="car-title">${data.maker} ${data.model}<br></span>
+							<span class="price-label">Τιμή αγοράς:</span>
+							<span class="price-value">${data.price} €</span>
+							<span class="vat-label">με τον ΦΠΑ</span>
+						</div>
+						<div class="upologismos_label">Υπολογισμός σε Δόσεις:</div>
+							<div class="btn-group">
+								<button class="custom-dropdown-button dropdown-toggle"
+									type="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									data-plan="efapaks">
+									Εφάπαξ χωρίς Τόκους
+								</button>
+								<ul class="dropdown-menu">
+									<li><button class="dropdown-item" type="button" value="efapaks">Εφάπαξ χωρίς Τόκους</button></li>
+									<li><button class="dropdown-item" type="button" value="6">6 Μήνες</button></li>
+									<li><button class="dropdown-item" type="button" value="12">12 Μήνες</button></li>
+									<li><button class="dropdown-item" type="button" value="24">24 Μήνες</button></li>
+									<li><button class="dropdown-item" type="button" value="36">36 Μήνες</button></li>
+									<li><button class="dropdown-item" type="button" value="48">48 Μήνες</button></li>
+								</ul>
+							</div>
+							<div class="installment-result">
+								Μηνιαία Δόση: <span id="installmentValue">-</span>
+							</div>
+							<div class="offer-button-container">
+								@if (isLoggedIn)
+								{
+									@:<button class="addToCartBtn"> Προσθήκη στο Καλάθι </button>
+								}
+								else
+								{
+									@:<button class="requestOfferBtn" data-bs-toggle="modal" data-bs-target="#offerModal">Θέλω Προσφορά</button>
+								}
+							</div>
+							
+						</div>
+					
+					<section class="car-specs-section">
+						<h2>Στοιχεία αυτοκινήτου</h2>
+						<div class="specs-grid">
+							<div><strong>Μάρκα:&nbsp;</strong> ${data.maker}</div>
+							<div><strong>Μοντέλο:&nbsp;</strong> ${data.model}</div>
+							<div><strong>Κατηγορία:&nbsp;</strong> ${data.typeOfCar}</div>
+							<div><strong>Χρώμα:&nbsp;</strong> ${data.color}</div>
+							<div><strong>Καύσιμο:&nbsp;</strong> ${data.fuel}</div>
+							<div><strong>Κιβώτιο:&nbsp;</strong> ${data.transmission}</div>
+							<div><strong>Χιλιόμετρα:&nbsp;</strong> ${data.km} km</div>
+							<div><strong>Ιπποδύναμη:&nbsp;</strong> ${data.hp} hp</div>
+							<div><strong>Κυβικά:&nbsp;</strong> ${data.cc} cc</div>
+							<div><strong>Μέση Κατανάλωση:&nbsp;</strong> ${data.consumption} l/100km</div>
+						</div>
+					</section>
+
+				<!-- Modal -->
+				<div class="modal fade" id="offerModal" tabindex="-1" aria-labelledby="offerModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+
+						<div class="modal-header">
+							<h5 class="modal-title" id="offerModalLabel">Επιβεβαίωση Αιτήματος</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Κλείσιμο"></button>
+						</div>
+
+						<div class="modal-body">
+							<form id="offerForm" onsubmit="return false;">
+							<input type="hidden" id="efapaks" value="efapaks" />
+							<input type="hidden" id="toko" value="toko" />
+							<div class="mb-3">
+								<label for="firstName" class="form-label">Όνομα</label>
+								<input type="text" class="form-control" id="firstName" required>
+							</div>
+							<div class="mb-3">
+								<label for="lastName" class="form-label">Επώνυμο</label>
+								<input type="text" class="form-control" id="lastName" required>
+							</div>
+							<div class="mb-3">
+								<label for="email" class="form-label">Email</label>
+								<input type="email" class="form-control" id="email" required autocomplete="email">
+								<div class="invalid-feedback">Δώστε έγκυρο email.</div>
+							</div>
+							<div class="mb-3">
+								<label for="phone" class="form-label">Κινητό</label>
+								<input
+									type="tel"
+									class="form-control"
+									id="phone"
+									required
+									pattern="^(?:\+?30|0030)?[-\s]*69(?:[-\s]*\d){8}$"
+									inputmode="tel"
+									autocomplete="tel"
+								>
+								<div class="invalid-feedback">Κινητό μορφής 69XXXXXXXX.</div>
+							</div>
+							<div id="offerStatus" class="small mt-2" style="display:none;"></div>
+							</form>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+							<button id="offerSubmitBtnVisitor" type="button" class="btn btn-primary">Υποβολή</button>
+						</div>
+
+						</div>
+					</div>
+				</div>
+				`; 
+				@* sessionStorage.removeItem("selectedCarId"); *@
+			})
+			.catch(error => {
+				console.error("API ERROR:", error); 
+			});
+		} else {
+			console.log("carID is missing or empty:", carID);
+		}
+	</script>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/carDetailsVisitor.js"></script>
+    
+</div>

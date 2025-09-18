@@ -1,0 +1,15 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<YourNamespace.Models.CarCard>
+@{
+    var imageUrl = Model.CarPic?.Url();
+    var model = Model.Model;
+    var year = Model.YearRelease;
+    var price = Model.Price;
+}
+
+<div style="display:flex; align-items:center; gap:10px; padding:5px;">
+    @if (!string.IsNullOrEmpty(imageUrl))
+    {
+        <img src="@imageUrl" style="height:40px; width:auto;" />
+    }
+    <span><strong>@model (@year)</strong> - @price €</span>
+</div>

@@ -1,0 +1,41 @@
+﻿@using Umbraco.Cms.Core.Models.Blocks;
+@using Umbraco.Cms.Core.Models;
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using Microsoft.AspNetCore.Http
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var financeImg = Model.Value<MediaWithCrops>("financeImg");
+	var FinancingTitle = Model.Value<string>("FinancingTitle");
+	IEnumerable<BlockListItem> blockList = Model.Value<IEnumerable<BlockListItem>>("financeCard");
+}
+
+
+@if (financeImg != null)
+{
+	<div class="warranty-img-wrapper text-center my-5">
+        <img src="@financeImg.Url()" alt="Warranty Image" class="warranty-img img-fluid shadow" />
+
+        <h1 class="warranty-title mt-4">@FinancingTitle</h1>
+        <h5 class="warranty-subtitle text-muted">Με σταθερό επιτόκιο 7% και αποπληρωμή έως 48 μήνες</h5>
+    </div>
+}
+
+
+
+<section class="loan-info-grid">
+    @foreach (var item in blockList ?? Enumerable.Empty<BlockListItem>())
+    {
+        var content = item?.Content;
+        if (content == null) continue;
+
+        var titleCard = content.Value<string>("titleCard");
+        var cardBody = content.Value<string>("cardBody");
+
+        <div class="loan-card">
+            <h2>@(string.IsNullOrWhiteSpace(titleCard) ? "Χωρίς τίτλο" : titleCard)</h2>
+            <hr>
+            <p>@Html.Raw(string.IsNullOrWhiteSpace(cardBody) ? "—" : cardBody)</p>
+        </div>
+    }
+</section>
