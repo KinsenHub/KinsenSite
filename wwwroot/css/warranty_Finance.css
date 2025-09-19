@@ -17,13 +17,13 @@
   font-size: 2.5rem;
   /* font-weight: bold; */
   font-family: "Open Sans", sans-serif;
-  color: #023859; /* ή ό,τι άλλο θέλεις */
+  color: #39c0c3 !important;
 }
 
 .warranty-subtitle {
   margin-top: 10px;
   font-size: 1.1rem;
-  color: #666; /* απαλό γκρι για διακριτικό ύφος */
+  color: #001858 !important;
 }
 
 .loan-info-grid {
@@ -60,14 +60,17 @@
 
 .loan-card h2 {
   font-size: 20px;
-  color: #032e48;
+  color: #39c0c3;
+  font-weight: bold;
   margin-bottom: 15px;
 }
-
-.loan-card p {
+/*  
+.loan-card ul,
+.loan-card li {
   font-size: 15px;
   line-height: 1.7;
-}
+  color: #001858;
+}*/
 
 @media (max-width: 768px) {
   .loan-card {

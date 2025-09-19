@@ -21,6 +21,7 @@
     var redirectUrl = "/πωλήσεις-μεταχειρισμένων/"; 
 	@* var fourStepsBlock = Model.Value<IEnumerable<BlockListItem>>("fourSteps"); *@
 	var accordionQuestionsBlock = Model.Value<IEnumerable<BlockListItem>>("accordionQuestions");
+    var carouselBackImage = Model.Value<MediaWithCrops>("carouselBackImage");
     var index = 0;
 }
 
@@ -74,7 +75,7 @@
 @*---------------Feature Cards---------------*@
 @if (featureCardsBlock != null && featureCardsBlock.Any())
 {
-    <h2 class="featureTitle">Επιλέξτε ανάμεσα σε ποικιλία κατηγοριών</h2>
+    @* <h2 class="featureTitle">Επιλέξτε ανάμεσα σε ποικιλία κατηγοριών</h2> *@
 
     <div class="features-container">
         @foreach (var card in featureCardsBlock)
@@ -100,31 +101,21 @@
 
 @*------------------Carousel-------------------*@
 <h2 class="prosfores" style="color:#39c0c3; font-weight:bold">Ανακαλύψτε τις Προσφορές σε ποικιλία μοντέλων</h2>
-<div class="d-flex justify-content-center mt-5 container-xl">
-    <div id="carouselExampleDark" class="carousel carousel-dark slide shadow-lg"
-         data-bs-ride="carousel"
-         style="max-width: 1800px; height:auto; width: 100%; border-radius: 1.5rem; overflow: hidden;">
-         
-        @if (carCardBlock != null && carCardBlock.Any())
-        {
-            <div class="carousel-indicators">
-                @for (var i = 0; i < carCardBlock.Count(); i++)
-                {
-                    <button type="button"
-                            data-bs-target="#carouselExampleDark"
-                            data-bs-slide-to="@i"
-                            class="@(i == 0 ? "active" : "")"
-                            aria-current="@(i == 0 ? "true" : "false")"
-                            aria-label="Slide @(i + 1)">
-                    </button>
-                }
-            </div>
 
-            <div class="carousel-inner">
+
+@if (carCardBlock != null && carCardBlock.Any())
+{
+    <div class="hero-carousel">
+        <div class="hero-bg">
+            <img src="@carouselBackImage.Url()" alt="Background" />
+        </div>
+
+        <div class="carousel-container">
+            <div class="carousel">
                 @foreach (var card in carCardBlock)
                 {
                     var content = card?.Content;
-                    if (content == null) { continue; } // skip αν είναι null
+                    if (content == null) { continue; }
 
                     var carPic = content.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("carPic");
                     var modelo = content.Value<string>("model");
@@ -133,44 +124,28 @@
                     var price = content.Value<string>("price");
                     var km = content.Value<string>("km");
 
-                    <div class="carousel-item @(index == 0 ? "active" : "")"
-                        data-bs-interval="5000"
-                        data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
-
+                    <div class="car-card" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
                         @if (!string.IsNullOrWhiteSpace(typeOfDiscount))
                         {
                             <span class="discount-badge">@typeOfDiscount</span>
                         }
 
-                        <div class="carousel-media">
-                            <img src="@carPic?.Url()" alt="@modelo" loading="lazy">
+                        <div class="car-img">
+                            <img src="@carPic?.Url()" alt="@modelo" loading="lazy" />
                         </div>
 
-                        <div class="p-4 text-center bg-light rounded-bottom shadow-sm">
-                            <h5>@(string.IsNullOrWhiteSpace(modelo) ? "Χωρίς Μοντέλο" : modelo)</h5>
+                        <div class="car-info">
+                            <h3>@(string.IsNullOrWhiteSpace(modelo) ? "Χωρίς Μοντέλο" : modelo)</h3>
                             <p>@(string.IsNullOrWhiteSpace(yearRelease) ? "—" : yearRelease) – @(string.IsNullOrWhiteSpace(km) ? "—" : km) km</p>
-                            <p class="fw-bold">@(string.IsNullOrWhiteSpace(price) ? "—" : price + " €")</p>
+                            <p class="price">@(string.IsNullOrWhiteSpace(price) ? "—" : price + " €")</p>
+                            <button class="btn-offer">Δείτε το</button>
                         </div>
                     </div>
-                    index++;
                 }
             </div>
-        }
-        else
-        {
-            <p class="text-muted">Δεν υπάρχουν διαθέσιμες κάρτες.</p>
-        }
-
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+        </div>
     </div>
-</div>
+}
 
 @*----------------Photo Trilogy------------------*@
 <section class="gallery-bg">
@@ -216,7 +191,7 @@
                 var description = content.Value<string>("cardBody");
 
                 <div class="trilogy-text-block">
-                    <h3>@title</h3>
+                    <h3><b>@title</b></h3>
                     <p>@Html.Raw(description)</p>
                 </div>
             }

@@ -1,0 +1,22 @@
+.faq-image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.faq-image {
+  margin-top: 50px;
+  border-radius: 12px;
+  max-width: 100%;
+  height: 70vh !important;
+  object-fit: cover;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.faq-title {
+  color: #001858;
+  font-weight: 400;
+  font-family: "Open Sans", sans-serif;
+  margin: 30px;
+}

@@ -59,12 +59,20 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent"))
+        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq"))
         {
-            <li class="nav-item mx-4">
-                <a class="nav-link" href="@item.Url()">@item.Name()</a>
-            </li>
+          <li class="nav-item mx-4">
+              <a class="nav-link" href="@item.Url()">@item.Name()</a>
+          </li>
         }
+          <li class="nav-item dropdown mx-4">
+              <span class="nav-link dropdown-toggle" id="companyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Η Εταιρεία μας
+              </span>
+              <ul class="dropdown-menu" aria-labelledby="companyDropdown">
+                  <li><a class="dropdown-item" href="/faq">FAQ</a></li>
+              </ul>
+          </li>
       </ul>
 
       <ul class="navbar-nav ms-auto d-flex align-items-center">

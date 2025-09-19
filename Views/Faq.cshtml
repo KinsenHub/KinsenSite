@@ -1,0 +1,36 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var faqImage = Model.Value<MediaWithCrops>("faqImage");
+	var title = Model.Value<string>("title");
+	IEnumerable<BlockListItem> accordion = Model.Value<IEnumerable<BlockListItem>>("accordionQuestions");
+}
+
+@if (faqImage != null)
+{
+	<div class="faq-image-wrapper">
+        <img src="@faqImage.Url()" class="faq-image img-fluid shadow" />
+
+        <h1 class="faq-title">@title</h1>
+    </div>
+}
+
+<section class="loan-info-grid">
+    @foreach (var item in accordion ?? Enumerable.Empty<BlockListItem>())
+    {
+        var content = item?.Content;
+        if (content == null) continue;
+
+        var accordionTitle = content.Value<string>("accordionTitle");
+        var accordionContent = content.Value<string>("accordionContent");
+
+        <div class="loan-card">
+            <h2>@(string.IsNullOrWhiteSpace(accordionTitle) ? "Χωρίς τίτλο" : accordionTitle)</h2>
+            <hr>
+            <p>@Html.Raw(string.IsNullOrWhiteSpace(accordionContent) ? "—" : accordionContent)</p>
+        </div>
+    }
+</section>
