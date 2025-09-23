@@ -160,7 +160,6 @@
   align-self: flex-start;
   height: auto;
 }
-
 /* ----------- Laptop & Tablet ----------- */
 @media (max-width: 992px) {
   .sidebar {
