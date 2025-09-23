@@ -13,12 +13,7 @@
     var heroDescription = Model.Value<string>("heroDescription");
 	var blockListItem = Model.Value<IEnumerable<BlockListItem>>("statsItem");
     var paragr = Model.Value<string>("paragr");
-
     var carCardBlock = Model.Value<IEnumerable<BlockListItem>>("carouselCars");
-    var carCount = carCardBlock?.Count() ?? 0;
-    var angleStep = 360 / (carCount == 0 ? 1 : carCount);
-    var cardIndex = 0;
-
     var photoTrilogy = Model.Value<IEnumerable<BlockListItem>>("photoTrilogy");
     var trilogyBlock = Model.Value<IEnumerable<BlockListItem>>("trilogyBlock");
 	var featureCardsBlock = Model.Value<IEnumerable<BlockListItem>>("featureCard");
@@ -26,7 +21,6 @@
 	@* var fourStepsBlock = Model.Value<IEnumerable<BlockListItem>>("fourSteps"); *@
 	var accordionQuestionsBlock = Model.Value<IEnumerable<BlockListItem>>("accordionQuestions");
     var carouselBackImage = Model.Value<MediaWithCrops>("carouselBackImage");
-    var index = 0;
 
     // Κατάσταση χρήστη
     var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
@@ -111,15 +105,30 @@
 
 @if (carCardBlock != null && carCardBlock.Any())
 {
-    <div class="hero-carousel">
-        <div class="hero-bg">
-            <img src="@carouselBackImage.Url()" alt="Background" />
-            
+    <div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
+        
+        @* ===== Indicators δυναμικά ===== *@
+        <div class="carousel-indicators">
+            @{
+                var index = 0;
+                foreach (var card in carCardBlock)
+                {
+                    <button type="button" data-bs-target="#carouselExampleDark"
+                            data-bs-slide-to="@index"
+                            class="@(index == 0 ? "active" : "")"
+                            aria-current="@(index == 0 ? "true" : "false")"
+                            aria-label="Slide @(index + 1)">
+                    </button>;
+                    index++;
+                }
+            }
         </div>
 
-        <div class="carousel-container">
-            <div class="carousel">
-                @foreach (var card in carCardBlock)
+        @* ===== Carousel Items ===== *@
+        <div class="carousel-inner">
+            @{
+                index = 0;
+                foreach (var card in carCardBlock)
                 {
                     var content = card?.Content;
                     if (content == null) { continue; }
@@ -131,38 +140,41 @@
                     var price = content.Value<string>("price");
                     var typeOfDiscount = content.Value<string>("typeOfDiscount");
 
-                    <div class="car-card" data-id="@carID">
-                        <div class="discount-badge">@typeOfDiscount</div>
-                        <img src="@carPic?.Url()" alt="@modelo"/>
-                        <h3>@modelo</h3>
-                        <p>@yearRelease</p>
-                        <p class="price">@price €</p>
-                       
-                        <a href="/carDetails/"
-                        class="btn-offer"
-                        onclick="sessionStorage.setItem('selectedCarId', '@carID')">
-                        Δείτε το
-                        </a>
-                    </div>
+                    <div class="carousel-item @(index == 0 ? "active" : "")" data-bs-interval="4000">
+                        <div class="car-card text-center" data-id="@carID">
+                            <div class="discount-badge">@typeOfDiscount</div>
+                            <img src="@carPic?.Url()" class="d-block mx-auto" alt="@modelo" style="max-height:300px; object-fit:contain;" />
+                            <h3>@modelo</h3>
+                            <p>@yearRelease</p>
+                            <p class="price">@price €</p>
 
-                    cardIndex++;
+                            <a href="/carDetails/"
+                               class="btn-offer"
+                               onclick="sessionStorage.setItem('selectedCarId', '@carID')">
+                                Δείτε το
+                            </a>
+                        </div>
+                    </div>;
+
+                    index++;
                 }
-            </div>
+            }
         </div>
+
+        @* ===== Controls (βελάκια) ===== *@
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Προηγούμενο</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Επόμενο</span>
+        </button>
     </div>
 }
 
 @*----------------Photo Trilogy------------------*@
 <section class="gallery-bg">
-    @* @if (!string.IsNullOrWhiteSpace(videoUrl))
-    {
-        <div class="video-container">
-            <video class="hero-video" autoplay muted loop playsinline>
-                <source src="@videoUrl" type="video/mp4" />
-                Το βίντεο δεν υποστηρίζεται από τον browser σας.
-            </video>
-        </div>
-    } *@
 
     @if (photoTrilogy != null && photoTrilogy.Any())
     {
@@ -223,39 +235,6 @@
                         <h4 class="step-text-header">@Html.Raw(titleStep)</h4>
                     </div>
                     <p class="step-text-par">@Html.Raw(descriptionStep)</p>
-                </div>
-            }
-        </div>
-    }
-</section> *@
-
-@*---------------Accordion-------------------*@
-@* <h2 class="steps-title" style="color:#002e4d; margin-top:30px;">Συχνές Ερωτήσεις</h2>
-<section class="accordion-wrapper">
-	
-    @if (accordionQuestionsBlock != null && accordionQuestionsBlock.Any())
-    {
-        <div class="custom-accordion" id="faqAccordion">
-            @foreach (var item in accordionQuestionsBlock.Select((val, idx) => new { val, idx }))
-            {
-                var content = item.val.Content;
-                var accordionTitle = content.Value<string>("accordionTitle");
-                var accordionContent = content.Value<string>("accordionContent");
-                var id = $"accordion-item-{item.idx}";
-                var collapseId = $"collapse-{item.idx}";
-                var headingId = $"heading-{item.idx}";
-                
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="@headingId">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
-                            @accordionTitle
-                        </button>
-                    </h2>
-                    <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            @Html.Raw(accordionContent)
-                        </div>
-                    </div>
                 </div>
             }
         </div>

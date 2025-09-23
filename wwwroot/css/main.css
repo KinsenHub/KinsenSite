@@ -165,72 +165,63 @@ body {
   filter: blur(6px) brightness(0.6); /* θαμπάδα + σκοτείνιασμα */
 }
 
-.carousel-container {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-}
-
-.carousel {
-  display: flex;
-  gap: 2rem;
-  overflow-x: auto; /* scroll αν έχει πολλές */
-  scroll-snap-type: x mandatory;
-  padding: 20px;
-  scrollbar-width: none; /* Firefox */
-}
-
-.carousel::-webkit-scrollbar {
-  display: none; /* Chrome */
+.carousel-inner {
+  padding: 60px 0;
 }
 
 .car-card {
-  flex: 0 0 auto;
-  width: 280px;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  padding: 16px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  padding: 28px;
   text-align: center;
-  scroll-snap-align: center;
+  margin: 30px auto;
+  max-width: 600px;
+  min-height: 520px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.car-card:hover {
-  transform: translateY(-8px) scale(1.05);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-}
-
 .car-card img {
-  max-width: 100%;
-  border-radius: 8px;
+  width: 100%;
+  max-height: 350px;
   object-fit: contain;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }
 
 .car-card h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0 0 4px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 12px 0 6px;
   color: #001858;
 }
 
 .car-card p {
-  margin: 2px 0;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
+  margin: 4px 0;
   color: #333;
+}
+
+.car-card .price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 14px;
+  color: #023859;
+}
+
+.car-card:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
 .car-card .price {
   font-weight: bold;
   color: #023859;
-  font-size: 1.1rem;
-  margin-top: 6px;
+  font-size: 1.3rem;
+  margin: 10px 0 30px 0 !important;
 }
 
 .btn-offer {
-  margin-top: 18px !important;
+  margin-top: 80px;
   padding: 8px 16px;
   border: none;
   background: #023859;
