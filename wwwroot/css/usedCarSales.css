@@ -20,6 +20,28 @@
   /* background-color: yellow !important; */
 }
 
+.usedCar-img-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* padding: 20px; */
+}
+
+.usedCar-img {
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.usedCar-title {
+  margin-top: 30px;
+  font-size: 2.5rem;
+  /* font-weight: bold; */
+  font-family: "Open Sans", sans-serif;
+  color: #39c0c3 !important;
+}
+
 .clear-filters-btn {
   font-size: 1rem;
   font-weight: 600;
@@ -36,7 +58,7 @@
   transform: translateY(-2px) scale(1.03);
 }
 
-.results-btn {
+/* .results-btn {
   padding: 14px 24px;
   font-size: 1rem;
   font-weight: 600;
@@ -51,7 +73,7 @@
   overflow: hidden;
   margin-left: auto;
   display: block;
-}
+} */
 
 .filter-static-header {
   display: flex;
@@ -124,8 +146,8 @@
 }
 
 .sidebar {
-  width: 100%; /* για κινητά */
-  max-width: 100%; /* για desktop */
+  width: 320px; /* ήταν 100% ή πιο στενό */
+  max-width: 320px; /* κρατάμε όριο */
   box-sizing: border-box;
   background-color: #f9f9f9;
   border-radius: 12px;
@@ -135,9 +157,36 @@
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   margin-bottom: 1rem;
   overflow-x: hidden;
-  align-self: flex-start; /* ✅ Σταματά την κάθετη τέντωσή του */
+  align-self: flex-start;
   height: auto;
-  /* max-height: 150vh; */
+}
+
+/* ----------- Laptop & Tablet ----------- */
+@media (max-width: 992px) {
+  .sidebar {
+    position: fixed; /* γίνεται off-canvas */
+    top: 0;
+    left: -300px; /* κρυφό αρχικά */
+    height: 100%;
+    width: 280px;
+    z-index: 1050;
+    overflow-y: auto;
+    transition: left 0.3s ease-in-out;
+  }
+  .sidebar.open {
+    left: 0; /* εμφανίζεται */
+  }
+}
+
+/* ----------- Mobile ----------- */
+@media (max-width: 576px) {
+  .sidebar {
+    width: 100%; /* full screen */
+    left: -100%;
+  }
+  .sidebar.open {
+    left: 0;
+  }
 }
 
 .checkbox-columns {

@@ -13,6 +13,7 @@
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	var usedCarTitle = Model.Value<string>("usedCarTitle");
 	var carCardBlock = Model.Value<IEnumerable<BlockListItem>>("carCardBlock");
+	var imgTitle = Model.Value<MediaWithCrops>("image");
 	
 	// ----------- Μάρκες και Logos------------
 	// helper για consistent σύγκριση (αγνοεί κενά/σημεία στίξης, όλα κεφαλαία)
@@ -170,7 +171,6 @@
     var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
 }
 
-
 <div class="usedCars-container">
 	<!-- Mobile toggle button -->
 	<button id="toggleSidebarBtn" class="filter-dropdown-toggle d-block d-md-none">
@@ -182,7 +182,7 @@
 			<i class="fas fa-times"></i> Κλείσιμο
 		</button>
 	</div>
-	<div class="filters-container">
+	<div class="filters-container my-2">
 
 		<aside class="sidebar" id="filterSidebar">
 			<div class="filter-static-header">
@@ -427,6 +427,14 @@
 	</div>
 
     <div class="carsAndPaginationOUTER">
+		@if (imgTitle != null)
+		{
+			<div class="usedCar-img-wrapper text-center my-2">
+				<img src="@imgTitle.Url()" class="usedCar-img img-fluid shadow" />
+
+				<h1 class="usedCar-title mt-4">@usedCarTitle</h1>
+			</div>
+		}
 		<div class="carsAndPagination">
 			<div id="displayCars" class="displayCars">
 				<div class="noResultsMsg text-center fw-bold fs-5 p-4" style="display: none;">
