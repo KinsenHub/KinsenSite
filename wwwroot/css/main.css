@@ -92,20 +92,63 @@ body {
   text-align: center;
 }
 
+/*--------CAR ICONS---------*/
+.feature-icon {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%; /* κόβει τις γωνίες */
+  overflow: hidden; /* εξαφανίζει ό,τι περισσεύει */
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none; /* χωρίς background */
+  box-shadow: none; /* χωρίς εξωτερικό κύκλο */
+}
+
+.feature-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon img {
+  transform: scale(1.1);
+}
+
+.feature-description p {
+  margin: 0;
+  font-weight: 600;
+  color: #023859;
+  text-align: center;
+}
+
 /*--------Καρουζέλ---------*/
 .prosfores {
-  padding-bottom: 70px;
-  color: #001858;
-  font-size: 2.5rem;
   text-align: center;
-  font-family: "Open Sans", sans-serif;
-  font-weight: 300;
+  color: #39c0c3;
+  font-weight: 400;
+  margin: 30px;
+  font-size: 3rem;
+}
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #fff;
+  color: #39c0c3;
+  font-size: 1.2rem !important;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .hero-carousel {
   position: relative;
   width: 100%;
-  height: 80vh;
+  padding: 60px 0;
   overflow: hidden;
 }
 
@@ -119,7 +162,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(6px) brightness(0.6);
+  filter: blur(6px) brightness(0.6); /* θαμπάδα + σκοτείνιασμα */
 }
 
 .carousel-container {
@@ -127,85 +170,75 @@ body {
   z-index: 2;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100%;
 }
 
 .carousel {
   display: flex;
-  gap: 3rem;
-  animation: slide 30s linear infinite; /* διάρκεια 30s */
+  gap: 2rem;
+  overflow-x: auto; /* scroll αν έχει πολλές */
+  scroll-snap-type: x mandatory;
+  padding: 20px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.carousel::-webkit-scrollbar {
+  display: none; /* Chrome */
 }
 
 .car-card {
   flex: 0 0 auto;
-  min-width: 320px;
-  max-width: 350px;
+  width: 280px;
   background: #fff;
   border-radius: 12px;
-  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  padding: 16px;
   text-align: center;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
   scroll-snap-align: center;
-  position: relative;
-  transition: transform 0.3s ease;
-}
-
-@keyframes slide {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  } /* μετακινείται μισό πλάτος (επειδή διπλασιάσαμε τις κάρτες) */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .car-card:hover {
-  transform: translateY(-8px) scale(1.02);
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
 
-.car-img img {
+.car-card img {
   max-width: 100%;
   border-radius: 8px;
+  object-fit: contain;
+  margin-bottom: 10px;
 }
 
-.car-info h3 {
-  margin: 10px 0 5px;
-  font-size: 1.3rem;
+.car-card h3 {
+  font-size: 1.2rem;
   font-weight: 600;
+  margin: 0 0 4px;
+  color: #001858;
 }
 
-.car-info p {
-  margin: 5px 0;
+.car-card p {
+  margin: 2px 0;
   font-size: 0.95rem;
   color: #333;
 }
 
-.price {
+.car-card .price {
   font-weight: bold;
-  color: #001858;
+  color: #023859;
   font-size: 1.1rem;
+  margin-top: 6px;
 }
 
 .btn-offer {
-  margin-top: 10px;
+  margin-top: 18px !important;
   padding: 8px 16px;
   border: none;
-  background: #ffd400;
+  background: #023859;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-}
-
-.discount-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: red;
   color: white;
-  font-size: 1rem;
-  padding: 4px 8px;
-  border-radius: 4px;
+  text-decoration: none;
 }
 
 /* 

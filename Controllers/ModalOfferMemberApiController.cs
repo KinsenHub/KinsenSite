@@ -63,7 +63,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
 
         // === LOGO Kinsen ===
         const string logoUrl = "https://production-job-board-public.s3.amazonaws.com/logos/43021810-0cfb-466e-b00c-46c05fd4b394";
-        var logoTag = await ToBase64ImgTag(logoUrl, "Kinsen", 180);
+        var logoTag = await ToBase64ImgTag(logoUrl, "Kinsen", 250);
 
         // === Κάρτες αυτοκινήτων ===
         var carCardsHtml = string.Join("", await Task.WhenAll(request.Cars.Select(async c => $@"
@@ -97,45 +97,46 @@ public class ModalOfferMemberApiController : UmbracoApiController
 
         var subjectCustomer = "Λάβαμε το αίτημά σας – Kinsen";
         var bodyCustomer = $@"
-            <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' 
-                  style='background:#007c91;padding:20px 0;'>
-              <tr><td align='center'>
-                <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
-                      style='width:600px;background:#007c91;color:#ffffff;'>
-                  <tr><td align='center' style='padding:10px;'>{logoTag}</td></tr>
-                  <tr><td align='center' style='padding:5px;'>
-                    <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
-                                font-size:18px;font-weight:300;color:#ffffff;'>
-                      Σας ευχαριστούμε για το ενδιαφέρον σας!
-                    </div>
-                  </td></tr>
-                  <tr><td align='left' style='padding:15px 30px;'>
-                    <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:14px;line-height:1.6;color:#ffffff;'>
-                      Αγαπητέ/ή {request.FirstName} {request.LastName},<br/>
-                      Λάβαμε το αίτημά σας για προσφορά. Ετοιμάσαμε αναλυτικά τα στοιχεία του οχήματος που επιλέξατε. 
-                      Η προσφορά ισχύει για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής της.
-                    </div>
-                  </td></tr>
-                  <tr><td align='center' style='padding:20px;'>
-                    {carCardsHtml}
-                  </td></tr>
-                </table>
+        <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' 
+              style='padding:20px 0;'>
+          <tr><td align='center'>
+            <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
+                  style='width:600px;'>
+              <tr><td align='center' style='padding:10px;'>{logoTag}</td></tr>
+              <tr><td align='center' style='padding:5px;'>
+                <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                            font-size:20px;font-weight:300;color:#39c0c3;'>
+                  Σας ευχαριστούμε για το ενδιαφέρον σας!
+                </div>
               </td></tr>
+              <tr><td align='left' style='padding:15px 30px;'>
+                <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                            font-size:14px;line-height:1.6;color:#000000;'>
+                  Αγαπητέ/ή {request.FirstName} {request.LastName},<br/>
+                  Λάβαμε το αίτημά σας για προσφορά. Ετοιμάσαμε αναλυτικά τα στοιχεία του οχήματος που επιλέξατε. 
+                  Η προσφορά ισχύει για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής της.
+                </div>
+              </td></tr>
+              <tr><td align='center' style='padding:20px;'>
+                {carCardsHtml}
+              </td></tr>
+            </table>
+          </td></tr>
 
-              <tr>
-                <td align='center' style='padding:20px;background:#023859;color:#ffffff;
-                                          font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.6;'>
-                  <div style='margin-bottom:6px;'>Kinsen - Όμιλος Σαρακάκη</div>
-                  <div style='margin-bottom:6px;'>{companyAddress}</div>
-                  <div style='margin-bottom:6px;'>📞 {companyPhone}</div>
-                  <div style='margin-bottom:6px;'>✉️ <a href='mailto:{companyEmail}' style='color:#ffffff;text-decoration:none;'>{companyEmail}</a></div>
-                  <div style='margin-top:10px;font-size:11px;'>
-                    <a href='{termsUrl}' style='color:#ffffff;text-decoration:underline;margin-right:8px;'>Όροι & Προϋποθέσεις</a>
-                    <a href='{cookiesUrl}' style='color:#ffffff;text-decoration:underline;'>Πολιτική Cookies</a>
-                  </div>
-                </td>
-              </tr>
-            </table>";
+          <tr>
+            <td align='center' style='padding:20px;color:#000000;
+                                      font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.6;'>
+              <div style='margin-bottom:6px;'>Kinsen - Όμιλος Σαρακάκη</div>
+              <div style='margin-bottom:6px;'>{companyAddress}</div>
+              <div style='margin-bottom:6px;'>📞 {companyPhone}</div>
+              <div style='margin-bottom:6px;'>✉️ <a href='mailto:{companyEmail}' style='color:#000000;text-decoration:none;'>{companyEmail}</a></div>
+              <div style='margin-top:10px;font-size:11px;'>
+                <a href='{termsUrl}' style='color:#000000;text-decoration:underline;margin-right:8px;'>Όροι & Προϋποθέσεις</a>
+                <a href='{cookiesUrl}' style='color:#000000;text-decoration:underline;'>Πολιτική Cookies</a>
+              </div>
+            </td>
+          </tr>
+        </table>";
 
             var msgCustomer = new EmailMessage(
                 from: null,

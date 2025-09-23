@@ -13,8 +13,12 @@
     var heroDescription = Model.Value<string>("heroDescription");
 	var blockListItem = Model.Value<IEnumerable<BlockListItem>>("statsItem");
     var paragr = Model.Value<string>("paragr");
+
     var carCardBlock = Model.Value<IEnumerable<BlockListItem>>("carouselCars");
-    var total = carCardBlock?.Count() ?? 0;
+    var carCount = carCardBlock?.Count() ?? 0;
+    var angleStep = 360 / (carCount == 0 ? 1 : carCount);
+    var cardIndex = 0;
+
     var photoTrilogy = Model.Value<IEnumerable<BlockListItem>>("photoTrilogy");
     var trilogyBlock = Model.Value<IEnumerable<BlockListItem>>("trilogyBlock");
 	var featureCardsBlock = Model.Value<IEnumerable<BlockListItem>>("featureCard");
@@ -23,6 +27,9 @@
 	var accordionQuestionsBlock = Model.Value<IEnumerable<BlockListItem>>("accordionQuestions");
     var carouselBackImage = Model.Value<MediaWithCrops>("carouselBackImage");
     var index = 0;
+
+    // Κατάσταση χρήστη
+    var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
 }
 
 <div class="hero-wrapper">
@@ -81,14 +88,14 @@
         @foreach (var card in featureCardsBlock)
         {
             var content = card.Content;
-            var icon = content.Value<string>("icon"); 
+            var img = content.Value<MediaWithCrops>("featureImg"); 
             var description = content.Value<string>("description");
             var targetSlug = content.Value<string>("targetSlug") ?? "";
 
             <a href="/πωλήσεις-μεταχειρισμένων?carType=@targetSlug" onclick="selectCategory('@targetSlug')" class="feature-card-link">
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <p>@Html.Raw(icon)</p>
+                        <img src="@img?.Url()"loading="lazy" style="width: 200px;" />
                     </div>
                     <div class="feature-description">
                         <p>@Html.Raw(description)</p>
@@ -100,14 +107,14 @@
 }
 
 @*------------------Carousel-------------------*@
-<h2 class="prosfores" style="color:#39c0c3; font-weight:bold">Ανακαλύψτε τις Προσφορές σε ποικιλία μοντέλων</h2>
-
+<h2 class="prosfores">Ανακαλύψτε τις Προσφορές σε ποικιλία μοντέλων</h2>
 
 @if (carCardBlock != null && carCardBlock.Any())
 {
     <div class="hero-carousel">
         <div class="hero-bg">
             <img src="@carouselBackImage.Url()" alt="Background" />
+            
         </div>
 
         <div class="carousel-container">
@@ -117,30 +124,28 @@
                     var content = card?.Content;
                     if (content == null) { continue; }
 
+                    var carID = content.Value<string>("carID");
                     var carPic = content.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("carPic");
                     var modelo = content.Value<string>("model");
-                    var typeOfDiscount = content.Value<string>("typeOfDiscount");
                     var yearRelease = content.Value<string>("yearRelease");
                     var price = content.Value<string>("price");
-                    var km = content.Value<string>("km");
+                    var typeOfDiscount = content.Value<string>("typeOfDiscount");
 
-                    <div class="car-card" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
-                        @if (!string.IsNullOrWhiteSpace(typeOfDiscount))
-                        {
-                            <span class="discount-badge">@typeOfDiscount</span>
-                        }
-
-                        <div class="car-img">
-                            <img src="@carPic?.Url()" alt="@modelo" loading="lazy" />
-                        </div>
-
-                        <div class="car-info">
-                            <h3>@(string.IsNullOrWhiteSpace(modelo) ? "Χωρίς Μοντέλο" : modelo)</h3>
-                            <p>@(string.IsNullOrWhiteSpace(yearRelease) ? "—" : yearRelease) – @(string.IsNullOrWhiteSpace(km) ? "—" : km) km</p>
-                            <p class="price">@(string.IsNullOrWhiteSpace(price) ? "—" : price + " €")</p>
-                            <button class="btn-offer">Δείτε το</button>
-                        </div>
+                    <div class="car-card" data-id="@carID">
+                        <div class="discount-badge">@typeOfDiscount</div>
+                        <img src="@carPic?.Url()" alt="@modelo"/>
+                        <h3>@modelo</h3>
+                        <p>@yearRelease</p>
+                        <p class="price">@price €</p>
+                       
+                        <a href="/carDetails/"
+                        class="btn-offer"
+                        onclick="sessionStorage.setItem('selectedCarId', '@carID')">
+                        Δείτε το
+                        </a>
                     </div>
+
+                    cardIndex++;
                 }
             </div>
         </div>
@@ -225,7 +230,7 @@
 </section> *@
 
 @*---------------Accordion-------------------*@
-<h2 class="steps-title" style="color:#002e4d; margin-top:30px;">Συχνές Ερωτήσεις</h2>
+@* <h2 class="steps-title" style="color:#002e4d; margin-top:30px;">Συχνές Ερωτήσεις</h2>
 <section class="accordion-wrapper">
 	
     @if (accordionQuestionsBlock != null && accordionQuestionsBlock.Any())
@@ -255,7 +260,7 @@
             }
         </div>
     }
-</section>
+</section> *@
 
 <script>
   function selectCategory(type) {

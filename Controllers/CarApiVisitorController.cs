@@ -27,6 +27,12 @@ public class CarApiVisitorController : UmbracoApiController
         _env = env;
     }
 
+    // Μοντέλο για το GetCarById
+    public class CarRequest
+    {
+        public int Id { get; set; }
+    }
+
     // ====== Υπάρχον action: ΜΟΝΟ data (όπως το έχεις) ======
     [HttpPost("getcarbyid")]
     public IActionResult GetCarById([FromBody] CarRequest request)
@@ -303,7 +309,7 @@ public class CarApiVisitorController : UmbracoApiController
             else
             {
                 // Production: ελαφρύ remote image
-                logoTag = $"<img src='{logoUrl}' alt='Kinsen' width='220' style='display:block;width:200px;height:auto;border:0;outline:none;text-decoration:none;margin-bottom:12px;' />";
+                logoTag = $"<img src='{logoUrl}' alt='Kinsen' width='220' style='display:block;width:220px;height:auto;border:0;outline:none;text-decoration:none;margin-bottom:12px;' />";
             }
         }
 
@@ -321,143 +327,95 @@ public class CarApiVisitorController : UmbracoApiController
 
         var customerSubject = "Λάβαμε το αίτημά σας – Kinsen";
         var customerBody = $@"
-            <!doctype html>
-            <html xmlns='http://www.w3.org/1999/xhtml'>
-            <head>
-                <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-                <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
-                <title>Kinsen</title>
-            </head>
-            <body style='margin:0;padding:0;background:#007c91;'>
-                <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' style='background:#007c91;padding:8px 0 20px 0;'>
-                <tr><td align='center'>
+        <!doctype html>
+        <html xmlns='http://www.w3.org/1999/xhtml'>
+        <head>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+        <title>Kinsen</title>
+        </head>
+        <body style='margin:0;padding:0;'>
+        <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' style='padding:0;margin:0;'>
+            <tr>
+            <td align='center'>
 
-                    <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0' style='width:600px;'>
+                <!-- Wrapper -->
+                <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0' style='width:600px;'>
 
+                <!-- Logo -->
+                <tr>
+                    <td align='center' style='padding:24px;'>
+                    {logoTag}
+                    </td>
+                </tr>
+
+                <!-- Title -->
+                <tr>
+                    <td align='center' style='padding:0 24px 10px 24px;'>
+                    <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:400;
+                                font-size:18px;line-height:1.4;color:#39c0c3;;margin:10px 0;'>
+                        Σας ευχαριστούμε για το ενδιαφέρον σας!
+                    </div>
+                    </td>
+                </tr>
+
+                <!-- Greeting -->
+                <tr>
+                    <td align='left' style='padding:0 24px 20px 24px;'>
+                    <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                                font-size:14px;line-height:1.6;color:#000;font-weight:300;'>
+                        <div style='margin-bottom:8px;'>
+                        <b>Αγαπητέ/ή {request.FirstName} {request.LastName}</b>
+                        </div>
+                        Λάβαμε το αίτημά σας για προσφορά. Ετοιμάσαμε αναλυτικά τα στοιχεία του οχήματος
+                        που επιλέξατε. Η προσφορά ισχύει για δέκα (10) ημερολογιακές ημέρες από την
+                        ημερομηνία παραλαβής της.
+                    </div>
+                    </td>
+                </tr>
+
+                <!-- Car Card -->
+                <tr>
+                    <td align='center' style='padding:0 24px 30px 24px;'>
+                    <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
+                            style='border-radius:8px;overflow:hidden;'>
                         <tr>
-                            <td align='center' style='padding:8px 24px 6px 24px;'>
-                                <!-- Logo σε capsule με #007c91 -->
-                                <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='margin:0 auto;'>
-                                <tr>
-                                    <td align='center'>
-                                    {logoTag}
-                                    </td>
-                                </tr>
-                                </table>
-                            </td>
-                        </tr>
-
-                        <tr>
-                        <td align='center' style='padding:0 24px 2px 24px;'>
-                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:800;font-size:18px;line-height:1.2;color:#ffffff;margin:10px;'>Σας ευχαριστούμε για το ενδιαφέρον σας!</div>
-                        </td>
-                        </tr>
-
-                        <tr>
-                            <td align='left' style='padding:0 24px 5px 24px;'>
-                                <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:14px;line-height:1.7;color:#ffffff;font-weight:300;'>
-                                <div style='margin-bottom:5px;'><b>Αγαπητέ/ή {request.FirstName} {request.LastName}</b></div>
-                                Λάβαμε το αίτημά σας για προσφορά. Ετοιμάσαμε αναλυτικά τα στοιχεία του οχήματος που επιλέξατε. Η προσφορά ισχύει για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής της.
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr>
-                        <tr>
-                        <td style='padding:5px 24px 1px 24px;'>
-                            <!-- Κεφαλίδα (πάνω μέρος κουτιού) με border #023859 -->
-                            <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
-                                style='background:#ffffff;border:10px solid #023859;border-bottom:none;border-radius:6px 6px 0 0;'>
-                            <tr>
-                                <td align='center' style='padding:14px 12px;font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:600;font-size:16px;line-height:1.3;color:#023859;'>
-                                <span style='color:#007c91;text-decoration:none;'>{maker} {model}</span>
-                                </td>
-                            </tr>
-                            </table>
-                        </td>
-                        </tr>
-
-                        <tr>
-                        <td style='padding:0 24px;'>
-                            <!-- Σώμα (κάτω μέρος κουτιού) με border #023859 -->
-                            <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
-                                style='background:#ffffff;border:10px solid #023859;border-top:none;border-radius:0 0 6px 6px;'>
-                            
-                            <tr>
-                                <td align='center' style='padding:24px;'>{imgTag}</td>
-                            </tr>
-
-                            <tr>
-                                <td style='border-top:1px solid #023859;border-bottom:1px solid #023859;'>
-                                <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'>
-                                    <tr>
-                                    <td width='33.33%' align='center'
-                                        style='background:#ffffff;border-right:1px solid #023859;padding:14px 8px;font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:14px;line-height:1.2;color:#023859;'>
-                                        {price} €
-                                    </td>
-                                    <td width='33.33%' align='center'
-                                        style='background:#ffffff;border-right:1px solid #023859;padding:14px 8px;font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:14px;line-height:1.2;color:#023859;'>
-                                        {km} km
-                                    </td>
-                                    <td width='33.33%' align='center'
-                                        style='background:#ffffff;padding:14px 8px;font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:14px;line-height:1.2;color:#023859;'>
-                                        {cc} cc
-                                    </td>
-                                    </tr>
-                                </table>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td style='padding:16px 20px 18px 20px;'>
-                                <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'>
-                                    <tr>
-                                    <td width='50%' valign='top' style='padding-right:18px;'>
-                                        <p style='margin:0 0 8px 0;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.7;color:#023859;'><strong>Μοντέλο:</strong> {maker} {model}</p>
-                                        <p style='margin:0 0 8px 0;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.7;color:#023859;'><strong>Έτος:</strong> {year}</p>
-                                        <p style='margin:0 0 8px 0;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.7;color:#023859;'><strong>Καύσιμο:</strong> {fuel}</p>
-                                        <p style='margin:0 0 8px 0;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.7;color:#023859;'><strong>Χρώμα:</strong> {color}</p>
-                                        {hpHtml}
-                                    </td>
-                                    <td width='50%' valign='top' style='padding-left:18px;'>
-                                        <p style='margin:0 0 8px 0;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.7;color:#023859;'><strong>Χιλιόμετρα:</strong> {km} km</p>
-                                        <p style='margin:0 0 8px 0;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.7;color:#023859;'><strong>Κυβικά:</strong> {cc} cc</p>
-                                        <p style='margin:0 0 8px 0;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.7;color:#023859;'><strong>Πλάνο Πληρωμής:</strong> {planDisplay}</p>
-                                        <p style='margin:0 0 8px 0;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.7;color:#023859;'><strong>Τιμή:</strong> {price} €</p>
-                                    </td>
-                                    </tr>
-                                </table>
-                                </td>
-                            </tr>
-
-                            </table>
-                        </td>
-                        </tr>
-                        <tr>
-                        <td style='padding:0 24px 12px 24px;'>
-                            <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' style='border:1px solid #007c91;border-top:none;'><tr><td style='font-size:0;line-height:0'>&nbsp;</td></tr></table>
-                        </td>
-                        </tr>
-
-                        <tr>
-                        <td align='center' style='padding:4px 24px 22px 24px;'>
-                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:16px;line-height:1.7;color:#ffffff;margin:8px 0 10px 0;'>Παραμένουμε στη διάθεσή σας!</div>
-                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:400;font-size:14px;line-height:1.9;color:#ffffff;margin:8px 0;'>✉️ <a href='mailto:{companyEmail}' style='color:#ffffff;text-decoration:none;'>{companyEmail}</a></div>
-                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:400;font-size:14px;line-height:1.9;color:#ffffff;margin:8px 0;'>📞 <a href='tel:{companyPhone}' style='color:#ffffff;text-decoration:none;'>{companyPhone}</a></div>
-                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:400;font-size:14px;line-height:1.9;color:#ffffff;margin:8px 0;'>{companyAddress}</div>
-                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:400;font-size:12px;line-height:1.9;color:#ffffff;margin-top:10px;'>
-                            <a href='{cookiesUrl}' style='color:#ffffff;text-decoration:underline;'>Πολιτική Cookies</a> |
-                            <a href='{termsUrl}' style='color:#ffffff;text-decoration:underline;'>Όροι &amp; Προϋποθέσεις</a>
+                        <td align='center' style='padding:20px;'>
+                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:16px;font-weight:600;color:#023859;margin-bottom:6px;'>
+                            {maker} {model}
+                            </div>
+                            {imgTag}
+                            <div style='margin-top:10px;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:14px;line-height:1.5;color:#023859;'>
+                            {year} · {km} km · {fuel}
+                            </div>
+                            <div style='margin-top:8px;font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:16px;font-weight:700;color:#007c91;'>
+                            {price} €
                             </div>
                         </td>
                         </tr>
-
                     </table>
+                    </td>
+                </tr>
 
-                </td></tr>
-                </table>
-            </body>
-            </html>";
+                <!-- Footer -->
+                <tr>
+                    <td align='center' style='padding:20px;color:#000;
+                                            font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.6;'>
+                    <div style='margin-bottom:6px;'>Kinsen - Όμιλος Σαρακάκη</div>
+                    <div style='margin-bottom:6px;'>{companyAddress}</div>
+                    <div style='margin-bottom:6px;'>📞 {companyPhone}</div>
+                    <div style='margin-bottom:6px;'>✉️ <a href='mailto:{companyEmail}' style='color:#ffffff;text-decoration:none;'>{companyEmail}</a></div>
+                    <div style='margin-top:10px;font-size:11px;'>
+                        <a href='{termsUrl}' style='color:#000;text-decoration:underline;margin-right:8px;'>Όροι & Προϋποθέσεις</a>
+                        <a href='{cookiesUrl}' style='color:#000;text-decoration:underline;'>Πολιτική Cookies</a>
+                    </div>
+                    </td>
+                </tr>
+            </td>
+            </tr>
+        </table>
+        </body>
+        </html>";
 
         var customerMsg = new EmailMessage(
             null,
@@ -476,10 +434,4 @@ public class CarApiVisitorController : UmbracoApiController
         return Ok(new { ok = true });
     }
         
-}
-
-// Μοντέλο για το GetCarById
-public class CarRequest
-{
-    public int Id { get; set; }
 }

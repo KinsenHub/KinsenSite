@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 (function () {
-  const API_BASE = "/umbraco/api/carapivisitor";
+  const API_BASE = "/umbraco/api/CarApiVisitor";
   if (window.__offerBtnBound) return;
   window.__offerBtnBound = true;
 
@@ -197,20 +197,20 @@ window.addEventListener("beforeunload", () => {
   sessionStorage.removeItem("selectedCarId");
 });
 
-// ΑΦΟΡΑ ΜΟΝΟ ΤΟ ΚΟΥΜΠΙ "ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ"
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".addToCartBtn");
-  if (!btn) return;
+// // ΑΦΟΡΑ ΜΟΝΟ ΤΟ ΚΟΥΜΠΙ "ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ"
+// document.addEventListener("click", (e) => {
+//   const btn = e.target.closest(".addToCartBtn");
+//   if (!btn) return;
 
-  const carId =
-    window.CURRENT_CAR?.id ||
-    sessionStorage.getItem("selectedCarId") ||
-    new URLSearchParams(location.search).get("id");
+//   const carId =
+//     window.CURRENT_CAR?.id ||
+//     sessionStorage.getItem("selectedCarId") ||
+//     new URLSearchParams(location.search).get("id");
 
-  if (!carId) {
-    console.error("❌ Δεν βρέθηκε carId");
-    return;
-  }
+//   if (!carId) {
+//     console.error("❌ Δεν βρέθηκε carId");
+//     return;
+//   }
 
-  window.addToCart(carId); // καλεί την global από shoppingCart.js
-});
+//   window.addToCart(carId); // καλεί την global από shoppingCart.js
+// });
