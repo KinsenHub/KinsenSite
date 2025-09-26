@@ -470,19 +470,19 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("change", getSelectedFilters);
   });
 
-  const sidebar = document.getElementById("filterSidebar");
-  const openBtn = document.getElementById("toggleSidebarBtn");
-  const closeBtn = document.getElementById("closeSidebarBtn");
+  // const sidebar = document.getElementById("filterSidebar");
+  // const openBtn = document.getElementById("toggleSidebarBtn");
+  // const closeBtn = document.getElementById("closeSidebarBtn");
 
-  openBtn.addEventListener("click", () => {
-    sidebar.classList.add("open");
-    document.body.style.overflow = "hidden";
-  });
+  // openBtn.addEventListener("click", () => {
+  //   sidebar.classList.add("open");
+  //   document.body.style.overflow = "hidden";
+  // });
 
-  closeBtn.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    document.body.style.overflow = "";
-  });
+  // closeBtn.addEventListener("click", () => {
+  //   sidebar.classList.remove("open");
+  //   document.body.style.overflow = "";
+  // });
 
   //Fetch auth status ΓΙΑ ΝΑ ΜΑΣ ΠΗΓΑΙΝΕΙ ΕΙΤΕ ΣΤΗ carDetails είτε στη carDetailsAnonymous
   fetch("/umbraco/api/auth/status")
@@ -632,9 +632,21 @@ function clearAllFilters() {
 }
 
 let currentPage = 1;
-const carsPerPage = 6;
+
+function getCarsPerPage() {
+  if (window.innerWidth < 768) {
+    return 1; // κινητό
+  } else if (window.innerWidth < 1080) {
+    return 2; // tablet
+  } else if (window.innerWidth < 1200) {
+    return 3; // μικρό desktop
+  } else {
+    return 6; // μεγάλο desktop (2x3)
+  }
+}
 
 function paginateVisibleCars(carList) {
+  const carsPerPage = getCarsPerPage();
   const totalPages = Math.ceil(carList.length / carsPerPage);
   const paginationContainer = document.getElementById("paginationControls");
 
@@ -644,15 +656,13 @@ function paginateVisibleCars(carList) {
   // Υπολογισμός ορατών καρτών για τη σελίδα
   const start = (currentPage - 1) * carsPerPage;
   const end = start + carsPerPage;
-
   carList.slice(start, end).forEach((card) => {
-    card.style.display = "flex"; // ή "block" ανάλογα το layout σου
+    card.style.display = "block";
   });
 
   // Καθαρισμός προηγούμενων κουμπιών
   paginationContainer.innerHTML = "";
 
-  // Δεν χρειάζεται pagination αν έχουμε μόνο 1 σελίδα
   if (totalPages <= 1) return;
 
   // Προηγούμενο
@@ -666,8 +676,16 @@ function paginateVisibleCars(carList) {
     paginationContainer.appendChild(prev);
   }
 
-  // Σελίδες
-  for (let i = 1; i <= totalPages; i++) {
+  // ----------- ΕΜΦΑΝΙΣΗ ΜΟΝΟ 2 ΣΕΛΙΔΩΝ -----------
+  let startPage = Math.max(1, currentPage - 1);
+  let endPage = Math.min(totalPages, startPage + 1);
+
+  // αν είμαστε στην τελευταία σελίδα, μετακινείται το "παράθυρο"
+  if (endPage - startPage < 1 && startPage > 1) {
+    startPage = endPage - 1;
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
     const pageBtn = document.createElement("button");
     pageBtn.innerText = i;
     if (i === currentPage) pageBtn.classList.add("active");
@@ -689,6 +707,11 @@ function paginateVisibleCars(carList) {
     paginationContainer.appendChild(next);
   }
 }
+
+// 🔹 Επαναυπολογισμός σε resize
+window.addEventListener("resize", () => {
+  paginateVisibleCars(filteredCards.length ? filteredCards : allCards);
+});
 
 function resetDisplayCarsLayout() {
   displayCars.style.justifyContent = "flex-start";

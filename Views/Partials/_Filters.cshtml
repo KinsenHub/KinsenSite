@@ -1,0 +1,230 @@
+
+
+    <div class="filter-item">
+        <button class="filter-toggle">Τιμή <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+        <div class="filter-content">
+            <div class="input-group">
+                <label>Από:</label>
+                <input type="number" id="minPriceInput"  placeholder="π.χ. 5000" />
+                <label>Έως:</label>
+                <input type="number" id="maxPriceInput" placeholder="π.χ. 20000" />
+            </div>
+            <div class="checkbox-columns">
+                <div class="checkbox-pair">
+                    @foreach (var key in allOfferTypes)
+                    {
+                        var name = offerTypeNames[key];   // Original display name
+                        var count = offerTypeCounts[key]; // Count
+                        <label>
+                            <input type="checkbox" class="offerTypeCheckbox" value="@name" />
+                            @name (@count)
+                        </label>
+                    }
+                </div>
+
+                <div class="price-order-wrapper">
+                    <select id="priceOrderSelect" class="form-select">
+                    <option value="asc">Αύξουσα τιμή</option>
+                    <option value="desc">Φθίνουσα τιμή</option>
+                    </select>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">
+            Κατασκευαστής <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+        </button>
+
+        <div class="filter-content">
+            <div class="twoColumns-grid">
+                @foreach (var normBrand in allBrands)
+                {
+                    var displayName = brandDisplayNames[normBrand];
+                    var count = brandCounts[normBrand];
+                    brandLogos.TryGetValue(normBrand, out var logoUrl);
+
+                    <label>
+                        <input type="checkbox" class="brandCheckbox" value="@normBrand" />
+                        @if (!string.IsNullOrWhiteSpace(logoUrl))
+                        {
+                            <img src="@logoUrl" alt="@displayName logo" width="20" height="20" />
+                        }
+                        <span>
+                            @displayName
+                            (<span class="brand-count">@count</span>)
+                        </span>
+                    </label>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">Χρονολογία <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+        <div class="filter-content">
+            <div class="input-group">
+                <label> Από:</label>
+                <input type="number"
+                id="minYearInput"
+                name="minYear"
+                min="2000"
+                max="@DateTime.Now.Year"
+                placeholder="π.χ. 2010" />
+
+                <label>Έως:</label>
+                <input type="number"
+                id="maxYearInput"
+                name="maxYear"
+                min="2000"
+                max="@DateTime.Now.Year"
+                placeholder="π.χ. 2025" />
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">Χιλιόμετρα <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+        <div class="filter-content">
+            <div class="input-group">
+                <label for="minKlmInput">Από:</label>
+                <input type="number"
+                id="minKlmInput"
+                name="minKm"
+                min="0"
+                max="200000"
+                placeholder="π.χ. 50000" />
+
+                <label for="maxKlmInput">Έως:</label>
+                <input type="number"
+                id="maxKlmInput"
+                name="maxKm"
+                min="0"
+                max="200000"
+                placeholder="π.χ. 150000" />
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">
+            Καύσιμο <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+        </button>
+
+        <div class="filter-content">
+            <div class="twoColumns-grid">
+                @foreach (var normFuel in allFuels)
+                {
+                    var displayNameFuels = fuelDisplayNames[normFuel];
+                    var countF = fuelCounts[normFuel];
+
+                    <label>
+                        <input type="checkbox" class="fuelCheckbox" value="@normFuel" />
+                        <span>
+                            @displayNameFuels
+                            (<span class="fuel-count">@countF</span>)
+                        </span>
+                    </label>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">Κυβικά (cc) <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+        <div class="filter-content">
+            <div class="input-group">
+                <label>Από:</label>
+                <input type="number" id="minCcInput" name="minCc" min="600" max="6000" placeholder="π.χ. 1400" />
+                
+                <label>Έως:</label>
+                <input type="number" id="maxCcInput" name="maxCc" min="600" max="6000" placeholder="π.χ. 2000" />
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">Ιπποδύναμη (Bhp) <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
+        <div class="filter-content">
+            <div class="input-group">
+                <label>Από:</label>
+                <input type="number" id="minHpInput" name="minHp" min="100" max="1000" placeholder="π.χ. 100" />
+                
+                <label>Έως:</label>
+                <input type="number" id="maxHpInput" name="maxHp" min="100" max="1000" placeholder="π.χ. 400" />
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">
+            Κιβώτιο Ταχυτήτων <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+        </button>
+
+        <div class="filter-content">
+            <div class="twoColumns-grid">
+                @foreach (var normTransmission in allTransmissionTypes)
+                {
+                    var displayNameTransmissions = transmissionTypelDisplayNames[normTransmission];
+                    var countT = transmissionTypeCounts[normTransmission];
+
+                    <label>
+                        <input type="checkbox" class="transmissionCheckbox" value="@normTransmission" />
+                        <span>
+                            @displayNameTransmissions
+                            (<span class="transmission-count">@countT</span>)
+                        </span>
+                    </label>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">
+            Χρώμα <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+        </button>
+
+        <div class="filter-content">
+            <div class="twoColumns-grid">
+                @foreach (var normColor in allColors)
+                {
+                    var displayNameColor = colorNames[normColor];
+                    var countC = colorCounts[normColor];
+
+                    <label>
+                        <input type="checkbox" class="colorCheckbox" value="@normColor" />
+                        <span>
+                            @displayNameColor
+                            (<span class="color-count">@countC</span>)
+                        </span>
+                    </label>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-item">
+        <button class="filter-toggle">
+            Τύπος Αυτοκινήτου <span class="icon"><i class="fa-solid fa-chevron-down"></i></span>
+        </button>
+
+        <div class="filter-content">
+            <div class="twoColumns-grid">
+                @foreach (var normType in allTypeOfCars)
+                {
+                    var displayNameType = typeOfCarNames[normType];
+                    var countType = typeOfCarCounts[normType];
+
+                    <label>
+                        <input type="checkbox" class="carTypeCheckbox" value="@normType" />
+                        <span>
+                            @displayNameType
+                            (<span class="carType-count">@countType</span>)
+                        </span>
+                    </label>
+                }
+            </div>
+        </div>
+	</div>

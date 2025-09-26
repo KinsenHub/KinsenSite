@@ -1,8 +1,9 @@
 .usedCars-container {
   display: flex;
-  flex-direction: row;
-  margin-top: 50px;
-  margin-bottom: 50px;
+  align-items: flex-start;
+  /* gap: 2rem; */
+  width: 100%;
+  margin-top: 3rem;
 }
 
 .filters-container {
@@ -10,21 +11,12 @@
   width: 20%;
   max-width: 100%;
   margin-left: 30px;
-  /* background-color: purple !important; */
-}
-
-.carsAndPaginationOUTER {
-  /* o eksw container twn autokinitwn : AUTOS KAI O PANW EINAI TO SUNOLO TOU usedCars-container*/
-  width: 80%;
-  margin-left: 3rem;
-  /* background-color: yellow !important; */
 }
 
 .usedCar-img-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* padding: 20px; */
 }
 
 .usedCar-img {
@@ -39,7 +31,6 @@
   font-size: 2.5rem;
   /* font-weight: bold; */
   font-family: "Open Sans", sans-serif;
-  color: #39c0c3 !important;
 }
 
 .clear-filters-btn {
@@ -47,7 +38,7 @@
   font-weight: 600;
   border: none;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #fff;
   color: #007c91;
   cursor: pointer;
   position: relative;
@@ -57,23 +48,6 @@
 .clear-filters-btn:hover {
   transform: translateY(-2px) scale(1.03);
 }
-
-/* .results-btn {
-  padding: 14px 24px;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  background-color: #007c91;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  position: relative;
-  overflow: hidden;
-  margin-left: auto;
-  display: block;
-} */
 
 .filter-static-header {
   display: flex;
@@ -121,7 +95,7 @@
   background: transparent;
   border: none;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.1rem !important;
   width: 100%;
   text-align: left;
   padding: 0.5rem 0;
@@ -143,49 +117,6 @@
 
 .filter-item.active .filter-content {
   display: block;
-}
-
-.sidebar {
-  width: 320px; /* ήταν 100% ή πιο στενό */
-  max-width: 320px; /* κρατάμε όριο */
-  box-sizing: border-box;
-  background-color: #f9f9f9;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  padding: 1.5rem;
-  font-family: "Segoe UI", sans-serif;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  margin-bottom: 1rem;
-  overflow-x: hidden;
-  align-self: flex-start;
-  height: auto;
-}
-/* ----------- Laptop & Tablet ----------- */
-@media (max-width: 992px) {
-  .sidebar {
-    position: fixed; /* γίνεται off-canvas */
-    top: 0;
-    left: -300px; /* κρυφό αρχικά */
-    height: 100%;
-    width: 280px;
-    z-index: 1050;
-    overflow-y: auto;
-    transition: left 0.3s ease-in-out;
-  }
-  .sidebar.open {
-    left: 0; /* εμφανίζεται */
-  }
-}
-
-/* ----------- Mobile ----------- */
-@media (max-width: 576px) {
-  .sidebar {
-    width: 100%; /* full screen */
-    left: -100%;
-  }
-  .sidebar.open {
-    left: 0;
-  }
 }
 
 .checkbox-columns {
@@ -218,11 +149,6 @@
   align-items: center;
   gap: 0.4rem;
 }
-
-/* .filter-content label {
-  padding: 0 !important;
-  margin: 0 !important;
-} */
 
 input[type="number"] {
   /* padding: 0.45rem; */
@@ -266,13 +192,6 @@ label {
   object-fit: contain;
   object-position: center;
   background: #fff;
-}
-
-.checkbox-columns {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
 }
 
 .checkbox-pair {
@@ -338,44 +257,68 @@ label {
 }
 
 /*-----------------Card Car------------------*/
-.carsAndPagination {
+/* Parent flex */
+/* .usedCars-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+} */
+
+/* .sidebar {
+  width: 450px;
+  max-width: 450px;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  font-family: "Segoe UI", sans-serif;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 1rem;
+  overflow-x: hidden;
+  align-self: flex-start;
+  height: auto;
+  margin-top: 2rem;
+} */
+
+/* Container για pagination + κάρτες */
+/* .carsAndPaginationOUTER {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-}
+} */
 
-.displayCars {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px 20px;
+/* Pagination + grid */
+/* .carsAndPagination {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   width: 100%;
-  margin: auto;
-  padding-left: 40px;
-  border-radius: 12px;
-  position: relative;
-  /*background-color: rgb(149, 80, 149);
-  border: 2px solid red;  */
-}
+} */
 
-.pagination-wrapper {
-  /* background-color: yellow;
-  border: 2px solid blue; */
-}
+/* Grid */
+/* .displayCars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+} */
 
-.cardCar {
-  width: 80% !important;
+/* Κάρτες: να προσαρμόζονται στη στήλη */
+/* .cardCar {
+  width: 200px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  position: relative;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
+} */
 
 .cardCar:hover {
-  /* border: 1px solid #dcdcdc !important; */
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.31);
   transform: translateY(-5px);
 }
@@ -398,12 +341,9 @@ label {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-
   width: 100%;
   min-height: 120px;
   margin: auto 400px;
-  /* padding: 20px 30px; */
-
   background-color: #007c91;
   color: white;
   text-align: center;
@@ -442,9 +382,13 @@ label {
   outline: none;
   box-shadow: 0 0 5px rgba(57, 192, 195, 0.4);
 }
-/* ==================== */
+
 /*  Cars Page Layout */
-/* ==================== */
+.offcanvas,
+.sidebar {
+  overflow-y: auto;
+  overflow-x: hidden !important;
+}
 
 .pagination {
   display: flex;
@@ -499,14 +443,6 @@ label {
   z-index: 5;
 }
 
-.cars-container {
-  display: flex;
-  gap: 20px;
-  padding: 50px;
-  max-width: 2000px;
-  margin: auto;
-}
-
 .filter-item {
   margin-bottom: 15px;
   border-bottom: 3px solid #eaeaea;
@@ -559,43 +495,9 @@ label {
   accent-color: #007acc;
 }
 
-/* Car Grid (2/3 Width) */
-.car-grid1 {
-  width: 70%; /* Takes 2/3 of the space */
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 cars per row */
-  gap: 30px; /* Space between cars */
-  justify-content: center;
-  align-items: start;
-  align-content: space-between;
-}
-
-/* Car Listing Card (2 cars per row) */
-.car-card {
-  background: white;
-  border-radius: 10px;
-  /* padding: 20px; */
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  transition: transform 0.3s ease;
-  width: 100%;
-  max-width: 400px;
-  position: relative;
-  overflow: hidden;
-  margin: auto; /* Centers each card */
-}
-
 .car-card:hover {
   transform: scale(1.05);
 }
-
-/* Car Image */
-/* .car-card img {
-  width: 100%;
-  height: 200px; 
-  object-fit: cover;
-  border-bottom: 2px solid #ddd;
-} */
 
 /* Car Name */
 .car-card h3 {
@@ -611,49 +513,8 @@ label {
   margin: 8px;
 }
 
-/* Car Description */
-.car-card .car-description {
-  font-size: 12px;
-  color: #555;
-  /* padding: 8px; */
-  line-height: 1.4;
-  /* height: 30px; */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  /* margin-left: 5px; */
-  /* white-space: nowrap; */
-}
-
 /* ==================== */
-/* Responsive Design */
-/* ==================== */
-
-@media (max-width: 1199px) {
-  .car-grid1 {
-    width: 100%;
-    grid-template-columns: repeat(2, 1fr); /* 2 cars per row */
-  }
-
-  .car-card {
-    width: 100%;
-    margin: auto;
-  }
-}
-
-@media (max-width: 767px) {
-  .car-grid1 {
-    width: 100%;
-    grid-template-columns: repeat(1, 1fr); /* 1 car per row */
-  }
-
-  .car-card {
-    width: 100%;
-    margin: auto;
-  }
-}
-
-/* ==================== */
-/* π Filter Sidebar (Cars Page) */
+/* Filter Sidebar (Cars Page) */
 /* ==================== */
 
 .sidebar h2 {
@@ -706,7 +567,7 @@ label {
 }
 
 /* ==================== */
-/* π Year Slider (Filter Sidebar) */
+/* Year Slider (Filter Sidebar) */
 /* ==================== */
 
 .year-slider-container {
@@ -743,30 +604,152 @@ label {
   cursor: pointer;
 }
 
-/* Hide sidebar on mobile by default */
-@media (max-width: 1024px) {
-  .filter-dropdown-toggle {
-    display: block;
+/*************************MEDIA QUERIES*********************** */
+/* ============ 📱 Mobile (έως 575px) ============ */
+@media (max-width: 575px) {
+  .displayCars {
+    display: grid;
+    grid-template-columns: 1fr; /* 1 κάρτα ανά σειρά */
+    /* gap: 14px; */
     width: 100%;
-    background-color: #032e48;
-    color: white;
-    font-size: 18px;
-    padding: 12px 16px;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    border-radius: 8px;
-    margin-bottom: 10px;
+    justify-items: left;
+    padding: 0 10px;
+    position: relative;
+    overflow: hidden;
   }
 
-  .sidebar.open {
-    display: block;
+  .cardCar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .filters-container {
+    margin: 10px;
   }
 }
 
-/* On desktop: show sidebar as usual */
-@media (min-width: 1025px) {
-  .filter-dropdown-toggle {
-    display: none;
+/* ============ 📱 Tablet (576px – 991px) ============ */
+@media (min-width: 576px) and (max-width: 991px) {
+  .displayCars {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* 2 κάρτες ανά σειρά */
+    gap: 30px;
+    width: 100%;
+    justify-items: center;
+    padding: 0 20px;
+  }
+
+  .cardCar {
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  h5.mb-0 {
+    display: none !important;
+  }
+
+  .sidebar {
+    width: 400px;
+  }
+}
+
+/* ============ 💻 Desktop (≥992px) ============ */
+@media (min-width: 992px) {
+  .sidebar {
+    width: 300px;
+  }
+
+  .displayCars {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* 3 κάρτες ανά σειρά */
+    gap: 50px;
+    width: 100%;
+    max-width: 1400px;
+    justify-items: stretch;
+    padding: 0 40px;
+  }
+
+  .cardCar {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 100px;
+    margin-top: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 1200px) {
+  .displayCars {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 3 κάρτες ανά σειρά */
+    gap: 10px;
+    width: 100%;
+    max-width: 1300px;
+    justify-items: stretch;
+    /* padding: 0 40px; */
+  }
+
+  .cardCar {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+    margin: 30px;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 1400px) {
+  .sidebar {
+    width: 350px;
+  }
+
+  .displayCars {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 120px;
+    width: 100%;
+    max-width: 1400px;
+    justify-items: stretch;
+    padding: 0 40px;
+    margin-left: 30px;
+  }
+
+  .cardCar {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    margin-left: 20px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .sidebar {
+    width: 450px;
+  }
+
+  .displayCars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 120px;
+    width: 100%;
+    max-width: 1400px;
+    justify-items: stretch;
+    padding: 0 40px;
+    margin-left: 50px;
+  }
+
+  .cardCar {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    margin-left: 20px;
   }
 }
