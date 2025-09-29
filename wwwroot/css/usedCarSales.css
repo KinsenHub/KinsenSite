@@ -256,68 +256,6 @@ label {
   background-color: #dcdcdc;
 }
 
-/*-----------------Card Car------------------*/
-/* Parent flex */
-/* .usedCars-container {
-  display: flex;
-  align-items: flex-start;
-  gap: 2rem;
-  width: 100%;
-} */
-
-/* .sidebar {
-  width: 450px;
-  max-width: 450px;
-  box-sizing: border-box;
-  background-color: #f9f9f9;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  padding: 1.5rem;
-  font-family: "Segoe UI", sans-serif;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  margin-bottom: 1rem;
-  overflow-x: hidden;
-  align-self: flex-start;
-  height: auto;
-  margin-top: 2rem;
-} */
-
-/* Container για pagination + κάρτες */
-/* .carsAndPaginationOUTER {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-} */
-
-/* Pagination + grid */
-/* .carsAndPagination {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  width: 100%;
-} */
-
-/* Grid */
-/* .displayCars {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); 
-  gap: 20px;
-  width: 100%;
-  box-sizing: border-box;
-} */
-
-/* Κάρτες: να προσαρμόζονται στη στήλη */
-/* .cardCar {
-  width: 200px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-} */
-
 .cardCar:hover {
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.31);
   transform: translateY(-5px);
@@ -731,6 +669,7 @@ label {
 @media (min-width: 1600px) {
   .sidebar {
     width: 450px;
+    padding-left: 20px !important;
   }
 
   .displayCars {
@@ -741,7 +680,7 @@ label {
     max-width: 1400px;
     justify-items: stretch;
     padding: 0 40px;
-    margin-left: 50px;
+    margin-left: 100px;
   }
 
   .cardCar {
