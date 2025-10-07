@@ -1,100 +1,441 @@
-/* body {
-  padding-top: 70px;
-} */
-
-.navbar-logo {
-  height: 30px;
-  width: auto;
-  object-fit: contain;
-  margin: 0.5rem 3rem;
+/* ================== Variables ================== */
+:root {
+  --nx-h: 56px;
+  --nx-bg: #fff;
+  --nx-text: #0f172a;
+  --nx-accent: #023859;
+  --nx-accent-2: #035171;
+  --nx-border: rgba(0, 0, 0, 0.12);
+  --nx-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
 }
 
-.navbar-nav .nav-item {
-  margin-left: 3rem;
-  margin-right: 2rem;
-  font-size: 1rem;
+/* Το burger να παίρνει το currentColor */
+.nx-toggle .nx-bar {
+  background: currentColor;
 }
 
-.navbar-nav .nav-link:hover {
-  color: #023859;
+/* Μηδενισμοί “gaps” γύρω από το body (παραμένει δική σου επιλογή) */
+body {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
 
-.hero-banner {
-  width: 100%;
-  height: 50vh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+/* ================== Desktop navbar ================== */
+.nx-navbar {
+  height: var(--nx-h);
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
+}
+.nx-container {
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-}
-
-.hero-banner::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 46, 77, 0.473); /* ανοιχτό μπλε φίλτρο */
-  z-index: 1;
-}
-
-#nav-login-btn {
-  background-color: #023859;
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 5px;
-  height: 45px;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-  margin-right: 50px;
-  width: 150px;
-  justify-content: center;
-  text-align: center;
-}
-
-.nav-login-btn:hover {
-  background-color: #035171; /* πιο ανοιχτό για hover */
-  color: #fff;
-  text-decoration: none;
-}
-
-/* Καλύτερη διάταξη για το offcanvas menu */
-.offcanvas-body {
+  padding: 0 16px;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* Ή space-between αν θες κάτω το κουμπί */
   align-items: center;
-  /* height: 100%; */
-  padding: 2rem 1.5rem;
+  justify-content: space-between;
+  gap: 12px;
 }
-
-.offcanvas-body .navbar-nav {
+.nx-toggle {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  display: none; /* εμφανίζεται στο mobile */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.nx-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--nx-text);
+  margin: 3px 0;
+}
+.nx-menu {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* ή center αν θέλεις πλήρη κεντραρίσμα */
-  width: 100%;
-  gap: 1rem;
+  align-items: center;
+  gap: 16px;
+}
+.nx-left,
+.nx-right {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 35px;
+  margin: 0;
+  padding: 0;
+}
+.nx-li {
+  display: flex;
+  align-items: center;
+}
+.nx-link {
+  background: none;
+  border: 0;
+  color: var(--nx-text);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 8px 4px;
+  font-weight: 400;
+}
+.nx-link:hover {
+  color: var(--nx-accent);
 }
 
-.offcanvas-body .nav-link {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #023859;
+.nx-btn {
+  background: var(--nx-accent);
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  min-width: 140px;
+  height: 40px;
+  padding: 0 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.nx-btn:hover {
+  background: var(--nx-accent-2);
+}
+
+/* overlay (χρησιμοποιείται και στο mobile) */
+.nx-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 4999;
+}
+
+/* ================== Mobile / Tablet ================== */
+@media (max-width: 1024px) {
+  .navbar-logoInner {
+    display: block !important;
+    height: 30px !important;
+    width: auto;
+    object-fit: contain;
+    margin: 0.5rem 1rem;
+  }
+
+  /* Default mobile: λευκή μπάρα (sticky) */
+  .nx-fixed {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-bottom: 1px solid var(--nx-border);
+    box-shadow: none;
+    z-index: 6000;
+  }
+
+  /* Home μόνο: διάφανο πάνω στο hero */
+  body.is-home {
+    padding-top: 0;
+  }
+  body.is-home .nx-fixed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  /* burger αριστερά, logo κέντρο */
+  .nx-container {
+    justify-content: center;
+    position: relative;
+  }
+  .nx-brand {
+    margin: 0 auto;
+  }
+  .nx-brand .navbar-logo {
+    height: 40px;
+  }
+
+  .nx-toggle {
+    display: inline-flex;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 26px;
+    cursor: pointer;
+    z-index: 6001;
+    color: #023859; /* default (όχι home) */
+  }
+  body.is-home .nx-toggle {
+    color: #fff;
+  } /* πάνω στο video */
+
+  /* Off-canvas από αριστερά */
+  .nx-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 82vw;
+    max-width: 340px;
+    background: #fff;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transform: translateX(-100%); /* κρυφό */
+    transition: transform 0.28s ease;
+    will-change: transform;
+    z-index: 5001;
+  }
+  .nx-menu.is-open {
+    transform: translateX(0);
+  }
+
+  .nx-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: saturate(100%) blur(1px);
+    z-index: 5000;
+  }
+
+  .nx-left,
+  .nx-right {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    list-style: none;
+    padding: 6px 0 24px;
+    margin: 0;
+  }
+
+  /* Items μέσα στο panel */
+  .nx-menu .nx-link,
+  .nx-menu .kx-link {
+    display: block;
+    font-size: 18px;
+    font-weight: 400;
+    color: #023859;
+    text-decoration: none;
+    padding: 14px 0 12px;
+    position: relative;
+  }
+  /* Τιρκουάζ underline on hover */
+  .nx-menu .nx-link::after,
+  .nx-menu .kx-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 3px;
+    background: #39c0c3;
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    opacity: 0;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+    pointer-events: none;
+  }
+  .nx-menu .nx-link:hover::after,
+  .nx-menu .kx-link:hover::after,
+  .nx-menu .nx-link:focus-visible::after,
+  .nx-menu .kx-link:focus-visible::after {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+
+  /* Dropdowns μέσα στο panel */
+  .nx-menu .kx-dropdown {
+    width: 100%;
+  }
+  .nx-menu .kx-menu {
+    position: static;
+    display: none;
+    margin: 6px 0 12px;
+    padding: 10px;
+    list-style: none;
+    background: #eef2f4;
+    border-radius: 14px;
+    border: 0;
+    box-shadow: none;
+  }
+  .nx-menu .kx-menu.is-open {
+    display: block;
+  }
+  .nx-menu .kx-menu-item {
+    display: block;
+    padding: 10px 12px;
+    color: #023859;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 10px;
+  }
+  .nx-menu .kx-menu-item:hover {
+    background: rgba(0, 180, 200, 0.14);
+    color: #023859;
+  }
+  .kx-link[aria-expanded="true"] .kx-caret {
+    transform: translateY(2px) rotate(180deg);
+  }
+
+  /* Κουμπί “Σύνδεση” */
+  #nav-login-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  /* safe-area */
+  .nx-menu::after {
+    content: "";
+    display: block;
+    height: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+/* ================== Dropdowns (desktop) ================== */
+.kx-dropdown,
+.kx-user-menu {
+  position: relative;
+  display: inline-block;
+}
+.kx-link {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  padding: 0.25rem 0;
+}
+.kx-link:focus {
+  outline: 2px solid rgba(2, 56, 89, 0.35);
+  outline-offset: 2px;
+}
+.kx-caret {
+  display: inline-block;
+  margin-left: 0.4rem;
+  border-top: 5px solid currentColor;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  transform: translateY(2px);
+}
+.kx-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 12rem;
+  margin: 0;
   padding: 0.5rem 0;
-  text-align: left;
-  width: 100%;
+  list-style: none;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  display: none;
+  z-index: 5002;
+}
+.kx-menu.is-open {
+  display: block;
+}
+.kx-menu-item {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #212529;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.kx-menu-item:hover {
+  background: #f8f9fa;
+}
+.kx-danger {
+  color: #dc3545;
+}
+.kx-user-menu .kx-menu {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
 }
 
-/* Το κουμπί σύνδεσης πάντα στο κάτω μέρος */
-.offcanvas-body .nav-login-btn {
-  margin-top: auto;
-  align-self: center;
-  width: 80%;
+.kx-btn-user {
+  background: var(--nx-accent);
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  min-width: 140px;
+  height: 40px;
+  padding: 0 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.kx-btn-user:hover {
+  background: var(--nx-accent-2);
+}
+
+/* Πολύ στενές οθόνες: dropdown shift */
+@media (max-width: 576px) {
+  #companyMenu {
+    left: 5px;
+    right: auto;
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+/* ============ >=1100px: desktop, STICKY ============ */
+@media (min-width: 1400px) {
+  .navbar-logo {
+    height: 40px !important;
+    width: auto !important;
+  }
+
+  .nx-fixed {
+    position: sticky !important;
+    top: 0;
+    left: auto;
+    right: auto; /* καθάρισμα πιθανών inline */
+    inset-inline: auto;
+    inset-block-start: 0;
+    z-index: 6000;
+    background: #fff;
+    border-bottom: 1px solid var(--nx-border);
+    box-shadow: none;
+  }
+
+  /* Αποφυγή κλασικών blockers του sticky */
+  .nx-navbar,
+  .nx-container {
+    overflow: visible !important;
+  }
+  .nx-navbar,
+  .nx-container,
+  .nx-fixed {
+    transform: none !important;
+  }
+
+  /* στο desktop κρύψε το burger */
+  .nx-toggle {
+    display: none !important;
+  }
+
+  /* βεβαιώσου ότι το off-canvas mode δεν μένει ενεργό */
+  #nxMenu {
+    position: static !important;
+    transform: none !important;
+  }
 }

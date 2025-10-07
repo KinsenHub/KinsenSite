@@ -21,7 +21,6 @@
 	@* var fourStepsBlock = Model.Value<IEnumerable<BlockListItem>>("fourSteps"); *@
 	var accordionQuestionsBlock = Model.Value<IEnumerable<BlockListItem>>("accordionQuestions");
     var carouselBackImage = Model.Value<MediaWithCrops>("carouselBackImage");
-
     // Κατάσταση χρήστη
     var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
 }
@@ -176,29 +175,30 @@
 @*----------------Photo Trilogy------------------*@
 <section class="gallery-bg">
 
-    @if (photoTrilogy != null && photoTrilogy.Any())
+@if (photoTrilogy != null && photoTrilogy.Any())
+{
+    foreach (var item in photoTrilogy)
     {
-        foreach (var item in photoTrilogy)
-        {
-            var content = item.Content;
+        var content = item.Content;
 
-            var trilogyPhoto1 = content.Value<MediaWithCrops>("trilogyPhoto1");
-            var trilogyPhoto2 = content.Value<MediaWithCrops>("trilogyPhoto2");
-            var trilogyPhoto3 = content.Value<MediaWithCrops>("trilogyPhoto3");
+        var trilogyPhoto1 = content.Value<MediaWithCrops>("trilogyPhoto1");
+        var trilogyPhoto2 = content.Value<MediaWithCrops>("trilogyPhoto2");
+        var trilogyPhoto3 = content.Value<MediaWithCrops>("trilogyPhoto3");
 
-            <div class="photo-trilogy-container">
-                <div class="main-photo">
-                    <img src="@trilogyPhoto1?.Url()" alt="Main Photo" />
-                </div>
-                <div class="side-photos">
-                    <img src="@trilogyPhoto2?.Url()" alt="Side Photo 1" />
-                    <img src="@trilogyPhoto3?.Url()" alt="Side Photo 2" />
-                </div>
+        <div class="photo-trilogy-container">
+            <div class="main-photo">
+                <img src="@trilogyPhoto1?.Url()" alt="Main Photo" />
             </div>
-        }
+            <div class="side-photos">
+                <img src="@trilogyPhoto2?.Url()" alt="Side Photo 1" />
+                <img src="@trilogyPhoto3?.Url()" alt="Side Photo 2" />
+            </div>
+        </div>
     }
+}
 
-    @if (trilogyBlock != null && trilogyBlock.Any())
+    
+@if (trilogyBlock != null && trilogyBlock.Any())
     {
         <div class="photo-trilogy-container">
             @foreach (var item in trilogyBlock)

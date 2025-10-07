@@ -1,40 +1,7 @@
-/*
 .warranty-img-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
-
-.warranty-img {
-  border-radius: 12px;
-  max-width: 100%;
-  height: auto;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
-.warranty-title {
-  margin-top: 30px;
-  font-size: 2.5rem;
-  font-family: "Open Sans", sans-serif;
-  color: #39c0c3;
-}
-
-.warranty-subtitle {
-  margin-top: 10px;
-  font-size: 1.1rem;
-  color: #001858;
-}
-
-.loan-info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  max-width: 70%;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-  */
 
 .loan-card {
   background-color: #ffffff;
@@ -63,15 +30,17 @@
 
   .warranty-title {
     margin-top: 30px;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-family: "Open Sans", sans-serif;
     color: #39c0c3;
+    width: 90%;
   }
 
   .warranty-subtitle {
     margin-top: 10px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: #001858;
+    width: 70%;
   }
 
   .loan-info-grid {
@@ -85,7 +54,7 @@
   .loan-card h2 {
     font-size: 1rem;
     color: #39c0c3;
-    font-weight: bold;
+    /* font-weight: bold; */
     margin-bottom: 15px;
   }
 }
@@ -95,6 +64,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .warranty-img {
+    border-radius: 12px;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   }
 
   .warranty-title {
@@ -106,7 +84,7 @@
 
   .warranty-subtitle {
     margin-top: 10px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #001858;
   }
 
@@ -121,49 +99,13 @@
   .loan-card h2 {
     font-size: 1.2rem;
     color: #39c0c3;
-    font-weight: bold;
+    /* font-weight: bold; */
     margin-bottom: 15px;
   }
 }
 
 /* ============ 💻 Desktop (≥992px) ============ */
 @media (min-width: 992px) {
-  .warranty-img-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .warranty-title {
-    margin-top: 30px;
-    font-size: 1.7rem;
-    font-family: "Open Sans", sans-serif;
-    color: #39c0c3;
-  }
-
-  .warranty-subtitle {
-    margin-top: 10px;
-    font-size: 1rem;
-    color: #001858;
-  }
-
-  .loan-info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-    max-width: 80%;
-    margin: 0 auto;
-  }
-
-  .loan-card h2 {
-    font-size: 1.2rem;
-    color: #39c0c3;
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-}
-
-@media (min-width: 1200px) {
   .warranty-img-wrapper {
     display: flex;
     flex-direction: column;
@@ -179,7 +121,43 @@
 
   .warranty-subtitle {
     margin-top: 10px;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
+    color: #001858;
+  }
+
+  .loan-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+
+  .loan-card h2 {
+    font-size: 1.2rem;
+    color: #39c0c3;
+    /* font-weight: bold; */
+    margin-bottom: 15px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .warranty-img-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .warranty-title {
+    margin-top: 30px;
+    font-size: 2.1rem;
+    font-family: "Open Sans", sans-serif;
+    color: #39c0c3;
+  }
+
+  .warranty-subtitle {
+    margin-top: 10px;
+    font-size: 1.2rem;
     color: #001858;
   }
 
@@ -194,7 +172,11 @@
   .loan-card h2 {
     font-size: 1.4rem;
     color: #39c0c3;
-    font-weight: bold;
+    /* font-weight: bold; */
     margin-bottom: 15px;
+  }
+
+  .loan-card span {
+    font-size: 11rem;
   }
 }

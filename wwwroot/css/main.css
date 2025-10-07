@@ -37,7 +37,7 @@ body {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7); /* για να ξεχωρίζει */
 }
 
-/* .hero-title {
+.hero-title {
   color: white;
   font-size: 4rem;
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
@@ -45,7 +45,7 @@ body {
   padding: 0 1rem;
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
-} */
+}
 
 /* Stats Item */
 .stats-row {
@@ -93,6 +93,7 @@ body {
 } */
 
 /*--------CAR ICONS---------*/
+
 .feature-icon {
   width: 180px;
   height: 180px;
@@ -166,8 +167,75 @@ body {
   filter: blur(6px) brightness(0.6); /* θαμπάδα + σκοτείνιασμα */
 }
 
+/* Feature Card */
+.featureTitle {
+  font-size: 30px;
+  margin-top: 70px;
+  color: #002e4d;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.features-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3rem;
+  margin: 3rem auto;
+  max-width: 1400px;
+  padding: 1 1rem;
+}
+
+.feature-card {
+  background-color: #ffffff;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  border: none !important; /* 1px solid #007c91; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  /* box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1); */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 1.5rem;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  color: #002e4d;
+  margin-bottom: 1rem;
+}
+
+.feature-description p {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  color: #002e4d;
+}
+
+.feature-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.feature-card-link:hover .feature-card {
+  box-shadow: 0 0 15px rgba(0, 100, 200, 0.2);
+  transform: scale(1.03);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
 .carousel-inner {
-  padding: 60px 0;
+  padding: 10px 0;
 }
 
 .car-card {
@@ -377,75 +445,8 @@ body {
   font-weight: light;
 }
 
-/* Feature Card */
-.featureTitle {
-  font-size: 30px;
-  margin-top: 70px;
-  color: #002e4d;
-  font-family: "Open Sans", sans-serif;
-  font-weight: 300;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-  text-align: center;
-}
-
-.features-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 3rem;
-  margin: 3rem auto;
-  max-width: 1400px;
-  padding: 0 1rem;
-}
-
-.feature-card {
-  background-color: #ffffff;
-  width: 230px;
-  height: 230px;
-  border-radius: 50%;
-  border: none !important; /* 1px solid #007c91; */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  /* box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1); */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  padding: 1.5rem;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
-.feature-icon {
-  font-size: 3rem;
-  color: #002e4d;
-  margin-bottom: 1rem;
-}
-
-.feature-description p {
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 0;
-  color: #002e4d;
-}
-
-.feature-card-link {
-  text-decoration: none;
-  color: inherit;
-}
-
-.feature-card-link:hover .feature-card {
-  box-shadow: 0 0 15px rgba(0, 100, 200, 0.2);
-  transform: scale(1.03);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
 /* FourSteps */
-.steps-section {
+/* .steps-section {
   background-color: #002e4d !important;
   padding: 50px 20px;
 }
@@ -458,7 +459,7 @@ body {
   font-weight: 300;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
   text-align: center;
-}
+} */
 /*
 .step-card {
   display: flex;
@@ -565,6 +566,7 @@ body {
 @media (max-width: 575px) {
   h1.hero-title {
     font-size: 2rem;
+    font-weight: 300;
   }
 
   .hero-video {
@@ -593,7 +595,7 @@ body {
   }
 
   .stat-number {
-    font-size: 3rem;
+    font-size: 2.3rem;
     font-weight: bold;
     color: #001858;
   }
@@ -623,6 +625,13 @@ body {
     font-size: 1.8rem;
   }
 
+  .feature-description p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    color: #002e4d;
+  }
+
   .cardCar {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
@@ -648,7 +657,7 @@ body {
   }
 
   .text-block-h3 {
-    font-size: 1.8rem !important;
+    font-size: 1.6rem !important;
     font-weight: bold;
   }
 
@@ -661,6 +670,7 @@ body {
 @media (min-width: 576px) and (max-width: 991px) {
   h1.hero-title {
     font-size: 3rem;
+    font-weight: 300 !important;
   }
 
   .hero-video {
@@ -689,7 +699,7 @@ body {
   }
 
   .stat-number {
-    font-size: 3.2rem;
+    font-size: 3rem;
     font-weight: bold;
     color: #001858;
   }
@@ -701,7 +711,7 @@ body {
   }
 
   .stats-paragr {
-    max-width: 70%;
+    max-width: 80%;
     margin: 50px auto; /* auto για να μπει στο κέντρο */
     color: #001858;
     font-family: "Open Sans", sans-serif;
@@ -711,12 +721,30 @@ body {
     text-align: center;
   }
 
+  .features-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+    justify-items: center;
+    align-items: start;
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 1rem;
+  }
+
   .prosfores {
     text-align: center;
     color: #39c0c3;
     font-weight: 400;
     margin: 30px;
     font-size: 1.9rem;
+  }
+
+  .feature-description p {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    color: #002e4d;
   }
 
   .cardCar {
@@ -786,19 +814,19 @@ body {
   }
 
   .stat-number {
-    font-size: 3.9rem;
+    font-size: 3.5rem;
     font-weight: bold;
     color: #001858;
   }
 
   .stat-label {
     margin-top: 10px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #333;
   }
 
   .stats-paragr {
-    max-width: 70%;
+    max-width: 80%;
     margin: 50px auto; /* auto για να μπει στο κέντρο */
     color: #001858;
     font-family: "Open Sans", sans-serif;
@@ -817,7 +845,7 @@ body {
   }
 
   .feature-description p {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: 500;
     margin: 0;
     color: #002e4d;
@@ -853,13 +881,13 @@ body {
   }
 
   .trilogy-text-block p {
-    font-size: 1rem !important;
+    font-size: 1.2rem !important;
   }
 }
 
 @media (min-width: 1200px) {
   h1.hero-title {
-    font-size: 5rem;
+    font-size: 3.8rem;
     font-weight: 300;
   }
 
@@ -884,12 +912,12 @@ body {
     padding: 1rem;
     color: #fff;
     font-size: clamp(1.2rem, 4vw, 2rem);
-    font-weight: bold;
+    font-weight: 300;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
   }
 
   .stat-number {
-    font-size: 4.6rem;
+    font-size: 3.5rem;
     font-weight: bold;
     color: #001858;
   }
@@ -901,18 +929,18 @@ body {
   }
 
   .stats-paragr {
-    max-width: 50%;
+    max-width: 90%;
     margin: 50px auto; /* auto για να μπει στο κέντρο */
     color: #001858;
     font-family: "Open Sans", sans-serif;
     text-align: center;
-    font-size: 2rem;
+    font-size: 1.9rem;
     line-height: 1.4;
     text-align: center;
   }
 
   .feature-description p {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-weight: 500;
     margin: 0;
     color: #002e4d;
@@ -923,7 +951,7 @@ body {
     color: #39c0c3;
     font-weight: 400;
     margin: 30px;
-    font-size: 2.3rem;
+    font-size: 2rem;
   }
 
   .cardCar {
@@ -951,11 +979,11 @@ body {
   }
 
   .text-block-h3 {
-    font-size: 2rem !important;
+    font-size: 1.7rem !important;
     font-weight: bold;
   }
 
   .trilogy-text-block p {
-    font-size: 1.7rem !important;
+    font-size: 1.4rem !important;
   }
 }

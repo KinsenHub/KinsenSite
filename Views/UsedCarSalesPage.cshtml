@@ -174,25 +174,31 @@
 <div class="usedCars-container">
 
 	<!-- Sidebar Responsive -->
-	<div class="filters-container my-2">
+	<div class="filters-container">
 
 		<!-- Κουμπί Burger μόνο σε κινητά -->
-		<button class="btn btn-primary d-lg-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersSidebar">
+		<button class="btn btn-primary btn-filters" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersSidebar">
 			<i class="fas fa-filter"></i> Φίλτρα
 		</button>
 
 		<!-- Offcanvas (Mobile/Tablet) -->
 		<div class="offcanvas offcanvas-start w-100" tabindex="-1" id="filtersSidebar">
 			<div class="offcanvas-header">
-			<h5 class="offcanvas-title">Φίλτρα</h5>
-			<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+				<h5 class="offcanvas-title" style="color:#032e48;">Φίλτρα</h5>
 			</div>
 			<div class="offcanvas-body">
 				<aside class="sidebar">
 					<div class="filter-static-header d-flex justify-content-between align-items-center mb-3">
 						@* <h6 class="mb-0 filtra" style="color:#032e48;">Φίλτρα</h6>  *@
-						<button onclick="clearAllFilters()" class="clear-filters-btn">
+						<button type="button" onclick="clearAllFilters()" class="clear-filters-btn">
 							<i class="fa-solid fa-arrows-rotate"></i> Καθαρισμός
+						</button>
+
+						<button type="button"
+							class="offcanvas-close"
+							data-bs-dismiss="offcanvas"
+							aria-label="Κλείσιμο">
+							<span aria-hidden="true"><i class="fa-solid fa-xmark"></i></span>
 						</button>
 					</div>
 					
@@ -202,9 +208,9 @@
 						<div class="filter-content">
 							<div class="input-group">
 								<label>Από:</label>
-								<input type="number" id="minPriceInput"  placeholder="π.χ. 5000" />
+								<input type="number" id="minPriceInputMobile"  placeholder="π.χ. 5000" />
 								<label>Έως:</label>
-								<input type="number" id="maxPriceInput" placeholder="π.χ. 20000" />
+								<input type="number" id="maxPriceInputMobile" placeholder="π.χ. 20000" />
 							</div>
 							<div class="checkbox-columns">
 								<div class="checkbox-pair">
@@ -264,7 +270,7 @@
 							<div class="input-group">
 								<label> Από:</label>
 								<input type="number"
-								id="minYearInput"
+								id="minYearInputMobile"
 								name="minYear"
 								min="2000"
 								max="@DateTime.Now.Year"
@@ -272,7 +278,7 @@
 
 								<label>Έως:</label>
 								<input type="number"
-								id="maxYearInput"
+								id="maxYearInputMobile"
 								name="maxYear"
 								min="2000"
 								max="@DateTime.Now.Year"
@@ -287,7 +293,7 @@
 							<div class="input-group">
 								<label for="minKlmInput">Από:</label>
 								<input type="number"
-								id="minKlmInput"
+								id="minKlmInputMobile"
 								name="minKm"
 								min="0"
 								max="200000"
@@ -295,7 +301,7 @@
 
 								<label for="maxKlmInput">Έως:</label>
 								<input type="number"
-								id="maxKlmInput"
+								id="maxKlmInputMobile"
 								name="maxKm"
 								min="0"
 								max="200000"
@@ -333,10 +339,10 @@
 						<div class="filter-content">
 							<div class="input-group">
 								<label>Από:</label>
-								<input type="number" id="minCcInput" name="minCc" min="600" max="6000" placeholder="π.χ. 1400" />
+								<input type="number" id="minCcInputMobile" name="minCc" min="600" max="6000" placeholder="π.χ. 1400" />
 								
 								<label>Έως:</label>
-								<input type="number" id="maxCcInput" name="maxCc" min="600" max="6000" placeholder="π.χ. 2000" />
+								<input type="number" id="maxCcInputMobile" name="maxCc" min="600" max="6000" placeholder="π.χ. 2000" />
 							</div>
 						</div>
 					</div>
@@ -346,10 +352,10 @@
 						<div class="filter-content">
 							<div class="input-group">
 								<label>Από:</label>
-								<input type="number" id="minHpInput" name="minHp" min="100" max="1000" placeholder="π.χ. 100" />
+								<input type="number" id="minHpInputMobile" name="minHp" min="100" max="1000" placeholder="π.χ. 100" />
 								
 								<label>Έως:</label>
-								<input type="number" id="maxHpInput" name="maxHp" min="100" max="1000" placeholder="π.χ. 400" />
+								<input type="number" id="maxHpInputMobile" name="maxHp" min="100" max="1000" placeholder="π.χ. 400" />
 							</div>
 						</div>
 					</div>
@@ -430,7 +436,7 @@
 			</div>
 		</div>
 
-		<!-- Sidebar σταθερό (Desktop) -->
+		<!----- Sidebar σταθερό (Desktop) --------------->
 		<aside class="sidebar d-none d-lg-block">
 			<div class="filter-static-header d-flex justify-content-between align-items-center mb-3">
 				<h5 class="mb-0" style="color:#032e48;">Φίλτρα</h5>
@@ -439,15 +445,14 @@
 				</button>
 			</div>
 			
-
 			<div class="filter-item">
 				<button class="filter-toggle">Τιμή <span class="icon"><i class="fa-solid fa-chevron-down"></i></span></button>
 				<div class="filter-content">
 					<div class="input-group">
 						<label>Από:</label>
-						<input type="number" id="minPriceInput"  placeholder="π.χ. 5000" />
+						<input type="number" id="minPriceInputDesk" placeholder="π.χ. 5000" />
 						<label>Έως:</label>
-						<input type="number" id="maxPriceInput" placeholder="π.χ. 20000" />
+						<input type="number" id="maxPriceInputDesk" placeholder="π.χ. 20000" />
 					</div>
 					<div class="checkbox-columns">
 						<div class="checkbox-pair">
@@ -507,7 +512,7 @@
 					<div class="input-group">
 						<label> Από:</label>
 						<input type="number"
-						id="minYearInput"
+						id="minYearInputDesk"
 						name="minYear"
 						min="2000"
 						max="@DateTime.Now.Year"
@@ -515,7 +520,7 @@
 
 						<label>Έως:</label>
 						<input type="number"
-						id="maxYearInput"
+						id="maxYearInputDesk"
 						name="maxYear"
 						min="2000"
 						max="@DateTime.Now.Year"
@@ -530,7 +535,7 @@
 					<div class="input-group">
 						<label for="minKlmInput">Από:</label>
 						<input type="number"
-						id="minKlmInput"
+						id="minKlmInputDesk"
 						name="minKm"
 						min="0"
 						max="200000"
@@ -538,7 +543,7 @@
 
 						<label for="maxKlmInput">Έως:</label>
 						<input type="number"
-						id="maxKlmInput"
+						id="maxKlmInputDesk"
 						name="maxKm"
 						min="0"
 						max="200000"
@@ -576,10 +581,10 @@
 				<div class="filter-content">
 					<div class="input-group">
 						<label>Από:</label>
-						<input type="number" id="minCcInput" name="minCc" min="600" max="6000" placeholder="π.χ. 1400" />
+						<input type="number" id="minCcInputDesk" name="minCc" min="600" max="6000" placeholder="π.χ. 1400" />
 						
 						<label>Έως:</label>
-						<input type="number" id="maxCcInput" name="maxCc" min="600" max="6000" placeholder="π.χ. 2000" />
+						<input type="number" id="maxCcInputDesk" name="maxCc" min="600" max="6000" placeholder="π.χ. 2000" />
 					</div>
 				</div>
 			</div>
@@ -589,10 +594,10 @@
 				<div class="filter-content">
 					<div class="input-group">
 						<label>Από:</label>
-						<input type="number" id="minHpInput" name="minHp" min="100" max="1000" placeholder="π.χ. 100" />
+						<input type="number" id="minHpInputDesk" name="minHp" min="100" max="1000" placeholder="π.χ. 100" />
 						
 						<label>Έως:</label>
-						<input type="number" id="maxHpInput" name="maxHp" min="100" max="1000" placeholder="π.χ. 400" />
+						<input type="number" id="maxHpInputDesk" name="maxHp" min="100" max="1000" placeholder="π.χ. 400" />
 					</div>
 				</div>
 			</div>
@@ -682,9 +687,27 @@
 		} *@
 		<div class="carsAndPagination">
 			<div id="displayCars" class="displayCars">
-				<div class="noResultsMsg text-center fw-bold fs-5 p-4" style="display: none;">
-					Δεν βρέθηκαν αυτοκίνητα για τα φίλτρα που επιλέξατε. <i class="fa-solid fa-ban"></i>
+    			<div id="noResultsBox">
+					<div class="card-header">
+						<div class="no-results__icon" aria-hidden="true">
+						<i class="fa-solid fa-magnifying-glass"></i>
+						</div>
+					</div>
+
+					<div class="card-body">
+						<h5 class="card-title no-results__title">Δεν βρέθηκαν οχήματα</h5>
+						<p class="card-text no-results__hint">
+						Δοκίμασε να αλλάξεις τα φίλτρα ή καθάρισέ τα για να δεις όλα τα αποτελέσματα.
+						</p>
+						<div class="no-results__actions">
+						<button type="button" class="nr-btn" onclick="clearAllFilters()">
+							<i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+							Καθαρισμός φίλτρων
+						</button>
+						</div>
+					</div>
 				</div>
+
 				@if (carCardBlock != null && carCardBlock.Any())
 				{	
 					var validCards = carCardBlock
@@ -772,5 +795,19 @@
 	</div>
 </div>
 
-<script src="~/js/usedCarSalesFilters.js"></script>
+<script>
+(function(){
+  var el = document.getElementById('filtersSidebar');
+  var btn = el && el.querySelector('.offcanvas-close');
+  if(!el || !btn) return;
+  btn.addEventListener('click', function(){
+    var inst = window.bootstrap && bootstrap.Offcanvas
+      ? bootstrap.Offcanvas.getOrCreateInstance(el) : null;
+    if(inst) inst.hide(); else el.classList.remove('show');
+  });
+})();
+
+</script>
+
+<script src="~/js/usedCarSalesFilters.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

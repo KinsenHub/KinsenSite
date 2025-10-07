@@ -1,43 +1,61 @@
+/* ===== Login Page CSS (fixed for mobile gap) ===== */
+
+/* Fallback αν δεν έχει ήδη οριστεί από το navbar */
+:root {
+  --nx-h: 56px;
+}
+
+/* Βασικά */
 html,
 body {
-  height: 100%;
   margin: 0;
   padding: 0;
-  overflow-y: hidden;
+  overflow-y: auto; /* όχι hidden */
 }
 
+/* Wrapper: ύψος οθόνης ΜΕΙΟΝ το fixed navbar */
 .login-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* να ξεκινά ακριβώς κάτω από το navbar */
   justify-content: center;
-  padding: 0;
   box-sizing: border-box;
-  min-height: 100vh;
+  padding: 8px 16px 24px; /* μικρό, καθαρό padding */
+  min-height: calc(100vh - var(--nx-h));
+}
+@supports (height: 100dvh) {
+  .login-wrapper {
+    min-height: calc(100dvh - var(--nx-h));
+  }
 }
 
+/* Κουτί login */
 .login-box {
   width: 100%;
-  max-width: 700px; /* Πιο φαρδιά */
-  padding: 40px 48px; /* Πιο ψηλή */
+  max-width: 700px;
+  padding: 30px 48px; /* εσωτερική ανάσα */
   border-radius: 15px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
   background: #fff;
   text-align: center;
-  margin-top: 100px;
+  margin-top: 0; /* <-- ήταν 100px: έφτιαχνε το κενό */
+  box-sizing: border-box;
 }
 
+/* Λογότυπο & Τίτλος */
 .login-logo {
   max-width: 200px;
+  height: auto;
   margin-bottom: 20px;
 }
-
 .login-title {
   font-family: "Open Sans", sans-serif;
   color: #001858;
   font-size: 2rem;
   line-height: 1.6;
+  margin: 0 0 8px 0;
 }
 
+/* Labels */
 .login-box label {
   display: block;
   text-align: left;
@@ -46,10 +64,11 @@ body {
   font-size: 17px;
 }
 
+/* Inputs */
 .login-box input[type="email"],
 .login-box input[type="password"] {
   width: 100%;
-  padding: 16px 18px; /* Πιο άνετο padding */
+  padding: 16px 18px;
   border-radius: 10px;
   border: 1px solid #ccc;
   font-size: 17px;
@@ -57,8 +76,8 @@ body {
   outline: none;
 }
 
+/* Button */
 .login-box button {
-  background-color: #33c1cb;
   color: #fff;
   border: none;
   padding: 18px;
@@ -70,7 +89,92 @@ body {
   background-color: #007c91;
   margin-top: 25px;
 }
-
 .login-box button:hover {
   background-color: #007c91;
+}
+
+/* ===== Mobile tweaks ===== */
+@media (max-width: 575px) {
+  .login-wrapper {
+    padding-top: 10px; /* κόψε το “μαξιλαράκι” κάτω απ’ το navbar */
+    padding-inline: 12px;
+  }
+  .login-box {
+    padding-top: 66px; /* δώσε ανάσα ΜΕΣΑ στο box για το logo */
+    padding-inline: 16px;
+  }
+  .login-title {
+    font-size: 1.8rem;
+    line-height: 1.4;
+  }
+  .login-box label {
+    font-size: 16px;
+    margin: 20px 0 8px;
+  }
+  .login-box input[type="email"],
+  .login-box input[type="password"] {
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+  .login-box button {
+    font-size: 16px;
+    padding: 16px;
+  }
+}
+
+/* ===== Tablet (576px–991px) ===== */
+@media (min-width: 576px) and (max-width: 991px) {
+  .login-wrapper {
+    align-items: flex-start;
+    min-height: auto;
+    padding: 100px 30px 30px 30px;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .login-box {
+    padding: 28px 24px 22px;
+    margin: 8px auto 6px;
+    border-radius: 14px;
+  }
+}
+
+@media (min-width: 992px) {
+  .login-wrapper {
+    min-height: auto; /* override του calc(100vh - var(--nx-h)) */
+    padding-top: 120px; /* μικρό κενό πάνω */
+    padding-bottom: 24px; /* μικρό κενό κάτω, όχι «χαλί» */
+  }
+
+  .login-box {
+    margin: 16px auto 12px; /* λίγη ανάσα γύρω από το box */
+  }
+}
+
+@media (min-width: 1200px) {
+  .login-wrapper {
+    min-height: auto;
+    padding-top: 80px;
+    padding-bottom: 24px;
+  }
+
+  .login-box {
+    margin: 16px auto 12px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .login-wrapper {
+    margin-top: 30px;
+    padding-top: 130px;
+    padding-inline: 12px;
+  }
+  .login-box {
+    padding: 100px 170px 100px 170px;
+    padding-inline: 20px;
+  }
+  .login-title {
+    font-size: 1.8rem;
+    line-height: 1.4;
+  }
 }

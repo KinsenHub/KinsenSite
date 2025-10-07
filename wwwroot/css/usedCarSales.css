@@ -1,16 +1,45 @@
+#filtersSidebar .offcanvas-header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+}
+
+#filtersSidebar .offcanvas-close {
+  background: none;
+  border: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px; /* μέγεθος του × */
+  line-height: 1;
+  color: #032e48; /* σκουρό μπλε */
+  opacity: 1;
+  cursor: pointer;
+  padding: 0;
+}
+#filtersSidebar .offcanvas-close:focus {
+  outline: 2px solid rgba(2, 56, 89, 0.25);
+  outline-offset: 2px;
+}
+
+.carsAndPaginationOUTER {
+  width: 100%;
+  /* padding: 10px 15px; */
+}
+
 .usedCars-container {
   display: flex;
   align-items: flex-start;
-  /* gap: 2rem; */
   width: 100%;
-  margin-top: 3rem;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
-.filters-container {
-  /* o container twn filtrwn : AUTOS KAI O KATW EINAI TO SUNOLO TOU usedCars-container*/
-  width: 20%;
-  max-width: 100%;
-  margin-left: 30px;
+#filterSidebar.is-open {
+  display: block;
 }
 
 .usedCar-img-wrapper {
@@ -121,9 +150,9 @@
 
 .checkbox-columns {
   display: flex;
-  gap: 1rem; /* απόσταση μεταξύ των στηλών */
+  gap: 1rem;
   margin-top: 1rem;
-  flex-wrap: wrap; /* να σπάει σε μικρές οθόνες */
+  flex-wrap: wrap;
 }
 
 .checkbox-columns label {
@@ -258,7 +287,8 @@ label {
 
 .cardCar:hover {
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.31);
-  transform: translateY(-5px);
+  /* transform: translateY(-5px); */
+  transform: scale(1.05);
 }
 
 .discount-badge {
@@ -272,22 +302,6 @@ label {
   font-weight: bold;
   border-radius: 0.25rem;
   z-index: 1;
-}
-
-.noResultsMsg {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-  min-height: 120px;
-  margin: auto 400px;
-  background-color: #007c91;
-  color: white;
-  text-align: center;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  font-family: "Open Sans", sans-serif;
 }
 
 /* Price Filter Group */
@@ -433,10 +447,6 @@ label {
   accent-color: #007acc;
 }
 
-.car-card:hover {
-  transform: scale(1.05);
-}
-
 /* Car Name */
 .car-card h3 {
   font-size: 16px;
@@ -543,37 +553,117 @@ label {
 }
 
 /*************************MEDIA QUERIES*********************** */
-/* ============ 📱 Mobile (έως 575px) ============ */
+/* ============= 📱 Mobile (έως 575px) ============== */
+/* :root {
+  --nr-blue: #023859;
+  --nr-teal: #39c0c3;
+  --nr-bg: #f4fbfd;
+  --nr-border: #cfe6ee;
+  --nr-bg-container: rgba(2, 56, 89, 0.08);
+} */
+
 @media (max-width: 575px) {
+  .usedCars-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .filters-container {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+    margin-top: 0 !important;
+  }
+
+  .btn-filters {
+    width: 200px;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .carsAndPaginationOUTER {
+    width: 100%;
+    padding: 10px 20px;
+  }
+
   .displayCars {
     display: grid;
-    grid-template-columns: 1fr; /* 1 κάρτα ανά σειρά */
-    /* gap: 14px; */
-    width: 100%;
-    justify-items: left;
-    padding: 0 10px;
-    position: relative;
-    overflow: hidden;
+    gap: 2rem;
+    justify-items: center;
+    width: 85%;
+    max-width: 100%;
+    grid-template-columns: repeat(1, 1fr);
+    margin: 0 auto;
   }
 
   .cardCar {
     width: 100%;
     max-width: 100%;
+    text-align: center;
+    justify-content: center;
   }
 
-  .filters-container {
-    margin: 10px;
+  .no-results__hint {
+    margin: 20px 10px !important;
+    color: #063247cc;
+    font-size: var(--nr-hint-size);
+    line-height: 1.45;
   }
 }
 
 /* ============ 📱 Tablet (576px – 991px) ============ */
+
 @media (min-width: 576px) and (max-width: 991px) {
+  .btn-filters {
+    margin-bottom: 2rem !important;
+  }
+
+  .clear-filters-btn {
+    font-size: 1.2rem;
+  }
+
+  .usedCars-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 2rem;
+  }
+
+  .sidebar {
+    /* width: 400px; */
+    margin-left: 20px;
+  }
+
+  .filters-container {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+  }
+
+  .btn-filters {
+    width: 250px;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .carsAndPaginationOUTER {
+    width: 100%;
+    padding: 10px 15px;
+  }
+
   .displayCars {
     display: grid;
-    grid-template-columns: repeat(1, 1fr); /* 2 κάρτες ανά σειρά */
+    grid-template-columns: repeat(1, 1fr);
     gap: 30px;
     width: 100%;
     justify-items: center;
+    text-align: center;
     padding: 0 20px;
   }
 
@@ -590,43 +680,94 @@ label {
 
   .sidebar {
     width: 400px;
+    margin-left: 20px;
   }
 }
 
 /* ============ 💻 Desktop (≥992px) ============ */
 @media (min-width: 992px) {
+  .clear-filters-btn {
+    font-size: 1.2rem;
+  }
+
+  .navbar-logo {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+    margin: 0.5rem 1.5rem;
+  }
+
+  .navbar-nav.ms-auto {
+    padding-right: 1rem;
+  }
+
+  .navbar-nav .nav-item {
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
+    font-size: 1rem;
+  }
+
+  #nav-login-btn {
+    width: 130px;
+  }
+
   .sidebar {
-    width: 300px;
+    width: 350px;
+    margin-left: 30px;
+  }
+
+  .btn-filters {
+    display: none !important;
   }
 
   .displayCars {
     display: grid;
-    grid-template-columns: repeat(1, 1fr); /* 3 κάρτες ανά σειρά */
-    gap: 50px;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 30px;
     width: 100%;
     max-width: 1400px;
     justify-items: stretch;
-    padding: 0 40px;
   }
 
   .cardCar {
     width: 100%;
     max-width: 100%;
-    margin-left: 100px;
+    margin-left: 70px;
     margin-top: 30px;
     position: relative;
     overflow: hidden;
   }
+
+  /* #displayCars.is-empty {
+    width: 80%;
+    justify-items: center;
+    margin-top: 50px !important;
+    margin-left: 80px;
+  }
+
+  #displayCars.is-empty #noResultsBox {
+    background: #007b9130;
+    max-width: 720px;
+    width: 90%;
+    margin: 1rem auto;
+    padding: 16px 20px;
+    border-radius: 8px;
+  } */
 }
 
 @media (min-width: 1200px) {
+  .sidebar {
+    width: 370px;
+    padding-right: 30px;
+  }
+
   .displayCars {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* 3 κάρτες ανά σειρά */
     gap: 10px;
     width: 100%;
     max-width: 1300px;
-    justify-items: stretch;
+    justify-items: center;
     /* padding: 0 40px; */
   }
 
@@ -638,21 +779,60 @@ label {
     margin: 30px;
     overflow: hidden;
   }
+
+  .cardCar:hover {
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.31);
+    /* transform: translateY(-5px); */
+    transform: scale(1.01);
+  }
+
+  #displayCars.is-empty {
+    display: grid;
+    grid-template-columns: 1fr; /* απλό layout όταν δεν έχει κάρτες */
+    place-items: center; /* κέντρο οριζόντια & κάθετα */
+    align-content: center; /* κέντρο το περιεχόμενο στο block axis */
+    min-block-size: 40vh; /* λίγο ύψος για ανάσα */
+    padding-block: clamp(16px, 2vw, 32px);
+    padding-inline: clamp(12px, 2vw, 24px);
+  }
+
+  /* Το noResults κουτί: full center, σωστά πλάτη και χωρίς άσκοπα margins */
+  #displayCars.is-empty #noResultsBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    box-sizing: border-box;
+    inline-size: min(
+      100%,
+      var(--nr-box-maxw)
+    ); /* ίδια λογική με width:min(...), RTL-safe */
+    max-inline-size: var(--nr-box-maxw);
+    /* δεν χρειάζεται margin:auto επειδή ο γονιός το κεντράρει ήδη */
+    margin: 0;
+
+    background: #007b9130;
+    padding: var(--nr-box-padding);
+    border-radius: var(--nr-box-radius);
+    border: 1px solid var(--nr-border);
+  }
 }
 
 @media (min-width: 1400px) {
   .sidebar {
-    width: 350px;
+    width: 450px;
   }
 
   .displayCars {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 120px;
+    gap: 80px;
     width: 100%;
     max-width: 1400px;
     justify-items: stretch;
-    padding: 0 40px;
+    padding: 0 10px;
     margin-left: 30px;
   }
 
@@ -662,7 +842,13 @@ label {
     border-radius: 10px;
     position: relative;
     overflow: hidden;
-    margin-left: 20px;
+    /* margin-left: 10px; */
+  }
+
+  .cardCar:hover {
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.31);
+    /* transform: translateY(-5px); */
+    transform: scale(1.01);
   }
 }
 
@@ -672,15 +858,21 @@ label {
     padding-left: 20px !important;
   }
 
+  .carsAndPagination {
+    flex: 1; /* γεμίζει όλο τον διαθέσιμο χώρο */
+    width: auto; /* αφήνεις το flex να κάνει τη δουλειά */
+    max-width: none;
+  }
+
   .displayCars {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 120px;
+    gap: 20px;
     width: 100%;
-    max-width: 1400px;
+    max-width: 2000px;
     justify-items: stretch;
     padding: 0 40px;
-    margin-left: 100px;
+    margin-left: 10px;
   }
 
   .cardCar {
@@ -691,4 +883,134 @@ label {
     overflow: hidden;
     margin-left: 20px;
   }
+}
+
+/* ΑΦΟΡΑ ΤΟ ΜΗΝΥΜΑ NoResults */
+:root {
+  --nr-blue: #023859;
+  --nr-teal: #39c0c3;
+  --nr-bg: #f4fbfd;
+  --nr-border: #cfe6ee;
+
+  /* No-results tokens (desktop/default) */
+  --nr-box-maxw: 720px;
+  --nr-box-width: 90%;
+  --nr-box-padding: 20px 24px;
+  --nr-box-radius: 12px;
+
+  --nr-icon-box: 72px; /* container width/height */
+  --nr-icon-size: 64px; /* <i> font-size */
+
+  --nr-title-size: clamp(1.2rem, 2.1vw, 1.6rem);
+  --nr-hint-size: clamp(0.98rem, 1.6vw, 1.08rem);
+
+  --nr-actions-gap: 10px;
+  --nr-btn-width: 70%;
+  --nr-btn-font: 1rem;
+  --nr-btn-radius: 12px;
+  --nr-btn-padding: 14px 18px;
+}
+
+#noResultsBox {
+  display: none;
+}
+
+#displayCars.is-empty {
+  display: grid;
+  place-items: center;
+  min-height: 40vh;
+}
+
+#displayCars.is-empty #noResultsBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  background: #007b9130;
+  max-width: var(--nr-box-maxw);
+  width: min(var(--nr-box-width), var(--nr-box-maxw));
+  margin: 1rem auto;
+  padding: var(--nr-box-padding);
+  border-radius: var(--nr-box-radius);
+  border: 1px solid var(--nr-border);
+}
+
+#displayCars.is-empty #noResultsBox .card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin-bottom: 6px;
+}
+
+.no-results__icon {
+  width: var(--nr-icon-box);
+  height: var(--nr-icon-box);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--nr-teal);
+  margin-bottom: 6px;
+}
+.no-results__icon i {
+  font-size: var(--nr-icon-size);
+  line-height: 1;
+}
+
+.no-results__title {
+  margin: 0 0 6px;
+  color: var(--nr-blue);
+  font-weight: 600;
+  font-size: var(--nr-title-size);
+  letter-spacing: 0.6px;
+}
+.no-results__hint {
+  margin: 30px 30px;
+  color: #063247cc;
+  font-size: var(--nr-hint-size);
+  line-height: 1.45;
+}
+
+.no-results__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--nr-actions-gap);
+  width: 100%;
+  margin-top: 8px;
+}
+
+.nr-btn {
+  width: var(--nr-btn-width);
+  padding: var(--nr-btn-padding);
+  border-radius: var(--nr-btn-radius);
+  font-weight: 600;
+  font-size: var(--nr-btn-font);
+  border: 2px solid var(--nr-blue);
+  color: #fff;
+  background: var(--nr-blue);
+  transition: transform 0.05s ease, box-shadow 0.15s ease, background 0.2s ease,
+    color 0.2s ease;
+}
+.nr-btn--ghost {
+  background: transparent;
+  color: var(--nr-blue);
+  border: 2px solid var(--nr-blue);
+}
+.nr-btn--ghost:hover {
+  background: rgba(2, 56, 89, 0.06);
+}
+.nr-btn:hover {
+  transform: translateY(-1px);
+}
+.nr-btn:active {
+  transform: translateY(0);
+}
+.nr-btn i {
+  margin-right: 0.4rem;
 }

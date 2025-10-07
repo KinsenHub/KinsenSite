@@ -1,8 +1,13 @@
 let sidebar;
 
+// function toggleFilters() {
+//   sidebar = document.getElementById("filterSidebar");
+//   sidebar.classList.toggle("show");
+// }
+
 function toggleFilters() {
   sidebar = document.getElementById("filterSidebar");
-  sidebar.classList.toggle("show");
+  sidebar.classList.toggle("is-open");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -71,7 +76,15 @@ let makerName,
 
 function filterCards(filters) {
   filteredCards = [];
-  //displayCars.querySelectorAll(".cardCar").forEach((card) => card.remove());
+
+  if (
+    displayCars &&
+    noResultsMsg &&
+    noResultsMsg.parentElement !== displayCars
+  ) {
+    displayCars.prepend(noResultsMsg);
+  }
+  if (noResultsMsg) noResultsMsg.style.display = "none";
 
   allCards = [...originalCardElements]; // shallow copy.
   let anyMatch = false;
@@ -122,7 +135,12 @@ function filterCards(filters) {
     carYear = parseInt(yearText);
 
     klmText = card.querySelector(".klm")?.textContent.trim().replace(/\D/g, "");
-    carKlm = parseFloat(klmText);
+    carKlm = parseInt(
+      klmText
+        .replace(/\u00A0|\u202F/g, "") // non-breaking spaces
+        .replace(/[^\d]/g, ""), // κράτα μόνο ψηφία
+      10
+    );
 
     ccText = card.querySelector(".cc")?.textContent.trim().replace(/\D/g, "");
     carCc = parseInt(ccText);
@@ -208,6 +226,29 @@ function filterCards(filters) {
     }
   });
 
+  // Αφορά το μήνυμα NoResults!!
+  if (noResultsMsg) noResultsMsg.style.display = "none";
+  if (displayCars) displayCars.classList.remove("is-empty");
+
+  // ...
+  if (filteredCards.length === 0) {
+    // καθάρισε/κρύψε κάρτες
+    displayCars
+      .querySelectorAll(".cardCar")
+      .forEach((c) => c.remove?.() || (c.style.display = "none"));
+
+    // Εμφάνισε μήνυμα + κλάση
+    if (noResultsMsg) noResultsMsg.style.display = "block"; // ή ''
+    if (displayCars) displayCars.classList.add("is-empty");
+
+    if (paginationContainer) paginationContainer.style.display = "none";
+    return;
+  } else {
+    if (noResultsMsg) noResultsMsg.style.display = "none";
+    if (displayCars) displayCars.classList.remove("is-empty");
+    if (paginationContainer) paginationContainer.style.display = "";
+  }
+
   if (filters.priceOrder === "asc" || filters.priceOrder === "desc") {
     filteredCards.sort((a, b) => {
       const priceA = parseFloat(
@@ -230,33 +271,26 @@ function filterCards(filters) {
     });
 
     const container = document.getElementById("displayCars");
-    container.innerHTML = "";
+    // container.innerHTML = "";
 
     // ✅ Καθάρισε παλιές κάρτες
-    //container.querySelectorAll(".cardCar").forEach((card) => card.remove());
+    container.querySelectorAll(".cardCar").forEach((card) => card.remove());
 
     filteredCards.forEach((card) => container.appendChild(card));
     currentPage = 1;
     paginateVisibleCars(filteredCards);
   }
 
-  if (anyMatch) {
-    if (noResultsMsg) noResultsMsg.style.display = "none";
-    resetDisplayCarsLayout();
-  } else {
-    if (noResultsMsg) noResultsMsg.style.display = "block";
-    displayCars.style.justifyContent = "center";
-    displayCars.style.alignItems = "center";
-  }
-
   // displayCars.innerHTML = "";
 
   if (!filters.priceOrder) {
-    displayCars.innerHTML = ""; // ✅ Καθαρισμός container
+    [...displayCars.querySelectorAll(".cardCar")].forEach((card) =>
+      card.remove()
+    );
 
     filteredCards.forEach((card) => {
       card.style.display = "flex"; // ή "block" ανάλογα με το layout
-      displayCars.appendChild(card); // ✅ Re-append για να εμφανιστούν σωστά
+      displayCars.appendChild(card);
     });
 
     currentPage = 1;
@@ -264,7 +298,6 @@ function filterCards(filters) {
   }
 
   updateAvailableOffers(filters, filteredCards);
-  //updateAvailableBrands(filters, filteredCards);
 }
 
 //-------------------------------------------------//
@@ -396,12 +429,38 @@ function InitializeCounters(originalCardElements) {
   });
 }
 
+function pickVisible(...ids) {
+  // επέστρεψε το πρώτο ορατό element από τη λίστα IDs
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (el && el.offsetParent !== null) return el; // ορατό
+  }
+  // αλλιώς επέστρεψε όποιο υπάρχει (π.χ. σε SSR/hidden)
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (el) return el;
+  }
+  return null;
+}
+
+function readNumVisible(fallback, ...ids) {
+  const el = pickVisible(...ids);
+  if (!el) return fallback;
+  const s = String(el.value || "")
+    .replace(/\u00A0|\u202F/g, "")
+    .replace(/[^\d]/g, "");
+  return s ? parseInt(s, 10) : fallback;
+}
+
 function collectFilters() {
   return {
     // Τιμή
-    minPrice: parseFloat(document.getElementById("minPriceInput")?.value) || 0,
-    maxPrice:
-      parseFloat(document.getElementById("maxPriceInput")?.value) || Infinity,
+    minPrice: readNumVisible(0, "minPriceInputDesk", "minPriceInputMobile"),
+    maxPrice: readNumVisible(
+      Infinity,
+      "maxPriceInputDesk",
+      "maxPriceInputMobile"
+    ),
     //
     // Προσφορά
     offerTypes: getCheckedValues(".offerTypeCheckbox"),
@@ -410,23 +469,22 @@ function collectFilters() {
     priceOrder: document.getElementById("priceOrderSelect")?.value || null,
     //
     // Έτος
-    minYear: parseInt(document.getElementById("minYearInput")?.value) || 1990,
+    minYear: readNumVisible(0, "minYearInputDesk", "minYearInputMobile"),
     maxYear:
-      parseInt(document.getElementById("maxYearInput")?.value) ||
+      readNumVisible(Infinity, "maxYearInputDesk", "maxYearInputMobile") ||
       new Date().getFullYear(),
     //
     // Χιλιόμετρα
-    minKm: parseFloat(document.getElementById("minKlmInput")?.value) || 0,
-    maxKm:
-      parseFloat(document.getElementById("maxKlmInput")?.value) || Infinity,
+    minKm: readNumVisible(0, "minKlmInputDesk", "minKlmInputMobile"),
+    maxKm: readNumVisible(Infinity, "maxKlmInputDesk", "maxKlmInputMobile"),
     //
     // Κυβικά
-    minCc: parseInt(document.getElementById("minCcInput")?.value) || 0,
-    maxCc: parseInt(document.getElementById("maxCcInput")?.value) || Infinity,
+    minCc: readNumVisible(0, "minCcInputDesk", "minCcInputMobile"),
+    maxCc: readNumVisible(Infinity, "maxCcInputDesk", "maxCcInputMobile"),
     //
     // Ίπποι
-    minhp: parseInt(document.getElementById("minHpInput")?.value) || 0,
-    maxhp: parseInt(document.getElementById("maxHpInput")?.value) || Infinity,
+    minhp: readNumVisible(0, "minHpInputDesk", "minHpInputMobile"),
+    maxhp: readNumVisible(Infinity, "maxHpInputDesk", "maxHpInputMobile"),
     //
     // Κατασκευαστής
     brands: getCheckedValues(".brandCheckbox"),
@@ -453,7 +511,7 @@ function getCheckedValues(selector) {
 
 document.addEventListener("DOMContentLoaded", () => {
   displayCars = document.getElementById("displayCars");
-  noResultsMsg = document.querySelector(".noResultsMsg");
+  noResultsMsg = document.querySelector("#noResultsBox");
   paginationContainer = document.getElementById("paginationControls");
 
   const filterInputs = document.querySelectorAll(
@@ -468,21 +526,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ Listeners σε όλα τα φίλτρα
   filterInputs.forEach((input) => {
     input.addEventListener("change", getSelectedFilters);
+    input.addEventListener("input", getSelectedFilters);
   });
-
-  // const sidebar = document.getElementById("filterSidebar");
-  // const openBtn = document.getElementById("toggleSidebarBtn");
-  // const closeBtn = document.getElementById("closeSidebarBtn");
-
-  // openBtn.addEventListener("click", () => {
-  //   sidebar.classList.add("open");
-  //   document.body.style.overflow = "hidden";
-  // });
-
-  // closeBtn.addEventListener("click", () => {
-  //   sidebar.classList.remove("open");
-  //   document.body.style.overflow = "";
-  // });
 
   //Fetch auth status ΓΙΑ ΝΑ ΜΑΣ ΠΗΓΑΙΝΕΙ ΕΙΤΕ ΣΤΗ carDetails είτε στη carDetailsAnonymous
   fetch("/umbraco/api/auth/status")
@@ -537,28 +582,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (matchedCheckbox) {
         matchedCheckbox.checked = true;
-        console.log("✅ Τικάραμε το φίλτρο:", matchedCheckbox.value);
+        matchedCheckbox.dispatchEvent(new Event("change", { bubbles: true })); // 🔔 τρέχει τους listeners σου
+        getSelectedFilters();
 
         // Άνοιξε accordion
         const filterItem = matchedCheckbox.closest(".filter-item");
         const toggleButton = filterItem?.querySelector(".filter-toggle");
         if (toggleButton) toggleButton.click();
-
-        // Εφάρμοσε φιλτράρισμα
-        const filters = collectFilters();
-        console.log("NAV πριν:", document.getElementById("navbarCollapse"));
-        filterCards(filters);
-        console.log("NAV μετά:", document.getElementById("navbarCollapse"));
-        const navbar = document.getElementById("navbarCollapse");
-        console.log(
-          "Navbar visible?",
-          !!navbar,
-          "offsetTop:",
-          navbar?.offsetTop,
-          "height:",
-          navbar?.offsetHeight
-        );
-        console.log("Scroll position:", window.scrollY);
 
         // Άνοιξε sidebar
         document.getElementById("toggleSidebarBtn")?.click();
@@ -570,85 +600,290 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //----------------Clear Filters-------------------//
-function clearAllFilters() {
-  // Καθαρισμός όλων των input fields
-  document.querySelectorAll("input, select").forEach((input) => {
-    if (input.type === "checkbox" || input.type === "radio") {
-      input.checked = false;
-    } else {
-      input.value = "";
+function cleanupBackdrops() {
+  // καθάρισε τυχόν Bootstrap backdrops
+  document
+    .querySelectorAll(".offcanvas-backdrop, .modal-backdrop")
+    .forEach((n) => n.remove());
+  // ξεκλείδωσε scroll αν έχει μείνει κλειδωμένο
+  document.documentElement.style.overflow = "";
+  document.body.style.overflow = "";
+  document.body.classList.remove("modal-open");
+  // αν (τυχαίνει) υπάρχει δικό σου overlay, κρύψ’ το
+  const nxOv = document.getElementById("nxOverlay");
+  if (nxOv) nxOv.hidden = true;
+}
+
+function closeAllFilterSections(root) {
+  // Custom accordion
+  root.querySelectorAll(".filter-item").forEach((item) => {
+    item.classList.remove("active");
+
+    const toggle = item.querySelector(".filter-toggle");
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
+
+    const content = item.querySelector(".filter-content");
+    if (content) {
+      // Αφαίρεσε inline heights/dispays
+      content.style.maxHeight = "";
+      content.style.height = "";
+      content.style.display = "";
+      content.classList.remove("show");
+      content.setAttribute("aria-hidden", "true");
+
+      // Αν τυχόν είναι Bootstrap collapse, κλείστο σωστά
+      try {
+        if (
+          content.classList.contains("collapse") ||
+          content.classList.contains("show")
+        ) {
+          const inst = bootstrap.Collapse.getOrCreateInstance(content, {
+            toggle: false,
+          });
+          inst.hide();
+        }
+      } catch (_) {}
     }
   });
 
-  document.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
-    checkbox.disabled = false;
-    checkbox.parentElement.style.opacity = "1";
+  // Για την περίπτωση που τα sections είναι καθαρά .collapse χωρίς .filter-item
+  root.querySelectorAll(".collapse.show").forEach((el) => {
+    try {
+      bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).hide();
+    } catch (_) {}
   });
+}
 
-  // Επαναφορά του filters object στην αρχική του μορφή
-  filters = {
-    minPrice: null,
-    maxPrice: null,
-    AscDescPrice: [],
-    brands: [],
-    minYear: null,
-    maxYear: null,
-    minKm: null,
-    maxKm: null,
-    fuel: [],
-    minCc: null,
-    maxCc: null,
-    minHp: null,
-    maxHp: null,
-    transmission: [],
-    color: [],
-    carType: [],
-  };
+function clearAllFilters() {
+  const mobilePanel = document.getElementById("filtersSidebar");
+  const isMobileOpen = !!(
+    mobilePanel && mobilePanel.classList.contains("show")
+  );
 
-  // Κρύψε το μήνυμα "Δεν υπάρχουν αποτελέσματα"
-  if (noResultsMsg) noResultsMsg.style.display = "none";
+  // Από πού θα καθαρίσουμε inputs (mobile offcanvas ή desktop sidebar)
+  const ROOT = (() => {
+    if (isMobileOpen) {
+      return (
+        mobilePanel.querySelector("aside.sidebar") ||
+        mobilePanel.querySelector(".offcanvas-body") ||
+        mobilePanel
+      );
+    }
+    const desk = document.querySelector("aside.sidebar");
+    return desk && (!mobilePanel || !mobilePanel.contains(desk))
+      ? desk
+      : document;
+  })();
 
-  displayCars.querySelectorAll(".cardCar").forEach((card) => card.remove());
-
-  // Επαναφορά κάρτας & layout μετά από καθυστέρηση
-  setTimeout(() => {
-    allCards.forEach((card) => {
-      card.style.display = "flex"; // ή "block" αν χρησιμοποιείται block layout
-      displayCars.appendChild(card);
+  const runClear = () => {
+    // 1) Καθάρισε όλα τα inputs κάτω από το ενεργό panel
+    ROOT.querySelectorAll("input, select, textarea").forEach((el) => {
+      if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+      else el.value = "";
+      el.disabled = false;
+      if (el.parentElement) el.parentElement.style.opacity = "1";
     });
 
-    resetDisplayCarsLayout();
+    // 2) Κλείσε ΟΛΑ τα ανοιχτά sections φίλτρων (custom & Bootstrap collapse)
+    ROOT.querySelectorAll(".filter-item").forEach((item) => {
+      item.classList.remove("active");
+      const toggle = item.querySelector(".filter-toggle");
+      if (toggle) toggle.setAttribute("aria-expanded", "false");
+      const content = item.querySelector(".filter-content");
+      if (content) {
+        content.style.maxHeight = "";
+        content.style.height = "";
+        content.style.display = "";
+        content.classList.remove("show");
+        content.setAttribute("aria-hidden", "true");
+        try {
+          if (
+            content.classList.contains("collapse") ||
+            content.classList.contains("show")
+          ) {
+            bootstrap.Collapse.getOrCreateInstance(content, {
+              toggle: false,
+            }).hide();
+          }
+        } catch (_) {}
+      }
+    });
+    ROOT.querySelectorAll(".collapse.show").forEach((el) => {
+      try {
+        bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).hide();
+      } catch (_) {}
+    });
 
-    currentPage = 1;
-    paginateVisibleCars(Array.from(originalCardElements));
-  }, 300);
+    // 3) Reset του filters object
+    filters = {
+      minPrice: null,
+      maxPrice: null,
+      AscDescPrice: [],
+      priceOrder: null,
+      brands: [],
+      minYear: null,
+      maxYear: null,
+      minKm: null,
+      maxKm: null,
+      fuel: [],
+      minCc: null,
+      maxCc: null,
+      minHp: null,
+      maxHp: null,
+      transmission: [],
+      color: [],
+      carType: [],
+      offerTypes: [],
+    };
 
-  // Κλείσιμο όλων των φίλτρων και επαναφορά βελών
-  document.querySelectorAll(".filter-item").forEach((item) => {
-    item.classList.remove("active");
-  });
+    // 4) UI state
+    if (noResultsMsg) noResultsMsg.style.display = "none";
 
-  InitializeCounters(originalCardElements);
+    // 5) Επαναφορά καρτών & layout
+    if (displayCars && originalCardElements) {
+      displayCars.innerHTML = "";
+      Array.from(originalCardElements).forEach((card) => {
+        card.style.display = "flex"; // ή "block", ανάλογα με το layout σου
+        displayCars.appendChild(card);
+      });
+      resetDisplayCarsLayout?.();
+      currentPage = 1;
+      paginateVisibleCars?.(Array.from(originalCardElements));
+    }
+
+    // 6) Recompute counters & τρέξε κενό filter για συγχρονισμό UI
+    InitializeCounters?.(Array.from(originalCardElements));
+    filterCards?.(collectFilters?.() ?? {});
+
+    // 7) Καθάρισε τυχόν leftover backdrops/scroll locks
+    setTimeout(() => {
+      try {
+        document
+          .querySelectorAll(".offcanvas-backdrop")
+          .forEach((b) => b.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+      } catch (_) {}
+      cleanupBackdrops?.();
+    }, 10);
+  };
+
+  // Αν είμαστε σε mobile, κλείσε πρώτα το offcanvas και μετά τρέξε το clear
+  if (isMobileOpen) {
+    try {
+      const inst = bootstrap.Offcanvas.getOrCreateInstance(mobilePanel);
+      mobilePanel.addEventListener("hidden.bs.offcanvas", runClear, {
+        once: true,
+      });
+      inst.hide();
+    } catch (_) {
+      runClear();
+    }
+  } else {
+    runClear();
+  }
+}
+
+// ===== Infinite Scroll ΜΟΝΟ για κινητό (≤ 575px) =====
+const MOBILE_QUERY = "(max-width: 575px)";
+function isMobile() {
+  return window.matchMedia(MOBILE_QUERY).matches;
+}
+
+let inf = {
+  observer: null,
+  batchSize: 12, // πόσες κάρτες να φορτώνει κάθε φορά
+  offset: 0,
+  source: [],
+};
+
+function destroyInfinite() {
+  if (inf.observer) {
+    inf.observer.disconnect();
+    inf.observer = null;
+  }
+  const s = document.getElementById("infiniteSentinel");
+  if (s) s.remove();
+}
+
+function appendNextBatch() {
+  const sentinel = document.getElementById("infiniteSentinel");
+  const end = Math.min(inf.offset + inf.batchSize, inf.source.length);
+  for (let i = inf.offset; i < end; i++) {
+    const card = inf.source[i];
+    if (!card) continue;
+    card.style.display = "block"; // 👉 αν οι κάρτες σου είναι flex, άλλαξέ το σε "flex"
+    displayCars.insertBefore(card, sentinel || null);
+  }
+  inf.offset = end;
+  if (inf.offset >= inf.source.length) {
+    destroyInfinite(); // όλα φορτώθηκαν
+  }
+}
+
+function initInfinite(sourceList) {
+  destroyInfinite();
+
+  inf.source = sourceList.slice();
+  inf.offset = 0;
+
+  // καθάρισε container & κρύψε pagination controls
+  displayCars.innerHTML = "";
+  const pc = document.getElementById("paginationControls");
+  if (pc) {
+    pc.innerHTML = "";
+    pc.style.display = "none";
+  }
+
+  // sentinel
+  const sentinel = document.createElement("div");
+  sentinel.id = "infiniteSentinel";
+  sentinel.style.cssText = "height:1px;width:100%;";
+  displayCars.appendChild(sentinel);
+
+  // πρώτο batch
+  appendNextBatch();
+
+  // observer για επόμενα batches
+  inf.observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) appendNextBatch();
+      });
+    },
+    { rootMargin: "200px" }
+  );
+  inf.observer.observe(sentinel);
 }
 
 let currentPage = 1;
 
 function getCarsPerPage() {
-  if (window.innerWidth < 768) {
-    return 1; // κινητό
-  } else if (window.innerWidth < 1080) {
-    return 2; // tablet
+  if (window.innerWidth < 1080) {
+    return 4; // tablet
   } else if (window.innerWidth < 1200) {
-    return 3; // μικρό desktop
+    return 4; // μικρό desktop
+  } else if (window.innerWidth < 1400) {
+    return 4;
+  } else if (window.innerWidth < 1600) {
+    return 4;
   } else {
-    return 6; // μεγάλο desktop (2x3)
+    return 9;
   }
 }
 
 function paginateVisibleCars(carList) {
+  // --- Mobile: infinite scroll ---
+  if (isMobile()) {
+    initInfinite(carList);
+    return;
+  }
+
   const carsPerPage = getCarsPerPage();
   const totalPages = Math.ceil(carList.length / carsPerPage);
   const paginationContainer = document.getElementById("paginationControls");
+
+  if (!paginationContainer) return;
 
   // Κρύψε όλες τις κάρτες
   carList.forEach((card) => (card.style.display = "none"));
@@ -718,7 +953,7 @@ function resetDisplayCarsLayout() {
   displayCars.style.alignItems = "flex-start";
   displayCars.style.marginTop = "0";
 
-  const navbar = document.getElementById("navbarCollapse");
+  const navbar = document.querySelector(".navbar.fixed-top");
   const offset = navbar?.offsetHeight || 60;
 
   const topPos =

@@ -1,0 +1,68 @@
+.contact-container {
+  padding: 10px 20px;
+}
+
+@media (max-width: 575px) {
+  .warranty-img-wrapper img {
+    height: 180px;
+    object-fit: cover;
+  }
+
+  .contact-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .submit-btn {
+    width: 100px;
+    height: 45px; /* για σταθερό ύψος */
+    display: flex; /* flex container */
+    align-items: center; /* κέντρο κάθετα */
+    justify-content: center; /* κέντρο οριζόντια */
+    text-align: center;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .warranty-img-wrapper img {
+    height: 250px;
+    object-fit: cover;
+  }
+
+  .contact-title {
+    font-size: 2rem;
+    text-align: center;
+  }
+}
+
+@media (min-width: 992px) {
+  .warranty-img-wrapper img {
+    height: 350px;
+    object-fit: cover;
+  }
+
+  .contact-title {
+    font-size: 2.2rem;
+    text-align: center;
+  }
+
+  .contact-container {
+    padding: 10px 10px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .warranty-img-wrapper img {
+    height: 450px;
+    object-fit: cover;
+  }
+
+  .contact-title {
+    font-size: 2.7rem;
+    text-align: center;
+  }
+
+  .contact-container {
+    padding: 10px 10px;
+  }
+}
