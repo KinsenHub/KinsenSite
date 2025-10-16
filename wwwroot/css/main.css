@@ -17,24 +17,25 @@ body {
 }
 
 .hero-wrapper {
-  position: relative;
+  /* position: relative; */
   width: 100%;
-  height: 80vh; /* 60% του ύψους της οθόνης */
+  height: 80vh;
   overflow: hidden;
 }
 
 .hero-video,
 .hero-overlay {
-  position: absolute;
-  inset: 0; /* γεμίζει όλο το wrapper */
+  position: relative;
+  z-index: 1;
+  inset: 0;
   display: flex;
-  align-items: center; /* κάθετη στοίχιση */
-  justify-content: center; /* οριζόντια στοίχιση */
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  color: #fff; /* να φαίνεται πάνω από το video */
+  color: #fff;
   font-size: 2rem;
   font-weight: bold;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7); /* για να ξεχωρίζει */
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 .hero-title {
@@ -42,9 +43,68 @@ body {
   font-size: 4rem;
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
   text-align: center;
-  padding: 0 1rem;
+  padding: 2rem 1rem;
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
+}
+
+/* --- Pill button --- */
+.pill-cta {
+  --pill-bg: #ffffff;
+  --pill-fg: #0a2d4a; /* χρώμα γραμματοσειράς */
+  --pill-shadow: 0 10px 28px rgba(2, 56, 89, 0.18);
+  --icon-bg: #39c0c3; /* τιρκουάζ κύκλος */
+  --icon-size: 40px; /* διάμετρος κύκλου */
+  --radius: 999px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px 16px 28px;
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 400;
+  box-shadow: var(--pill-shadow);
+  line-height: 1;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.pill-cta__label {
+  letter-spacing: 0.2px;
+  text-shadow: none !important;
+}
+
+.pill-cta:hover .pill-cta__icon {
+  transform: translateX(2px);
+}
+
+.pill-cta:focus-visible {
+  outline: 3px solid rgba(57, 192, 195, 0.35);
+  outline-offset: 4px;
+  box-shadow: 0 14px 34px rgba(2, 56, 89, 0.22);
+}
+
+.pill-cta__icon {
+  display: grid;
+  place-items: center;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border-radius: 50%;
+  background: var(--icon-bg);
+  color: #fff; /* για το SVG */
+  /* transition: transform 0.18s ease; */
+  flex: 0 0 var(--icon-size);
+}
+/* --- τέλος του Pill button --- */
+
+.stats-section {
+  background: #fff;
+  padding: 48px 0 0 0; /* απόσταση από το video */
+  position: relative;
+  z-index: 2;
 }
 
 /* Stats Item */
@@ -60,114 +120,18 @@ body {
   text-align: center;
 }
 
-/* .stat-number {
-  font-size: 6rem;
-  font-weight: bold;
-  color: #001858;
-}
-
-.stat-label {
-  margin-top: 10px;
-  font-size: 1.5rem;
-  color: #333;
-}
-
-.stat-suffix {
-  font-size: 0.3em;
-  margin-left: 4px;
-  vertical-align: baseline;
-  position: relative;
-  top: 0.2em;
-  opacity: 0.8;
-}
-
-.stats-paragr {
-  max-width: 60%;
-  margin: 50px auto; 
-  color: #001858;
-  font-family: "Open Sans", sans-serif;
-  text-align: left;
-  font-size: 2.7rem;
-  line-height: 1.4;
-  text-align: center;
-} */
-
 /*--------CAR ICONS---------*/
-
-.feature-icon {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%; /* κόβει τις γωνίες */
-  overflow: hidden; /* εξαφανίζει ό,τι περισσεύει */
-  margin: 0 auto 1rem;
+.features-container {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
-  background: none; /* χωρίς background */
-  box-shadow: none; /* χωρίς εξωτερικό κύκλο */
+  gap: 3rem;
+  margin: 0 auto;
+  margin-bottom: 100px;
+  max-width: 1400px;
+  padding: 1 1rem;
 }
 
-.feature-icon img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-}
-
-.feature-card:hover .feature-icon img {
-  transform: scale(1.1);
-}
-
-.feature-description p {
-  margin: 0;
-  font-weight: 600;
-  color: #023859;
-  text-align: center;
-}
-
-/*--------Καρουζέλ---------*/
-/* .prosfores {
-  text-align: center;
-  color: #39c0c3;
-  font-weight: 400;
-  margin: 30px;
-  font-size: 3rem;
-} */
-
-/* .discount-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #fff;
-  color: #39c0c3;
-  font-size: 1.2rem !important;
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.hero-carousel {
-  position: relative;
-  width: 100%;
-  padding: 60px 0;
-  overflow: hidden;
-} */
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-.hero-bg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(6px) brightness(0.6); /* θαμπάδα + σκοτείνιασμα */
-}
-
-/* Feature Card */
 .featureTitle {
   font-size: 30px;
   margin-top: 70px;
@@ -176,16 +140,6 @@ body {
   font-weight: 300;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
   text-align: center;
-}
-
-.features-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 3rem;
-  margin: 3rem auto;
-  max-width: 1400px;
-  padding: 1 1rem;
 }
 
 .feature-card {
@@ -204,22 +158,38 @@ body {
   padding: 1.5rem;
 }
 
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
 .feature-icon {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%; /* κόβει τις γωνίες */
+  overflow: hidden; /* εξαφανίζει ό,τι περισσεύει */
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none; /* χωρίς background */
+  box-shadow: none; /* χωρίς εξωτερικό κύκλο */
   font-size: 3rem;
   color: #002e4d;
-  margin-bottom: 1rem;
+}
+
+.feature-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
 }
 
 .feature-description p {
-  font-size: 1rem;
-  font-weight: 500;
   margin: 0;
-  color: #002e4d;
+  font-weight: 500;
+  color: #023859;
+  text-align: center;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .feature-card-link {
@@ -234,6 +204,7 @@ body {
   cursor: pointer;
 }
 
+/*----------Καρουζέλ-----------*/
 .carousel-inner {
   padding: 10px 0;
 }
@@ -278,11 +249,6 @@ body {
   color: #023859;
 }
 
-/* .car-card:hover {
-  transform: translateY(-10px) scale(1.05);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-} */
-
 .car-card .price {
   font-weight: bold;
   color: #023859;
@@ -302,65 +268,34 @@ body {
   text-decoration: none;
 }
 
-/* 
-.d-flex.justify-content-center.mt-5 {
-  margin-bottom: 2rem;
-}
-
-.carousel-media {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9; 
-  max-height: 580px; 
-  background: #fff; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-top-left-radius: 1.5rem;
-  border-top-right-radius: 1.5rem;
-}
-
-:root {
-  --car-zoom: 1.7;
-} 
-
-.carousel-media img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  transform: scale(var(--car-zoom));
-  transform-origin: center;
-  transition: transform 0.2s ease;
-}
-
-@media (max-width: 768px) {
-  .carousel-media {
-    aspect-ratio: 4 / 3;
-    max-height: 420px;
-  }
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  width: 3rem !important;
-  height: 3rem;
-  background-size: 100% 100%;
-  filter: brightness(0) invert(0) !important;
-} */
-
-/* .hero-video {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-} */
-
 /* Photo Trilogy */
-.gallery-bg {
-  /* background-color: #023859 !important; */
+
+.trilogy-container {
+  /* background: #39c1c369; */
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.trilogy-text-block h6 {
+  font-size: 2.4rem;
+  font-family: "Open Sans", sans-serif;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  color: #023859;
+  font-weight: 700;
+}
+
+.trilogy-text-block p {
+  font-size: 1.1rem;
+  font-family: "Open Sans", sans-serif;
+  /* line-height: 1; */
+  margin-top: 0;
+  text-align: left;
+  font-weight: 500;
+  /* color: #fff !important; */
+}
+
+/* .gallery-bg {
   width: 100%;
   padding: 3rem 0;
 }
@@ -402,13 +337,12 @@ body {
 }
 
 .gallery-bg {
-  /* background-color: #000; */
   padding-top: 2rem;
   padding-bottom: 2rem;
-}
+} */
 
 /* wrapper for text blocks under gallery */
-.trilogy-text-wrapper {
+/* .trilogy-text-wrapper {
   display: flex;
   justify-content: center;
   gap: 2rem;
@@ -429,7 +363,6 @@ body {
 
 .trilogy-text-block h3 {
   font-size: 2.4rem;
-  /* font-weight: 600; */
   font-family: "Open Sans", sans-serif;
   margin-bottom: 0.5rem;
   line-height: 1.4;
@@ -443,60 +376,6 @@ body {
   text-align: left;
   line-height: 2;
   font-weight: light;
-}
-
-/* FourSteps */
-/* .steps-section {
-  background-color: #002e4d !important;
-  padding: 50px 20px;
-}
-
-.steps-title {
-  font-size: 1.8rem;
-  margin-bottom: 50px;
-  color: white;
-  font-family: "Open Sans", sans-serif;
-  font-weight: 300;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-  text-align: center;
-} */
-/*
-.step-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  color: white;
-  font-size: 1.3rem;
-  width: 50%;
-  margin: 0 auto;
-  padding: 5px;
-  font-family: "Open Sans", sans-serif;
-  font-weight: 300;
-}
-
-.step-icon {
-  color: white !important;
-  font-size: 2rem;
-  display: flex;
-  flex-direction: row;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.step-icon h4 {
-  margin-left: 30px;
-}
-
-.step-text-header {
-  margin-top: 5%;
-}
-
-.step-text-par {
-  font-size: 1.3rem;
-  margin-left: 40px !important;
 } */
 
 /* Accordion */
@@ -560,6 +439,11 @@ body {
   border-top: 1px solid #ddd;
 }
 
+.container-trilogy {
+  background-color: #001858;
+  height: 500px;
+}
+
 /*************************MEDIA QUERIES*********************** */
 
 /* ============ 📱 Mobile (έως 575px) ============ */
@@ -592,6 +476,12 @@ body {
     font-size: clamp(1.2rem, 4vw, 2rem);
     font-weight: bold;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  .pill-cta {
+    --icon-size: 30px;
+    padding: 10px 16px 10px 22px;
+    font-size: 0.8rem;
   }
 
   .stat-number {
@@ -698,6 +588,12 @@ body {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
   }
 
+  .pill-cta {
+    --icon-size: 33px;
+    padding: 12px 18px 12px 24px;
+    font-size: 1rem;
+  }
+
   .stat-number {
     font-size: 3rem;
     font-weight: bold;
@@ -716,7 +612,7 @@ body {
     color: #001858;
     font-family: "Open Sans", sans-serif;
     text-align: center;
-    font-size: 1.9rem;
+    font-size: 1.8rem;
     line-height: 1.4;
     text-align: center;
   }
@@ -811,6 +707,12 @@ body {
     font-size: clamp(1.2rem, 4vw, 2rem);
     font-weight: bold;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  .pill-cta {
+    --icon-size: 35px;
+    padding: 14px 20px 14px 28px;
+    font-size: 1.2rem;
   }
 
   .stat-number {
@@ -916,6 +818,12 @@ body {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
   }
 
+  .pill-cta {
+    --icon-size: 40px;
+    padding: 16px 22px 16px 30px;
+    font-size: 1.4rem;
+  }
+
   .stat-number {
     font-size: 3.5rem;
     font-weight: bold;
@@ -984,6 +892,6 @@ body {
   }
 
   .trilogy-text-block p {
-    font-size: 1.4rem !important;
+    font-size: 1.2rem !important;
   }
 }

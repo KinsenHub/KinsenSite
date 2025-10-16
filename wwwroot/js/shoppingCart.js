@@ -352,13 +352,14 @@ document.addEventListener("click", async (e) => {
     }
 
     // ✅ Κλείσιμο modal
-    setTimeout(() => {
-      if (window.bootstrap && modalEl) {
-        const modalInstance =
-          bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        modalInstance.hide();
-      }
-    }, 1000);
+    // setTimeout(() => {
+    //   if (window.bootstrap && modalEl) {
+    //     const modalInstance =
+    //       bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    //     modalInstance.hide();
+    //   }
+    // }, 1000);
+    await waitModalHidden(modalEl);
 
     // ✅ Reset φόρμας
     document.getElementById("offerForm")?.reset();
@@ -382,6 +383,7 @@ document.addEventListener("click", async (e) => {
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = original;
+    clearUiOverlays();
   }
 });
 
@@ -393,3 +395,28 @@ document.addEventListener("submit", (e) => {
 window.addEventListener("beforeunload", () => {
   sessionStorage.removeItem("selectedCarId");
 });
+
+// Ειναι μετα την αποστολή της προσφοράς να μην μαυριζει η οθονη στον χρηστη και παγωνουν ολα
+function waitModalHidden(modalEl) {
+  return new Promise((resolve) => {
+    if (!modalEl || !window.bootstrap || !bootstrap.Modal) return resolve();
+    const onHidden = () => {
+      modalEl.removeEventListener("hidden.bs.modal", onHidden);
+      resolve();
+    };
+    modalEl.addEventListener("hidden.bs.modal", onHidden, { once: true });
+    const inst = bootstrap.Modal.getOrCreateInstance(modalEl);
+    inst.hide();
+  });
+}
+
+// Fail-safe καθάρισμα από τυχόν overlays/backdrops/lock scroll που έμειναν
+function clearUiOverlays() {
+  document.body.classList.remove("modal-open");
+  document.body.style.overflow = "";
+  document
+    .querySelectorAll(
+      ".modal-backdrop, .nx-overlay, .overlay, .backdrop, .loader"
+    )
+    .forEach((el) => el.remove());
+}

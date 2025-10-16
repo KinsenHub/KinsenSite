@@ -165,14 +165,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const modalEl = document.getElementById("offerModal");
       // ✅ Κλείσιμο modal
-      setTimeout(() => {
-        if (window.bootstrap && modalEl) {
-          const modalInstance =
-            bootstrap.Modal.getInstance(modalEl) ||
-            new bootstrap.Modal(modalEl);
-          modalInstance.hide();
-        }
-      }, 1000);
+      // setTimeout(() => {
+      //   if (window.bootstrap && modalEl) {
+      //     const modalInstance =
+      //       bootstrap.Modal.getInstance(modalEl) ||
+      //       new bootstrap.Modal(modalEl);
+      //     modalInstance.hide();
+      //   }
+      // }, 1000);
+
+      await waitModalHidden(modalEl);
 
       document.getElementById("offerForm")?.reset();
     } catch (err) {
@@ -185,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } finally {
       btn.disabled = false;
       btn.innerText = original;
+      cleanupBootstrapArtifacts();
     }
   });
 
@@ -196,6 +199,33 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("beforeunload", () => {
   sessionStorage.removeItem("selectedCarId");
 });
+
+// Ειναι μετα την αποστολή της προσφοράς να μην μαυριζει η οθονη στον χρηστη και παγωνουν ολα
+function waitModalHidden(modalEl) {
+  return new Promise((resolve) => {
+    if (!modalEl || !window.bootstrap || !bootstrap.Modal) return resolve();
+    const onHidden = () => {
+      modalEl.removeEventListener("hidden.bs.modal", onHidden);
+      resolve();
+    };
+    modalEl.addEventListener("hidden.bs.modal", onHidden, { once: true });
+    const inst = bootstrap.Modal.getOrCreateInstance(modalEl);
+    inst.hide();
+  });
+}
+
+function cleanupBootstrapArtifacts() {
+  // ΜΟΝΟ Bootstrap backdrops + body lock. Δεν αγγίζουμε άλλα overlays του site.
+  document.body.classList.remove("modal-open");
+  document.body.style.overflow = "";
+  document
+    .querySelectorAll(".modal-backdrop, .offcanvas-backdrop")
+    .forEach((el) => {
+      try {
+        el.remove();
+      } catch {}
+    });
+}
 
 // // ΑΦΟΡΑ ΜΟΝΟ ΤΟ ΚΟΥΜΠΙ "ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ"
 // document.addEventListener("click", (e) => {

@@ -1,85 +1,103 @@
-/* ================== Variables ================== */
+/* ============== Variables ============== */
 :root {
   --nx-h: 56px;
-  --nx-bg: #fff;
-  --nx-text: #0f172a;
+  --nx-bg: transparent; /* διάφανο για header πάνω από video */
+  --nx-text: #023859;
   --nx-accent: #023859;
   --nx-accent-2: #035171;
+  --nx-underline: #39c0c3; /* hover underline */
   --nx-border: rgba(0, 0, 0, 0.12);
   --nx-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
 }
 
-/* Το burger να παίρνει το currentColor */
-.nx-toggle .nx-bar {
-  background: currentColor;
-}
-
-/* Μηδενισμοί “gaps” γύρω από το body (παραμένει δική σου επιλογή) */
+/* ============== Base ============== */
 body {
   padding-top: 0 !important;
   margin-top: 0 !important;
 }
-
-/* ================== Desktop navbar ================== */
-.nx-navbar {
-  height: var(--nx-h);
-  display: flex;
-  align-items: center;
+a {
+  color: inherit;
+  text-decoration: none;
 }
+
+/* ============== Navbar layout ============== */
+.navbar-logo {
+  height: 40px;
+  width: auto;
+}
+
+nav.navbar {
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 6000;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* container: full width πάνω από το video */
 .nx-container {
   width: 100%;
-  max-width: 1400px;
+  max-width: none;
   margin: 0 auto;
   padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 12px;
+  background: transparent;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
 }
+
+/* ============== Burger ============== */
+/* Χρησιμοποιείς <i class="fa-bars">, οπότε δεν χρειάζεται .nx-bar */
 .nx-toggle {
   width: 40px;
   height: 40px;
   border: 0;
   background: transparent;
-  display: none; /* εμφανίζεται στο mobile */
+  display: none; /* θα εμφανιστεί στο mobile media query */
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
-.nx-bar {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--nx-text);
-  margin: 3px 0;
-}
+
+/* ============== Menus ============== */
 .nx-menu {
   display: flex;
   align-items: center;
   gap: 16px;
+  padding-top: 30px;
 }
+
 .nx-left,
 .nx-right {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 35px;
+  gap: 55px;
   margin: 0;
   padding: 0;
 }
+
 .nx-li {
   display: flex;
   align-items: center;
+  color: var(--nx-text);
 }
+
 .nx-link {
   background: none;
   border: 0;
   color: var(--nx-text);
-  text-decoration: none;
   cursor: pointer;
   padding: 8px 4px;
-  font-weight: 400;
+  font-weight: 600;
 }
+
 .nx-link:hover {
   color: var(--nx-accent);
 }
@@ -91,45 +109,271 @@ body {
   border-radius: 6px;
   min-width: 140px;
   height: 40px;
-  padding: 0 20px;
+  padding: 0 30px;
+  margin-left: 20px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
 }
+
 .nx-btn:hover {
   background: var(--nx-accent-2);
 }
 
-/* overlay (χρησιμοποιείται και στο mobile) */
-.nx-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.2);
-  z-index: 4999;
+/* ============== Dropdowns (desktop) ============== */
+.kx-dropdown,
+.kx-user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.kx-link {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  padding: 0.25rem 0;
+  font-weight: 600;
+}
+
+.kx-link:focus {
+  outline: 2px solid rgba(2, 56, 89, 0.35);
+  outline-offset: 2px;
+}
+
+.kx-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 12rem;
+  margin: 0;
+  padding: 0.5rem 0;
+  list-style: none;
+  /* background: #fff; */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  display: none;
+  z-index: 5002;
+}
+
+.kx-menu.is-open {
+  display: block;
+}
+
+.kx-menu-item {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #212529;
+  white-space: nowrap;
+}
+
+.kx-menu-item:hover {
+  background: #f8f9fa;
+}
+
+.kx-menu .kx-menu-item::after {
+  content: none !important;
+}
+.kx-menu .kx-menu-item:hover::after,
+.kx-menu .kx-menu-item:focus-visible::after {
+  opacity: 0 !important;
+}
+
+.kx-danger {
+  color: #dc3545;
+}
+
+.kx-user-menu .kx-menu {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.kx-btn-user {
+  background: var(--nx-accent);
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  min-width: 140px;
+  height: 40px;
+  padding: 0 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kx-btn-user:hover {
+  background: var(--nx-accent-2);
+}
+
+/* ============== Hover underline ============== */
+.nx-menu a.nx-link,
+.nx-menu .kx-link,
+.nx-menu .kx-menu-item {
+  position: relative;
+  text-decoration: none;
+}
+
+.nx-menu a.nx-link::after,
+.nx-menu .kx-link::after,
+.nx-menu .kx-menu-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #39c0c3;
+  bottom: -8px;
+  opacity: 0;
+  transform: scaleX(0.9);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.nx-menu a.nx-link:hover::after,
+.nx-menu .kx-link:hover::after,
+.nx-menu .kx-menu-item:hover::after,
+.nx-menu a.nx-link:focus-visible::after,
+.nx-menu .kx-link:focus-visible::after,
+.nx-menu .kx-menu-item:focus-visible::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 /* ================== Mobile / Tablet ================== */
-@media (max-width: 1024px) {
+@media (max-width: 576px) {
+  .navbar-logo {
+    height: 30px !important;
+    width: auto !important;
+    margin: 20px auto;
+  }
+
+  .nx-menu a.nx-link,
+  .nx-menu .kx-link,
+  .nx-menu .kx-menu-item {
+    position: relative;
+    text-decoration: none;
+  }
+
+  .nx-menu a.nx-link::after,
+  .nx-menu .kx-link::after,
+  .nx-menu .kx-menu-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #39c0c3;
+    bottom: -8px;
+    opacity: 0;
+    transform: scaleX(0.9);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .nx-menu a.nx-link:hover::after,
+  .nx-menu .kx-link:hover::after,
+  .nx-menu .kx-menu-item:hover::after,
+  .nx-menu a.nx-link:focus-visible::after,
+  .nx-menu .kx-link:focus-visible::after,
+  .nx-menu .kx-menu-item:focus-visible::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  #nxMenu .nx-right {
+    display: flex;
+    flex-direction: column;
+    align-items: left; /* <-- κλειδί */
+    justify-content: left;
+  }
+
+  /* 2) Μηδενίσεις σε wrappers που συχνά κεντράρουν */
+  #nxMenu .nx-right .nx-li {
+    align-self: flex-start;
+    margin-left: 0;
+  }
+
+  /* 3) Το ίδιο το κουμπί */
+  #nxMenu #nav-login-btn {
+    display: inline-flex;
+    width: auto; /* όχι 100% */
+    margin: 0 !important; /* ακυρώνει το global margin-left:20px */
+    align-self: flex-start; /* κολλάει αριστερά */
+  }
+
+  /* αν ο off-canvas είχε text-align:center */
+  #nxMenu.nx-offcanvas.is-open {
+    text-align: left;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+  .navbar-logo {
+    height: 35px !important;
+    width: auto !important;
+    margin: 20px auto;
+  }
+
+  .nx-menu a.nx-link,
+  .nx-menu .kx-link,
+  .nx-menu .kx-menu-item {
+    position: relative;
+    text-decoration: none;
+  }
+
+  .nx-menu a.nx-link::after,
+  .nx-menu .kx-link::after,
+  .nx-menu .kx-menu-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #39c0c3;
+    bottom: -8px;
+    opacity: 0;
+    transform: scaleX(0.9);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .nx-menu a.nx-link:hover::after,
+  .nx-menu .kx-link:hover::after,
+  .nx-menu .kx-menu-item:hover::after,
+  .nx-menu a.nx-link:focus-visible::after,
+  .nx-menu .kx-link:focus-visible::after,
+  .nx-menu .kx-menu-item:focus-visible::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 1200px) {
+  .navbar-logo {
+    height: 36px;
+    width: auto;
+    margin: 20px auto;
+  }
+
+  .nx-toggle {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    color: #023859 !important;
+    display: block !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
   .navbar-logoInner {
     display: block !important;
     height: 30px !important;
     width: auto;
     object-fit: contain;
-    margin: 0.5rem 1rem;
-  }
-
-  /* Default mobile: λευκή μπάρα (sticky) */
-  .nx-fixed {
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border-bottom: 1px solid var(--nx-border);
-    box-shadow: none;
-    z-index: 6000;
+    margin: 1rem auto;
   }
 
   /* Home μόνο: διάφανο πάνω στο hero */
@@ -197,14 +441,6 @@ body {
   }
   .nx-menu.is-open {
     transform: translateX(0);
-  }
-
-  .nx-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: saturate(100%) blur(1px);
-    z-index: 5000;
   }
 
   .nx-left,
@@ -289,15 +525,15 @@ body {
   }
 
   /* Κουμπί “Σύνδεση” */
-  #nav-login-btn {
+  /* #nav-login-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 12px 16px;
+    padding: 12px 26px;
     border-radius: 12px;
     text-align: center;
-  }
+  } */
 
   /* safe-area */
   .nx-menu::after {
@@ -307,114 +543,12 @@ body {
   }
 }
 
-/* ================== Dropdowns (desktop) ================== */
-.kx-dropdown,
-.kx-user-menu {
-  position: relative;
-  display: inline-block;
-}
-.kx-link {
-  background: none;
-  border: 0;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-  padding: 0.25rem 0;
-}
-.kx-link:focus {
-  outline: 2px solid rgba(2, 56, 89, 0.35);
-  outline-offset: 2px;
-}
-.kx-caret {
-  display: inline-block;
-  margin-left: 0.4rem;
-  border-top: 5px solid currentColor;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  transform: translateY(2px);
-}
-.kx-menu {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
-  min-width: 12rem;
-  margin: 0;
-  padding: 0.5rem 0;
-  list-style: none;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  display: none;
-  z-index: 5002;
-}
-.kx-menu.is-open {
-  display: block;
-}
-.kx-menu-item {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: #212529;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.kx-menu-item:hover {
-  background: #f8f9fa;
-}
-.kx-danger {
-  color: #dc3545;
-}
-.kx-user-menu .kx-menu {
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
-}
-
-.kx-btn-user {
-  background: var(--nx-accent);
-  color: #fff;
-  border: 0;
-  border-radius: 6px;
-  min-width: 140px;
-  height: 40px;
-  padding: 0 14px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-.kx-btn-user:hover {
-  background: var(--nx-accent-2);
-}
-
-/* Πολύ στενές οθόνες: dropdown shift */
-@media (max-width: 576px) {
-  #companyMenu {
-    left: 5px;
-    right: auto;
-    max-width: calc(100vw - 2rem);
-  }
-}
-
-/* ============ >=1100px: desktop, STICKY ============ */
+/* ============ >=1400px: desktop, STICKY ============ */
 @media (min-width: 1400px) {
   .navbar-logo {
     height: 40px !important;
     width: auto !important;
-  }
-
-  .nx-fixed {
-    position: sticky !important;
-    top: 0;
-    left: auto;
-    right: auto; /* καθάρισμα πιθανών inline */
-    inset-inline: auto;
-    inset-block-start: 0;
-    z-index: 6000;
-    background: #fff;
-    border-bottom: 1px solid var(--nx-border);
-    box-shadow: none;
+    margin-right: 30px;
   }
 
   /* Αποφυγή κλασικών blockers του sticky */
@@ -422,6 +556,7 @@ body {
   .nx-container {
     overflow: visible !important;
   }
+
   .nx-navbar,
   .nx-container,
   .nx-fixed {
@@ -437,5 +572,15 @@ body {
   #nxMenu {
     position: static !important;
     transform: none !important;
+  }
+
+  .nx-menu {
+    font-size: 18px;
+  }
+
+  .navbar-nav .nav-item {
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
+    font-size: 2rem;
   }
 }

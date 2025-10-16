@@ -660,7 +660,9 @@ function clearAllFilters() {
     mobilePanel && mobilePanel.classList.contains("show")
   );
 
-  // Από πού θα καθαρίσουμε inputs (mobile offcanvas ή desktop sidebar)
+  // Βρίσκει σε ποιο τμήμα της DOM θα γίνει το clear των φίλτρων.
+  // Αν είμαστε σε mobile, παίρνει το sidebar του offcanvas.
+  // Αν είμαστε σε desktop, παίρνει το aside.sidebar.
   const ROOT = (() => {
     if (isMobileOpen) {
       return (
@@ -676,7 +678,7 @@ function clearAllFilters() {
   })();
 
   const runClear = () => {
-    // 1) Καθάρισε όλα τα inputs κάτω από το ενεργό panel
+    // Καθαρίζει όλα τα input πεδία: checkboxes, radios, selects, κ.λπ.
     ROOT.querySelectorAll("input, select, textarea").forEach((el) => {
       if (el.type === "checkbox" || el.type === "radio") el.checked = false;
       else el.value = "";
@@ -684,11 +686,12 @@ function clearAllFilters() {
       if (el.parentElement) el.parentElement.style.opacity = "1";
     });
 
-    // 2) Κλείσε ΟΛΑ τα ανοιχτά sections φίλτρων (custom & Bootstrap collapse)
+    // Κλείνει τα collapsible φίλτρα
     ROOT.querySelectorAll(".filter-item").forEach((item) => {
       item.classList.remove("active");
       const toggle = item.querySelector(".filter-toggle");
       if (toggle) toggle.setAttribute("aria-expanded", "false");
+      //Επαναφέρει τα filter-content στην αρχική (κλειστή) κατάσταση.
       const content = item.querySelector(".filter-content");
       if (content) {
         content.style.maxHeight = "";

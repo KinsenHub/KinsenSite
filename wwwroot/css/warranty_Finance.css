@@ -77,7 +77,8 @@
 
   .warranty-title {
     margin-top: 30px;
-    font-size: 1.9rem;
+    font-size: 1.6rem;
+    margin: auto 20px;
     font-family: "Open Sans", sans-serif;
     color: #39c0c3;
   }

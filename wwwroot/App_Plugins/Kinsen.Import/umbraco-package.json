@@ -1,0 +1,27 @@
+{
+  "name": "Kinsen Import",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "Kinsen.Import.Dashboard",
+      "name": "Import cars",
+      "meta": {
+        "label": "Import cars",
+        "pathname": "kinsen-import"
+      },
+      "conditions": [
+        {
+          "alias": "Umb.Condition.SectionAlias",
+          "match": "content"
+        }
+      ]
+    },
+    {
+      "type": "bundle",
+      "alias": "Kinsen.Import.Bundle",
+      "name": "Kinsen Import bundle",
+      "js": ["/App_Plugins/Kinsen.Import/dashboard.js"]
+    }
+  ]
+}

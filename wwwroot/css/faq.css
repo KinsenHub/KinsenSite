@@ -1,4 +1,4 @@
-.faq-image-wrapper {
+/* .faq-image-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,4 +23,60 @@
 
 .loan-card h2 {
   font-weight: 400;
+} */
+
+/* ---- Brand palette ---- */
+:root {
+  --brand-teal: #39c0c3;
+  --bg-soft: #e7f7f7;
+  --ink-900: #1f242b;
+  --ink-700: #2a2f36;
+}
+
+/* --- ΜΟΝΟ styling, καμία αλλαγή διάταξης --- */
+footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 h6.text-uppercase.fw-bold {
+  display: flex; /* logo + τίτλος στην ίδια γραμμή */
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1rem !important; /* ίδια κάθετη ιεραρχία όπως πριν */
+  letter-spacing: 0.2px;
+  color: #1f242b; /* σκουρόχρωμο, corporate */
+}
+
+footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 h6.text-uppercase.fw-bold img {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  border-radius: 10px; /* προαιρετικό, βγάλ’ το αν δεν το θες */
+}
+
+/* Κείμενο παραγράφου όπως το ήθελες, χωρίς inline styles */
+footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 p {
+  text-align: left;
+  line-height: 2.2rem; /* όπως είχες */
+  color: #2a2f36; /* καλύτερη αναγνωσιμότητα */
+  margin-bottom: 0.5rem;
+  font-size: 0.98rem;
+}
+
+/* Αν το “Δείτε τα διαθέσιμα →” γίνει link, στυλ εδώ (δεν αλλάζει layout) */
+footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 a {
+  color: #39c0c3;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+}
+footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 a:hover {
+  border-bottom-color: #39c0c3;
+}
+
+/* Μικρό fine-tune σε πολύ μικρές οθόνες */
+@media (max-width: 576px) {
+  footer
+    .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4
+    h6.text-uppercase.fw-bold
+    img {
+    width: 40px;
+    height: 40px;
+  }
 }

@@ -38,123 +38,31 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-@* <nav class="navbar navbar-expand-lg navbar-light bg-light w-100 fixed-top">
-  <div class="container-fluid">
-    <a href="/">
-      <img src="~/media/kinsenLogo.png" alt="Kinsen Hellas Logo" class="navbar-logo" />
-    </a>
-    <button
-      type="button"
-      class="navbar-toggler"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarCollapse"
-      aria-controls="navbarCollapse"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq"))
-        {
-          <li class="nav-item mx-4">
-              <a class="nav-link" href="@item.Url()">@item.Name()</a>
-          </li>
-        }
-          <li class="mx-4">
-  <div class="kx-dropdown">
-    <button
-      id="companyDropdown"
-      type="button"
-      class="kx-link"
-      aria-haspopup="true"
-      aria-expanded="false"
-      aria-controls="companyMenu">
-      Η Εταιρεία μας
-      <span class="kx-caret" aria-hidden="true"></span>
-    </button>
-
-    <ul id="companyMenu" class="kx-menu" role="menu" aria-labelledby="companyDropdown">
-      <li role="none"><a role="menuitem" class="kx-menu-item" href="/faq">FAQ</a></li>
-    </ul>
-  </div>
-</li>
-      </ul>
-
-      <ul class="navbar-nav ms-auto d-flex align-items-center">
-        @if (isLoggedIn && isCustomer)
-        {
-            <li class="nav-item me-3">
-                <button id="offerCartBtn"
-                        class="btn btn-outline-secondary position-relative"
-                        type="button"
-                        title="Καλάθι προσφοράς">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    <span id="offerCartCount"
-                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-                </button>
-            </li>
-
-            <li class="nav-item">
-                
-              <div class="kx-user-menu">
-                <button
-                  id="nav-login-btn"
-                  class="kx-btn kx-btn-user"
-                  type="button"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  aria-controls="accountMenu">
-                  <i class="fa-solid fa-user"></i>&nbsp;@displayName
-                  <span class="kx-caret" aria-hidden="true"></span>
-                </button>
-
-                <ul id="accountMenu" class="kx-menu" role="menu" aria-labelledby="nav-login-btn">
-                  <li role="none">
-                    <a role="menuitem" class="kx-menu-item kx-danger" href="#" id="logoutBtn">Αποσύνδεση</a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-        }
-        else
-        {
-          <li class="nav-item">
-              <a href="/login" class="btn btn-secondary"id="nav-login-btn">
-                  <i class="fa-solid fa-user"></i>&nbsp;Σύνδεση
-              </a>
-          </li>
-        }
-      </ul>
       
-    </div>
-  </div>
-</nav> *@
 
-<nav class="nx-navbar nx-fixed" role="navigation" aria-label="Κύρια πλοήγηση">
+<nav class="navbar navbar-expand-lg navbar-dark border-0 bg-transparent" role="navigation" aria-label="Κύρια πλοήγηση">
   <div class="nx-container">
     <a href="/" class="nx-brand" aria-label="Αρχική">
-      <img src="~/media/kinsenLogo.png" alt="Kinsen Hellas Logo" class="navbar-logo" />
+      <img src="~/media/brandlogo.png" alt="Kinsen Hellas Logo" class="navbar-logo" />
     </a>
 
     <!-- Burger -->
     <button id="nxToggle" class="nx-toggle" type="button"
         aria-controls="nxMenu" aria-expanded="false" aria-label="Μενού">
-      <i class="fa-solid fa-bars"></i>
+      <i class="fa-solid fa-bars" style="color:#023859;"></i>
     </button>
 
     <!-- Menu -->
     <div id="nxMenu" class="nx-menu">
       <a href="/" class="nx-brand" aria-label="Αρχική">
-        <img src="~/media/kinsenLogo.png" alt="Kinsen Hellas Logo" class="navbar-logoInner" style="display:none;"/>
+        <img src="~/media/brandlogo.png" alt="Kinsen Hellas Logo" class="navbar-logoInner" style="display:none;"/>
       </a>
       <ul class="nx-left">
         @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq"))
         {
+          var menuTitle = item.Value("menuTitle") as string ?? item.Name();
           <li class="nx-li">
-            <a class="nx-link" href="@item.Url()">@item.Name()</a>
+              <a class="nx-link" href="@item.Url()">@menuTitle</a>
           </li>
         }
 
@@ -170,9 +78,9 @@
             </ul>
           </div>
         </li>
-      </ul>
+      
 
-      <ul class="nx-right">
+      @* <ul class="nx-right"> *@
         @if (isLoggedIn && isCustomer)
         {
 
@@ -213,6 +121,7 @@
             </a>
           </li>
         }
+      @* </ul> *@
       </ul>
     </div>
   </div>

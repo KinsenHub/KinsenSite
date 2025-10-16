@@ -1,4 +1,4 @@
-﻿@using Umbraco.Cms.Core.Models.Blocks;
+﻿﻿@using Umbraco.Cms.Core.Models.Blocks;
 @using Umbraco.Cms.Core.Models; 
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
@@ -6,9 +6,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 	
     var pageTitle = Model.Value<string>("pageTitle");
-    var carVideo = Model.Value<Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent>("homeVideo");
-    var videoUrl = carVideo?.Url();
-    @* var homeImage = Model.Value<IPublishedContent>("homeImage"); *@
+    var media = Model.Value<MediaWithCrops>("homeVideo");
+    var videoUrl = media?.MediaUrl();
+    var homeImage = Model.Value<IPublishedContent>("imgPaper");
     var heroHeader = Model.Value<string>("heroHeader");
     var heroDescription = Model.Value<string>("heroDescription");
 	var blockListItem = Model.Value<IEnumerable<BlockListItem>>("statsItem");
@@ -25,16 +25,33 @@
     var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
 }
 
+<style>
+    .trust-strip{padding:18px 0;border-top:1px solid #eef1f4}
+    .trust-strip ul{display:flex;gap:32px;justify-content:center;align-items:center;flex-wrap:wrap;opacity:.9}
+    .trust-strip img{height:30px;filter:grayscale(100%);transition:filter .2s,opacity .2s}
+    .trust-strip img:hover{filter:none;opacity:1}
+</style>
+
 <div class="hero-wrapper">
     @if (!string.IsNullOrWhiteSpace(videoUrl))
     {
-        <video class="hero-video" autoplay muted loop playsinline>
+        <video class="hero-video" autoplay muted playsinline loop preload="metadata">
             <source src="@videoUrl" type="video/mp4" />
-            Το βίντεο δεν υποστηρίζεται από τον browser σας.
+            Ο browser δεν υποστηρίζει video.
         </video>
     }
     <div class="hero-overlay">
         <h1 class="hero-title">@pageTitle</h1>
+
+        <a href="https://kinsen.gr" class="pill-cta" aria-label="Μάθετε περισσότερα">
+            <span class="pill-cta__label">Μάθετε περισσότερα</span>
+            <span class="pill-cta__icon" aria-hidden="true">
+                <!-- καθαρό SVG βελάκι -->
+                <svg viewBox="0 0 24 24" width="22" height="22">
+                <path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+        </a>
     </div>
 </div>
 
@@ -85,7 +102,7 @@
             var description = content.Value<string>("description");
             var targetSlug = content.Value<string>("targetSlug") ?? "";
 
-            <a href="/πωλήσεις-μεταχειρισμένων?carType=@targetSlug" onclick="selectCategory('@targetSlug')" class="feature-card-link">
+            <a href="/usedCarSalesPage?carType=@targetSlug" onclick="selectCategory('@targetSlug')" class="feature-card-link">
                 <div class="feature-card">
                     <div class="feature-icon">
                         <img src="@img?.Url()"loading="lazy" style="width: 200px;" />
@@ -175,17 +192,76 @@
 @*----------------Photo Trilogy------------------*@
 <section class="gallery-bg">
 
-@if (photoTrilogy != null && photoTrilogy.Any())
+@if ((photoTrilogy != null && photoTrilogy.Any()) && (trilogyBlock != null && trilogyBlock.Any()))
 {
-    foreach (var item in photoTrilogy)
+    var allPhotos = new List<MediaWithCrops>();
+    var allTexts  = new List<(string Title, string BodyHtml)>();
+
+    // 1) Photos: trilogyPhoto1..3
+    foreach (var blk in photoTrilogy)
     {
-        var content = item.Content;
+        var c = blk.Content;
+        for (var i = 1; i <= 3; i++)
+        {
+            var p = c.Value<MediaWithCrops>($"trilogyPhoto{i}");
+            if (p != null) allPhotos.Add(p);
+        }
+    }
 
-        var trilogyPhoto1 = content.Value<MediaWithCrops>("trilogyPhoto1");
-        var trilogyPhoto2 = content.Value<MediaWithCrops>("trilogyPhoto2");
-        var trilogyPhoto3 = content.Value<MediaWithCrops>("trilogyPhoto3");
+    // 2) Texts: titleCard / cardBody
+    foreach (var tb in trilogyBlock)
+    {
+        var ct = tb.Content;
+        var title = ct.Value<string>("titleCard");
+        var body  = ct.Value<string>("cardBody");
+        allTexts.Add((title ?? string.Empty, body ?? string.Empty));
+    }
 
-        <div class="photo-trilogy-container">
+    if (allPhotos.Any())
+    {
+        var cards = new List<(MediaWithCrops Photo, string Title, string BodyHtml)>();
+
+        if (allTexts.Count == 1)
+        {
+            var only = allTexts[0];
+            foreach (var ph in allPhotos)
+                cards.Add((ph, only.Title, only.BodyHtml));
+        }
+        else
+        {
+            var take = Math.Min(allPhotos.Count, allTexts.Count);
+            for (int i = 0; i < take; i++)
+                cards.Add((allPhotos[i], allTexts[i].Title, allTexts[i].BodyHtml));
+        }
+
+        <div class="container py-4 trilogy-container">
+            <div class="row justify-content-center g-5">
+                @foreach (var card in cards)
+                {
+                    <div class="col-12 col-md-6 col-lg-4 col-xl-3 d-flex">
+                        <div class="card h-100 w-100 border-0 bg-transparent">
+                            <div class="ratio ratio-16x9 mb-3">
+                                <img src="@card.Photo?.Url()" class="w-100 h-100 object-fit-cover rounded-4" alt="" />
+                            </div>
+                            <div class="card-body p-0 d-flex flex-column trilogy-text-block">
+                                @if (!string.IsNullOrWhiteSpace(card.Title))
+                                {
+                                    <h6 class="text-block-h3">@card.Title</h6>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(card.BodyHtml))
+                                {
+                                    <p>@Html.Raw(card.BodyHtml)</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}     
+
+@* <div class="photo-trilogy-container">
             <div class="main-photo">
                 <img src="@trilogyPhoto1?.Url()" alt="Main Photo" />
             </div>
@@ -193,53 +269,25 @@
                 <img src="@trilogyPhoto2?.Url()" alt="Side Photo 1" />
                 <img src="@trilogyPhoto3?.Url()" alt="Side Photo 2" />
             </div>
-        </div>
-    }
-}
-
+        </div> *@
     
-@if (trilogyBlock != null && trilogyBlock.Any())
-    {
-        <div class="photo-trilogy-container">
-            @foreach (var item in trilogyBlock)
-            {
-                var content = item.Content;
-                var title = content.Value<string>("titleCard");
-                var description = content.Value<string>("cardBody");
+@* @if (trilogyBlock != null && trilogyBlock.Any())
+{
+    <div class="photo-trilogy-container">
+        @foreach (var item in trilogyBlock)
+        {
+            var content = item.Content;
+            var title = content.Value<string>("titleCard");
+            var description = content.Value<string>("cardBody");
 
-                <div class="trilogy-text-block">
-                    <h3 class="text-block-h3">@title</h3>
-                    <p> @Html.Raw(description)</p>
-                </div>
-            }
-        </div>
-    }
-</section>
+            <div class="trilogy-text-block">
+                <h3 class="text-block-h3">@title</h3>
+                <p> @Html.Raw(description)</p>
+            </div>
+        }
+    </div>
+} *@
 
-@*---------------4 Steps------------------*@
-@* <section class="steps-section">
-    <h2 class="steps-title">Πώς λειτουργεί</h2>
-    @if (fourStepsBlock != null && fourStepsBlock.Any())
-    {
-        <div class="steps-wrapper">
-            
-            @foreach (var step in fourStepsBlock)
-            {
-                var content = step.Content;
-                var iconStep = content.Value<string>("iconStep");
-                var titleStep = content.Value<string>("titleStep");
-                var descriptionStep = content.Value<string>("descriptionStep");
-                <div class="step-card">
-                    <div class="step-icon">
-                        @Html.Raw(iconStep)
-                        <h4 class="step-text-header">@Html.Raw(titleStep)</h4>
-                    </div>
-                    <p class="step-text-par">@Html.Raw(descriptionStep)</p>
-                </div>
-            }
-        </div>
-    }
-</section> *@
 
 <script>
   function selectCategory(type) {

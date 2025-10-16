@@ -4,6 +4,11 @@
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @using Umbraco.Extensions
 @using System.Text;
+@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Core.Security
+@using Umbraco.Cms.Core;
+@inject IMemberManager MemberManager
+@inject IMemberService MemberService
 
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 
@@ -14,6 +19,12 @@
 	var usedCarTitle = Model.Value<string>("usedCarTitle");
 	var carCardBlock = Model.Value<IEnumerable<BlockListItem>>("carCardBlock");
 	var imgTitle = Model.Value<MediaWithCrops>("image");
+	var counter = 1;
+
+	var pageKey = "18ce1861-9a37-4582-8f52-0e866a3ef0de";
+
+	var backofficeUrl = $"/umbraco/backoffice/Kinsen/CarExport/ExportCsv?id={pageKey}";
+    var apiUrl        = $"/umbraco/api/CarExport/ExportCsv?id={pageKey}";
 	
 	// ----------- Μάρκες και Logos------------
 	// helper για consistent σύγκριση (αγνοεί κενά/σημεία στίξης, όλα κεφαλαία)
@@ -169,6 +180,43 @@
 
     // Κατάσταση χρήστη
     var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
+
+	// Έλεγχος εαν ανήκει στο GroupAdmins που αφορ΄ά το κουμπί Import/Export !!
+	var isAdminMember = false;
+
+    if (User?.Identity?.IsAuthenticated ?? false)
+    {
+        var memberTask = MemberManager.GetCurrentMemberAsync();
+        memberTask.Wait();
+        var member = memberTask.Result;
+
+        if (member != null)
+        {
+            var roles = MemberService.GetAllRoles(member.UserName);
+            isAdminMember = roles.Contains("GroupAdmins");
+        }
+    }
+}
+
+@* <div class="mt-3" style="display:flex;gap:.5rem;">
+  <a class="nx-btn" href="@backofficeUrl" target="_blank" rel="noopener">
+    Export cars (Backoffice CSV)
+  </a>
+  <a class="nx-btn" href="@apiUrl" target="_blank" rel="noopener">
+    Export cars (API CSV)
+  </a>
+</div> *@
+
+@if (isAdminMember)
+{
+	<a class="btn btn-primary" id="btnExportCars" href="#" role="button">Export Cars</a>
+
+	<form id="importForm" enctype="multipart/form-data" method="post" action="/umbraco/api/carimport/upload">
+		<h3>📥 Import Cars</h3>
+		<input type="file" name="csvFile" id="csvFile" accept=".csv" required />
+		<button type="submit" class="btn btn-primary mt-2">Import</button>
+		<p id="importMessage" style="margin-top: 10px;"></p>
+	</form>
 }
 
 <div class="usedCars-container">
@@ -176,7 +224,7 @@
 	<!-- Sidebar Responsive -->
 	<div class="filters-container">
 
-		<!-- Κουμπί Burger μόνο σε κινητά -->
+		<!-- Κουμπί φιλτρα μόνο σε κινητά -->
 		<button class="btn btn-primary btn-filters" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersSidebar">
 			<i class="fas fa-filter"></i> Φίλτρα
 		</button>
@@ -184,7 +232,7 @@
 		<!-- Offcanvas (Mobile/Tablet) -->
 		<div class="offcanvas offcanvas-start w-100" tabindex="-1" id="filtersSidebar">
 			<div class="offcanvas-header">
-				<h5 class="offcanvas-title" style="color:#032e48;">Φίλτρα</h5>
+				<h6 class="offcanvas-title" style="color:#007c91;">Φίλτρα</h6>
 			</div>
 			<div class="offcanvas-body">
 				<aside class="sidebar">
@@ -439,7 +487,7 @@
 		<!----- Sidebar σταθερό (Desktop) --------------->
 		<aside class="sidebar d-none d-lg-block">
 			<div class="filter-static-header d-flex justify-content-between align-items-center mb-3">
-				<h5 class="mb-0" style="color:#032e48;">Φίλτρα</h5>
+				<h5 class="mb-0" style="color:#007c91;"><i class="fas fa-filter"></i>Φίλτρα</h5>
 				<button onclick="clearAllFilters()" class="clear-filters-btn">
 					<i class="fa-solid fa-arrows-rotate"></i> Καθαρισμός
 				</button>
@@ -735,7 +783,10 @@
 					@foreach (var card in validCards)
 					{
 						var car = card.Content;
-						var carID = car.Value<string>("carID");
+						var storedId = car.Value<string>("carId"); 
+						var carID = !string.IsNullOrWhiteSpace(storedId)
+							? storedId
+							: "temp-" + Guid.NewGuid().ToString("N");
 						var carPic = car.Value<MediaWithCrops>("carPic");
 						var maker = car.Value<string>("maker");
 						var modelo = car.Value<string>("model");
@@ -750,39 +801,38 @@
 						var color = car.Value<string>("color");
 						var typeOfCar = car.Value<string>("typeOfCar");
  						
-						@* <div class="col-12 col-md-6 col-lg-4"> *@
-							<div class="cardCar" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
-								<a href="/carDetails/"
-									class="cardCarLink" 
-									data-car-id="@carID" 
-									onclick="storeCarId(event, '@carID')"
-									style="text-decoration: none; color: inherit;">
-								
-									@if (!string.IsNullOrWhiteSpace(typeOfDiscount))
-									{
-										<span class="discount-badge">@typeOfDiscount</span>
-									}
+						
+						<div class="cardCar" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
+							<a href="/carDetails/"
+								class="cardCarLink" 
+								data-car-id="@carID" 
+								onclick="storeCarId(event, '@carID')"
+								style="text-decoration: none; color: inherit;">
+							
+								@if (!string.IsNullOrWhiteSpace(typeOfDiscount))
+								{
+									<span class="discount-badge">@typeOfDiscount</span>
+								}
 
-									<img src="@carPic?.Url()" class="card-img-top car-image" />
-									<div class="card-body d-flex flex-column justify-content-between text-center p-3">
-										<div>
-											<h4 class="maker-title fw-semibold mb-2">@maker <span class="card-title">@modelo</span></h4>
-											<p class="car-year">@yearRelease</p>
-											<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@price €</p>
-											<p class="text-muted mb-0">
-												<i class="fa-solid fa-road"></i><span class="klm">&nbsp; @km </span>km &nbsp;&nbsp;
-												<i class="fa fa-wrench"></i><span class="cc">&nbsp; @cc</span>cc &nbsp;&nbsp;
-												<i class="fa-solid fa-gas-pump"></i><span class="fuel">&nbsp; @typeOfFuel</span>
-											</p>
-											<p class="transmission" style="display:none">@transmission</p>
-											<p class="typeOfColor" style="display:none">@color</p>
-											<p class="hp" style="display:none">@hp</p>
-											<p class="typeOfCar" style="display:none">@typeOfCar</p>
-										</div>
+								<img src="@carPic?.Url()" class="card-img-top car-image" />
+								<div class="card-body d-flex flex-column justify-content-between text-center p-3">
+									<div>
+										<h4 class="maker-title fw-semibold mb-2">@maker <span class="card-title">@modelo</span></h4>
+										<p class="car-year">@yearRelease</p>
+										<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@price €</p>
+										<p class="text-muted mb-0">
+											<i class="fa-solid fa-road"></i><span class="klm">&nbsp; @km </span>km &nbsp;&nbsp;
+											<i class="fa fa-wrench"></i><span class="cc">&nbsp; @cc</span>cc &nbsp;&nbsp;
+											<i class="fa-solid fa-gas-pump"></i><span class="fuel">&nbsp; @typeOfFuel</span>
+										</p>
+										<p class="transmission" style="display:none">@transmission</p>
+										<p class="typeOfColor" style="display:none">@color</p>
+										<p class="hp" style="display:none">@hp</p>
+										<p class="typeOfCar" style="display:none">@typeOfCar</p>
 									</div>
-								</a>
-							</div>
-						@* </div> *@
+								</div>
+							</a>
+						</div>
 					}
 				}
 			</div>
@@ -806,7 +856,97 @@
     if(inst) inst.hide(); else el.classList.remove('show');
   });
 })();
+</script>
 
+@* Αφορ΄ά το Export: *@
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const exportBtn = document.getElementById("btnExportCars");
+
+        if (exportBtn) {
+            exportBtn.addEventListener("click", function () {
+                const cars = document.querySelectorAll(".cardCar");
+
+                if (cars.length === 0) {
+                    alert("Δεν υπάρχουν αυτοκίνητα για export.");
+                    return;
+                }
+
+                const headers = [
+                    "ID", "Maker", "Model", "Year", "Price", "KM", "CC", "HP",
+                    "Fuel", "Transmission", "Color", "TypeOfCar", "OfferType"
+                ];
+
+                const escapeCSV = (text) => {
+                    if (!text) return "";
+                    const escaped = text.replace(/"/g, '""');
+                    return `"${escaped}"`;
+                };
+
+                const delimiter = ";"; // 👈 Εδώ αλλάζεις το delimiter
+
+                let csvRows = [];
+                csvRows.push(headers.map(escapeCSV).join(delimiter)); // Header row
+
+                cars.forEach(car => {
+                    const getText = (selector) => {
+                        const el = car.querySelector(selector);
+                        return el ? el.textContent.trim() : "";
+                    };
+
+                    const row = [
+                        car.getAttribute("data-id"),
+                        getText(".maker-title"),
+                        getText(".card-title"),
+                        getText(".car-year"),
+                        getText(".card-text"),
+                        getText(".klm"),
+                        getText(".cc"),
+                        getText(".hp"),
+                        getText(".fuel"),
+                        getText(".transmission"),
+                        getText(".typeOfColor"),
+                        getText(".typeOfCar"),
+                        car.getAttribute("data-offer-type")
+                    ].map(escapeCSV);
+
+                    csvRows.push(row.join(delimiter));
+                });
+
+                const csvContent = "\uFEFF" + csvRows.join("\n"); // UTF-8 BOM
+
+                const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute("download", "cars-export.csv");
+                link.click();
+            });
+        }
+    });
+</script>
+
+@* Αφορ΄ά το Import: *@
+<script>
+    document.getElementById("importForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const fileInput = document.getElementById("csvFile");
+        const formData = new FormData();
+        formData.append("csvFile", fileInput.files[0]);
+
+        fetch("/umbraco/api/carimport/upload", {
+            method: "POST",
+            body: formData
+        })
+        .then(r => r.text())
+        .then(res => {
+            document.getElementById("importMessage").textContent = res;
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById("importMessage").textContent = "❌ Σφάλμα κατά το import.";
+        });
+    });
 </script>
 
 <script src="~/js/usedCarSalesFilters.js" defer></script>

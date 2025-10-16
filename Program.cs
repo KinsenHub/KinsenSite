@@ -1,4 +1,6 @@
 using System;
+using Microsoft.AspNetCore.StaticFiles; // 🔹 ΠΡΟΣΟΧΗ: Βάλε αυτό στο top αν δεν υπάρχει
+using KinsenOfficial;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -27,12 +29,26 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddHttpClient(); // αφορά το import των αυτοκινήτων στο σύστημα
+
+// builder.Services.AddUnique<IContentAppFactory, ExportContentAppFactory>();
+
 WebApplication app = builder.Build();
+
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".mp4"] = "video/mp4"; // 👈 προσθέτει .mp4
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
 
 await app.BootUmbracoAsync();
 
 // 🔹 2) Session middleware ΠΡΙΝ το UseUmbraco
 app.UseSession();
+
+app.UseStaticFiles();
 
 app.UseUmbraco()
     .WithMiddleware(u =>
