@@ -79,6 +79,7 @@ const CartAPI = {
     const r = await fetch("/umbraco/api/cart/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
       body: JSON.stringify(item),
     });
     if (!r.ok) throw new Error(await r.text());
@@ -127,7 +128,12 @@ window.updateCartBadgeFromServer =
 
 // 3) normalizeCar (maker/model & priceText/priceValue)
 function normalizeCar(c) {
-  const id = String(c?.id ?? c?.Id ?? c?.carId ?? c?.carID ?? "").trim();
+  const id =
+    typeof c?.id === "number"
+      ? c.id
+      : /^\d+$/.test(String(c?.id ?? c?.Id ?? c?.carId ?? c?.carID ?? ""))
+      ? parseInt(String(c.id ?? c.Id ?? c.carId ?? c.carID), 10)
+      : null;
 
   const maker = String(c?.maker ?? c?.Maker ?? "").trim(); // <- maker (σωστό)
   const model = String(c?.model ?? c?.Model ?? "").trim();
@@ -148,8 +154,7 @@ function normalizeCar(c) {
     }
   }
 
-  const img =
-    c?.image ?? c?.imageUrl ?? c?.mainImage ?? c?.cover ?? c?.photo ?? "";
+  const img = c?.image ?? c?.imageUrl ?? c?.carPic ?? c?.photo ?? "";
   const url = location.pathname + location.search;
   const year = c?.year ?? c?.Year ?? null;
   const km = c?.km ?? c?.Km ?? c?.mileage ?? null;
@@ -172,14 +177,53 @@ function normalizeCar(c) {
 
 // 4) API του αυτοκινήτου
 async function fetchCarById(id) {
-  const r = await fetch("/umbraco/api/carapimember/getcarbyid", {
+  const r = await fetch("/umbraco/api/carstock/getcarbyid", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id: Number(id) }),
+    credentials: "same-origin",
+    body: JSON.stringify({ id: id }),
   });
-  if (!r.ok) throw new Error("API " + r.status);
+  if (!r.ok) {
+    const txt = await r.text().catch(() => "");
+    throw new Error("API " + r.status + (txt ? " - " + txt : ""));
+  }
   const raw = await r.json();
   return normalizeCar(raw);
+}
+
+// Αφορά για την εμφανιση του μηνύματος αμα είναι
+// ηδη γεμάτο το καλάθι και πάει να προσθέσει το ίδιο προϊόν
+function showToast(text, type = "info") {
+  const box =
+    document.getElementById("toastBox") ||
+    (() => {
+      const d = document.createElement("div");
+      d.id = "toastBox";
+      d.style.position = "fixed";
+      d.style.right = "16px";
+      d.style.bottom = "16px";
+      d.style.zIndex = "9999";
+      document.body.appendChild(d);
+      return d;
+    })();
+  const t = document.createElement("div");
+  t.className = `alert alert-${type}`;
+  t.textContent = text;
+  t.style.minWidth = "280px";
+  t.style.boxShadow = "0 8px 24px rgba(0,0,0,.12)";
+  box.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// API: ρωτάει τον server αν υπάρχει ήδη στο καλάθι
+async function cartContains(id) {
+  const r = await fetch(
+    `/umbraco/api/cart/contains?id=${encodeURIComponent(id)}`,
+    { credentials: "same-origin" }
+  );
+  if (!r.ok) return false;
+  const data = await r.json().catch(() => ({}));
+  return !!data.contains;
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -282,6 +326,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
 
       try {
+        const already = await cartContains(id); // ή await CartAPI.contains(id)
+        if (already) {
+          showToast(
+            "Το συγκεκριμένο αυτοκίνητο υπάρχει ήδη στο καλάθι σου.",
+            "warning"
+          );
+          // optional: μικρό “bounce” στο badge
+          const badge = document.querySelector("[data-cart-badge]");
+          if (badge) {
+            badge.classList.add("animate-bounce");
+            setTimeout(() => badge.classList.remove("animate-bounce"), 600);
+          }
+          return;
+        }
+
         const before = getCartBadgeCount();
         setCartBadgeCount(before + 1);
         window.dispatchEvent(
@@ -307,6 +366,24 @@ document.addEventListener("DOMContentLoaded", async () => {
           btn.textContent = prev;
         }, 1200);
       } catch (err) {
+        if (
+          err &&
+          (err.code === "DUPLICATE" || /duplicate/i.test(err.message || ""))
+        ) {
+          showToast(
+            "Το συγκεκριμένο αυτοκίνητο υπάρχει ήδη στο καλάθι σου.",
+            "warning"
+          );
+          // αν ο server έστειλε count, συγχρόνισε
+          if (typeof err.count === "number") {
+            setCartBadgeCount(err.count);
+            window.dispatchEvent(
+              new CustomEvent("cart:updated", { detail: { count: err.count } })
+            );
+          }
+          return;
+        }
+
         // Αν αποτύχει το API, επανέφερε το badge
         const before = getCartBadgeCount();
         setCartBadgeCount(Math.max(0, before - 1));

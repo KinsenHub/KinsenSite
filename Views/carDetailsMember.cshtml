@@ -16,27 +16,154 @@
 }
 
 <div id="carDetailsContainer">
+@* <script>
+;(() => {
+  const KEY = 'selectedCarId';
+
+  // ---- sessionStorage spy ----
+  const _set = sessionStorage.setItem.bind(sessionStorage);
+  const _get = sessionStorage.getItem.bind(sessionStorage);
+  const _rem = sessionStorage.removeItem.bind(sessionStorage);
+  const _clr = sessionStorage.clear.bind(sessionStorage);
+
+  sessionStorage.setItem = (k, v) => {
+    const stack = new Error().stack?.split('\n').slice(1,4).join(' ⟶ ');
+    console.log('[SS:set]', k, '→', v, '| from:', stack);
+    return _set(k, v);
+  };
+  sessionStorage.removeItem = (k) => {
+    const stack = new Error().stack?.split('\n').slice(1,4).join(' ⟶ ');
+    console.warn('[SS:remove]', k, '| from:', stack);
+    return _rem(k);
+  };
+  sessionStorage.clear = () => {
+    const stack = new Error().stack?.split('\n').slice(1,4).join(' ⟶ ');
+    console.error('[SS:CLEAR] ALL | from:', stack);
+    return _clr();
+  };
+
+  // ---- cookie helpers + spy ----
+  function getCookie(name) {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g,'\\$&') + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  function setCookie(name, value, sec) {
+    document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${sec}; Path=/; SameSite=Lax; Secure`;
+    console.log('[CK:set]', name, '→', value);
+  }
+
+  // ---- navigation / lifecycle logs ----
+  console.log('[BOOT] origin=', location.origin, 'path=', location.pathname);
+  console.log('[BOOT] SS:', _get(KEY), '| CK:', getCookie(KEY), '| window.name:', window.name, '| history.state:', history.state);
+
+  document.addEventListener('visibilitychange', () => {
+    console.log('[VIS]', document.visibilityState, '| SS:', _get(KEY), '| CK:', getCookie(KEY));
+  });
+
+  window.addEventListener('beforeunload', () => {
+    console.log('[UNLOAD] about to unload | SS:', _get(KEY), '| CK:', getCookie(KEY));
+  });
+
+  window.addEventListener('pageshow', (evt) => {
+    const nav = performance.getEntriesByType('navigation')[0];
+    console.log('[PAGESHOW]', { persisted: evt.persisted, navType: nav && nav.type, SS:_get(KEY), CK: getCookie(KEY) });
+  });
+
+  window.addEventListener('pagehide', (evt) => {
+    console.log('[PAGEHIDE]', { persisted: evt.persisted, SS:_get(KEY), CK: getCookie(KEY) });
+  });
+
+  // ---- handy poll (προσωρινά για debug) ----
+  let ticks = 0;
+  const t = setInterval(() => {
+    ticks++;
+    console.log(`[TICK ${ticks}] SS:`, _get(KEY), '| CK:', getCookie(KEY));
+    if (ticks > 15) clearInterval(t); // σταμάτα μετά από ~15 logs
+  }, 2000);
+
+  // ---- expose helpers for manual test in console ----
+  window.__dbg = {
+    setId: (v) => sessionStorage.setItem(KEY, String(v)),
+    rem: () => sessionStorage.removeItem(KEY),
+    clr: () => sessionStorage.clear(),
+    ck: () => setCookie(KEY, _get(KEY) ?? '', 1800),
+    get: () => ({ ss: _get(KEY), ck: getCookie(KEY), name: window.name, state: history.state })
+  };
+})();
+</script> *@
+
 	<script>
-		const carID = sessionStorage.getItem("selectedCarId");
+		(() => {
+		// helper: διάβασε cookie
+		function getCookie(name) {
+			const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g,'\\$&') + '=([^;]*)'));
+			return m ? decodeURIComponent(m[1]) : null;
+		}
 
-		console.log("carID from Razor:", carID); 
+		const fromStorage = sessionStorage.getItem('selectedCarId');
+		const fromState   = (history.state && history.state.carId) ? String(history.state.carId) : null;
+		const fromCookie  = getCookie('selectedCarId');
+		let   fromName    = null;
+		if (typeof window.name === 'string' && window.name.indexOf('car:') === 0) {
+   			fromName = window.name.slice(4); // πάρε ΜΟΝΟ το ID
+ 		}
+		const carID = (fromStorage && fromStorage.trim())
+					|| (fromState && fromState.trim())
+					|| (fromCookie && fromCookie.trim())
+					|| (fromName && fromName.trim());
 
-		if (carID) {
-		fetch("/umbraco/api/carapimember/getcarbyid", {
+		console.log('[MEMBER] carID (resolved):', carID);
+
+		if (!carID) {
+			console.warn('[MEMBER] carID is missing or empty');
+			// προαιρετικά: window.location.href = '/cars';
+			return;
+		}
+
+		// Αν ο controller σου θέλει int, κράτα αυτόν τον έλεγχο:
+		if (!/^\d+$/.test(carID)) {
+			console.error('[MEMBER] carID is not numeric, controller expects int:', carID);
+			return;
+		}
+
+		// ------- rehydrate για να επιβιώνει σε refresh/επιστροφές -------
+		if (!fromStorage && (fromCookie || fromName)) {
+			try { sessionStorage.setItem('selectedCarId', carID); } catch {}
+		}
+		if (!fromCookie) {
+			document.cookie = `selectedCarId=${encodeURIComponent(carID)}; Max-Age=${30*60}; Path=/; SameSite=Lax; Secure`;
+		}
+		if (!fromName) {
+			window.name = 'car:' + carID;
+		}
+		history.replaceState({ carId: carID }, '', location.pathname);
+
+		// ------- FETCH όπως το είχες (κρατάω ίδιο endpoint) -------
+		const payload = { id: Number(carID) }; 
+		fetch("/umbraco/api/carstock/getcarbyid", {
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({ id: carID })
+			headers: {"Content-Type": "application/json"},
+			credentials: "same-origin",
+  			body: JSON.stringify(payload)  
 		})
-			.then((response) => {
-				if (!response.ok) throw new Error("Not found");
-				return response.json();
+			.then(async (resp) => {
+				const text = await resp.text();
+				if (!resp.ok) {
+					let msg = text;
+					try { msg = JSON.parse(text).message || msg; } catch {}
+					throw new Error(`API ${resp.status} - ${msg}`);
+				}
+				return text ? JSON.parse(text) : null;
 			})
 			
 			.then(data => {
 				console.log("API RESPONSE:", data);
-				document.getElementById('carDetailsContainer').innerHTML = `	
+				
+				try { sessionStorage.setItem('selectedCarId', carID); } catch {}
+					document.cookie = `selectedCarId=${encodeURIComponent(carID)}; Max-Age=${30*60}; Path=/; SameSite=Lax; Secure`;
+					window.name = 'car:' + carID;
+				
+					document.getElementById('carDetailsContainer').innerHTML = `	
 					<div class="w-100 mt-5 d-flex justify-content-center">
 						<div id="carouselExampleDark" class="carousel carousel-dark slide shadow-lg custom-carousel"
 							data-bs-ride="carousel">
@@ -52,7 +179,7 @@
 
 							<div class="carousel-inner">
 								<div class="carousel-item active">
-									<img src="${data.imageUrl}" class="d-block w-100" style="object-fit: cover;" alt="Car Image" />
+									<img src="${data.carPicUrl}" class="d-block w-100" style="object-fit: cover;" alt="Car Image" />
 								</div>
 							</div>
 
@@ -101,33 +228,71 @@
 						</div>
 					
 					<section class="car-specs-section">
-						<h2>Στοιχεία αυτοκινήτου</h2>
+						<p>Στοιχεία αυτοκινήτου</p>
 						<div class="specs-grid">
 							<div><strong>Μάρκα:&nbsp;</strong> ${data.maker}</div>
 							<div><strong>Μοντέλο:&nbsp;</strong> ${data.model}</div>
 							<div><strong>Κατηγορία:&nbsp;</strong> ${data.typeOfCar}</div>
 							<div><strong>Χρώμα:&nbsp;</strong> ${data.color}</div>
 							<div><strong>Καύσιμο:&nbsp;</strong> ${data.fuel}</div>
-							<div><strong>Κιβώτιο:&nbsp;</strong> ${data.transmission}</div>
+							<div><strong>Κιβώτιο:&nbsp;</strong> ${data.transmissionType}</div>
 							<div><strong>Χιλιόμετρα:&nbsp;</strong> ${data.km} km</div>
 							<div><strong>Ιπποδύναμη:&nbsp;</strong> ${data.hp} hp</div>
 							<div><strong>Κυβικά:&nbsp;</strong> ${data.cc} cc</div>
-							<div><strong>Μέση Κατανάλωση:&nbsp;</strong> ${data.consumption} l/100km</div>
 						</div>
 					</section>
 				`; 
-				@* sessionStorage.removeItem("selectedCarId"); *@
 			})
 			.catch(error => {
 				console.error("API ERROR:", error); 
 			});
-		} else {
-			console.log("carID is missing or empty:", carID);
-		}
+			window.addEventListener('pageshow', evt => {
+			const nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+			const isBF = (evt.persisted === true) || (nav && nav.type === 'back_forward');
+			if (isBF) {
+			// αν θες να ξαναφέρνεις δεδομένα, μπορείς να ξανατρέξεις το fetch εδώ
+			// ή άστο όπως είναι αν ήδη φαίνονται στο DOM
+			}
+		});
+	})();
+		
 	</script>
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="~/js/carDetailsMember.js"></script>
-    
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/carDetailsMember.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const group = document.querySelector('.btn-group');          // το wrapper σου
+  const toggleBtn = group.querySelector('.custom-dropdown-button');
+
+  // Αρχικοποίηση Bootstrap dropdown
+  const dd = new bootstrap.Dropdown(toggleBtn, { autoClose: true });
+
+  // Προαιρετικό: programmatic toggle (αλλιώς θα δουλέψει μόνο με το data-bs-toggle="dropdown")
+  toggleBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    dd.toggle();
+	console.log("open");
+  });
+
+  // Επιλογή item: ενημέρωση κειμένου & data-plan, και κλείσιμο dropdown
+  group.addEventListener('click', (e) => {
+    const item = e.target.closest('.dropdown-item');
+    if (!item) return;
+
+    e.preventDefault();
+    const value = item.value ?? item.getAttribute('value');
+
+    toggleBtn.textContent = item.textContent.trim();
+    if (value) toggleBtn.setAttribute('data-plan', value);
+
+    dd.hide();
+  });
+});
+</script>
+
+
+

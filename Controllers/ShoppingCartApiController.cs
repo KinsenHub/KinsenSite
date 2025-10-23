@@ -38,6 +38,25 @@ namespace Kinsen.Web.Api
         [HttpGet("count")]
         public IActionResult Count() => Ok(new { count = GetCart().Count });
 
+        // [HttpPost("add")]
+        // public IActionResult Add([FromBody] CartItem item)
+        // {
+        //     if (item == null || string.IsNullOrWhiteSpace(item.Id))
+        //         return BadRequest("Invalid item");
+
+        //     item.Maker   = (item.Maker ?? item.Make ?? "").Trim();
+        //     item.Make    = null; // legacy
+        //     item.Model   = (item.Model ?? "").Trim();
+        //     item.AddedAt = item.AddedAt == 0 ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : item.AddedAt;
+
+        //     var cart = GetCart();
+        //     var idx = cart.FindIndex(x => x.Id == item.Id);
+        //     if (idx == -1) cart.Add(item); else cart[idx] = item;
+
+        //     SaveCart(cart);
+        //     return Ok(new { count = cart.Count, items = cart });
+        // }
+
         [HttpPost("add")]
         public IActionResult Add([FromBody] CartItem item)
         {
@@ -50,10 +69,23 @@ namespace Kinsen.Web.Api
             item.AddedAt = item.AddedAt == 0 ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : item.AddedAt;
 
             var cart = GetCart();
-            var idx = cart.FindIndex(x => x.Id == item.Id);
-            if (idx == -1) cart.Add(item); else cart[idx] = item;
 
+            // ⬇️ ΝΕΟ: έλεγχος διπλοεγγραφής
+            if (cart.Any(x => x.Id == item.Id))
+            {
+                return Conflict(new
+                {
+                    code = "DUPLICATE",
+                    message = "Το προϊόν υπάρχει ήδη στο καλάθι.",
+                    count = cart.Count,
+                    items = cart
+                });
+            }
+
+            // αλλιώς πρόσθεσέ το
+            cart.Add(item);
             SaveCart(cart);
+
             return Ok(new { count = cart.Count, items = cart });
         }
 
@@ -71,6 +103,17 @@ namespace Kinsen.Web.Api
         {
             SaveCart(new List<CartItem>());
             return Ok(new { count = 0 });
+        }
+
+        [HttpGet("contains")]
+        public IActionResult Contains([FromQuery] string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return BadRequest("Missing id");
+
+            var cart = GetCart();
+            var exists = cart.Any(x => x.Id == id);
+            return Ok(new { contains = exists, count = cart.Count });
         }
     }
 

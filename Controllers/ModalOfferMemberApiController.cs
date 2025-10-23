@@ -112,9 +112,10 @@ public class ModalOfferMemberApiController : UmbracoApiController
               <tr><td align='left' style='padding:15px 30px;'>
                 <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
                             font-size:14px;line-height:1.6;color:#000000;'>
-                  Αγαπητέ/ή {request.FirstName} {request.LastName},<br/>
+                  Αγαπητέ/ή <b> {request.FirstName} {request.LastName} </b>,<br/>
                   Λάβαμε το αίτημά σας για προσφορά. Ετοιμάσαμε αναλυτικά τα στοιχεία του οχήματος που επιλέξατε. 
-                  Η προσφορά ισχύει για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής της.
+                  Θα επικοινωνήσουμε μαζί σας το συντομότερο δυνατόν. <br>
+                  *Η προσφορά ισχύει για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής της.
                 </div>
               </td></tr>
               <tr><td align='center' style='padding:20px;'>

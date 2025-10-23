@@ -211,12 +211,12 @@
 {
 	<a class="btn btn-primary" id="btnExportCars" href="#" role="button">Export Cars</a>
 
-	<form id="importForm" enctype="multipart/form-data" method="post" action="/umbraco/api/carimport/upload">
+	@* <form id="importForm" enctype="multipart/form-data" method="post" action="/umbraco/api/carimport/upload">
 		<h3>📥 Import Cars</h3>
 		<input type="file" name="csvFile" id="csvFile" accept=".csv" required />
 		<button type="submit" class="btn btn-primary mt-2">Import</button>
 		<p id="importMessage" style="margin-top: 10px;"></p>
-	</form>
+	</form> *@
 }
 
 <div class="usedCars-container">
@@ -756,7 +756,7 @@
 					</div>
 				</div>
 
-				@if (carCardBlock != null && carCardBlock.Any())
+				@* @if (carCardBlock != null && carCardBlock.Any())
 				{	
 					var validCards = carCardBlock
 					.Where(b =>
@@ -806,7 +806,7 @@
 							<a href="/carDetails/"
 								class="cardCarLink" 
 								data-car-id="@carID" 
-								onclick="storeCarId(event, '@carID')"
+								onclick="return storeCarId(event, '@carID')"
 								style="text-decoration: none; color: inherit;">
 							
 								@if (!string.IsNullOrWhiteSpace(typeOfDiscount))
@@ -834,7 +834,7 @@
 							</a>
 						</div>
 					}
-				}
+				} *@
 			</div>
 			<div class="pagination-wrapper">
 				<nav class="mt-4 w-100">
@@ -926,7 +926,7 @@
 </script>
 
 @* Αφορ΄ά το Import: *@
-<script>
+@* <script>
     document.getElementById("importForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -947,7 +947,104 @@
             document.getElementById("importMessage").textContent = "❌ Σφάλμα κατά το import.";
         });
     });
+</script> *@
+
+<script>
+// -------- ΒΟΗΘΗΤΙΚΑ --------
+function storeCarId(e, carId) {
+  // γράφουμε το id πριν το navigation
+  const id = Number(carId);
+  if (!Number.isFinite(id) || id <= 0) {
+    console.warn('Invalid carId:', carId);
+    return true; 
+  }
+  try { 
+	sessionStorage.setItem('selectedCarId', String(id));
+	sessionStorage.setItem(`car:${id}`, JSON.stringify(carObj)); // <-- σώσε ΟΛΑ τα data
+    window.name = 'car:' + id;  
+  } catch {}
+  return true; 
+}
+
+function createCarCard(car) {
+  // car = { id, maker, model, yearRelease, price, km, cc, hp, typeOfDiscount, fuel, transmissionType, color, typeOfCar, carPicUrl }
+  const card = document.createElement('div');
+  const id = Number(car?.id ?? car?.Id);
+  const safeId = Number.isFinite(id) ? id : 0;
+  card.className = 'cardCar';
+  if (safeId) card.setAttribute('data-id', String(safeId));
+
+
+  const href = '/carDetails/';
+  card.innerHTML = `
+    <a href="${href}" class="cardCarLink" onclick="return storeCarId(event, ${Number(car?.id ?? car?.Id) || 0})" style="text-decoration:none;color:inherit;">
+      ${car.typeOfDiscount ? `<span class="discount-badge">${car.typeOfDiscount}</span>` : ``}
+      <img src="${car.carPicUrl || ''}" class="card-img-top car-image" onerror="this.src='/images/placeholder-car.jpg';"/>
+      <div class="card-body d-flex flex-column justify-content-between text-center p-3">
+        <div>
+          <h4 class="maker-title fw-semibold mb-2">${car.maker ?? ''} <span class="card-title">${car.model ?? ''}</span></h4>
+          <p class="car-year">${car.yearRelease ?? ''}</p>
+          <p class="card-text fw-bold mb-1" style="font-size:1.25rem;">${car.price ?? ''} €</p>
+          <p class="text-muted mb-0">
+            <i class="fa-solid fa-road"></i><span class="klm">&nbsp; ${car.km ?? ''} </span>km &nbsp;&nbsp;
+            <i class="fa fa-wrench"></i><span class="cc">&nbsp; ${car.cc ?? ''}</span>cc &nbsp;&nbsp;
+            <i class="fa-solid fa-gas-pump"></i><span class="fuel">&nbsp; ${car.fuel ?? ''}</span>
+          </p>
+          <p class="transmission" style="display:none">${car.transmissionType ?? ''}</p>
+          <p class="typeOfColor" style="display:none">${car.color ?? ''}</p>
+          <p class="hp" style="display:none">${car.hp ?? ''}</p>
+          <p class="typeOfCar" style="display:none">${car.typeOfCar ?? ''}</p>
+        </div>
+      </div>
+    </a>
+  `;
+  return card;
+}
+
+async function loadCars() {
+  const container = document.getElementById('displayCars');
+  const emptyBox  = document.getElementById('noResultsBox');
+
+  // Προαιρετικό: loading state
+  container.classList.add('loading');
+
+  try {
+    const resp = await fetch('/umbraco/api/carstock/getcarsStock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({}) // ή π.χ. { Page:1, PageSize:12 }
+    });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      throw new Error(`Server ${resp.status}: ${txt}`);
+    }
+    const cars = await resp.json(); // αναμένουμε List<CarDto>
+
+    // Καθάρισε προηγούμενα (εκτός από το noResultsBox)
+    [...container.querySelectorAll('.cardCar')].forEach(n => n.remove());
+
+    if (!cars || !cars.length) {
+      emptyBox.style.display = '';
+      return;
+    }
+    emptyBox.style.display = 'none';
+
+    const frag = document.createDocumentFragment();
+    cars.forEach(car => frag.appendChild(createCarCard(car)));
+    container.appendChild(frag);
+  } catch (err) {
+    console.error('loadCars error:', err);
+    emptyBox.style.display = '';
+  } finally {
+    container.classList.remove('loading');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadCars);
 </script>
+
+
 
 <script src="~/js/usedCarSalesFilters.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

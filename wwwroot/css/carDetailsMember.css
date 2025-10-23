@@ -30,14 +30,20 @@
   object-fit: cover;
   border-radius: 10px;
 }
-.cart-card .car-title {
+
+.price-section .car-title {
+  color: #023859 !important;
+}
+
+.price-section .price-value {
+  color: #023859 !important;
+}
+
+.car-specs-section p {
   font-weight: 600;
-  margin-bottom: 2px;
+  color: #023859 !important;
 }
-.cart-card .car-price {
-  font-weight: 700;
-  margin-top: 6px;
-}
+
 .cart-card .removeFromCart {
   width: 32px;
   height: 32px;
@@ -46,6 +52,15 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
+}
+
+.installment-result {
+  margin-top: 10px;
+}
+
+.car-specs-section p {
+  font-size: 1.2rem !important;
+  font-weight: 600;
 }
 
 /* Footer */
@@ -71,34 +86,42 @@
 
 /* Responsive */
 @media (max-width: 576px) {
-  .cart-list {
-    max-width: 95%;
+  .price-section .car-title {
+    display: block;
+    font-size: 1.2rem !important;
+    font-weight: 700;
+    color: #023859 !important;
+    margin-bottom: 0.5rem;
   }
-  .cart-card {
-    grid-template-columns: 90px 1fr 32px;
-    gap: 12px;
+
+  .price-section .price-value {
+    font-weight: 700;
+    margin: 0 0.25rem;
+    font-size: 1rem !important;
+    color: #023859 !important;
   }
-  .cart-card .car-img {
-    width: 90px;
-    height: 64px;
+
+  .upologismos_label {
+    font-size: 1rem !important;
   }
-  .cart-footer {
-    display: flex;
-    flex-direction: column; /* κάθετα */
-    align-items: center;
-    justify-content: center;
-    gap: 8px; /* απόσταση μεταξύ συνόλου & κουμπιού */
-    margin-top: 16px;
+
+  .car-specs-section p {
+    font-size: 1.2rem !important;
+    font-weight: 600;
   }
-  .cart-footer .cart-total {
-    transform: none;
-    width: 100%;
-    align-self: center;
-    text-align: center;
-    padding-left: 0;
+}
+
+@media (min-width: 1200px) {
+  .upologismos_label {
+    font-size: 1.3rem !important;
   }
-  /* προαιρετικά: κάνε το κουμπί πιο «mobile friendly» */
-  #proceedBtn {
-    min-width: 220px; /* ή width: 100% αν το θες full-width */
+
+  .installment-result {
+    font-size: 1.2rem !important;
+  }
+
+  .car-specs-section p {
+    font-size: 1.5rem !important;
+    font-weight: 600;
   }
 }

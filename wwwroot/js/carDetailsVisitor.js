@@ -196,10 +196,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 })();
 
-window.addEventListener("beforeunload", () => {
-  sessionStorage.removeItem("selectedCarId");
-});
-
 // Ειναι μετα την αποστολή της προσφοράς να μην μαυριζει η οθονη στον χρηστη και παγωνουν ολα
 function waitModalHidden(modalEl) {
   return new Promise((resolve) => {
@@ -226,21 +222,3 @@ function cleanupBootstrapArtifacts() {
       } catch {}
     });
 }
-
-// // ΑΦΟΡΑ ΜΟΝΟ ΤΟ ΚΟΥΜΠΙ "ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ"
-// document.addEventListener("click", (e) => {
-//   const btn = e.target.closest(".addToCartBtn");
-//   if (!btn) return;
-
-//   const carId =
-//     window.CURRENT_CAR?.id ||
-//     sessionStorage.getItem("selectedCarId") ||
-//     new URLSearchParams(location.search).get("id");
-
-//   if (!carId) {
-//     console.error("❌ Δεν βρέθηκε carId");
-//     return;
-//   }
-
-//   window.addToCart(carId); // καλεί την global από shoppingCart.js
-// });

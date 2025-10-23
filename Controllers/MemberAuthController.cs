@@ -46,7 +46,8 @@ namespace KinsenOfficial.Controllers
             }
 
             // Αν όλα είναι ΟΚ, κάνει sign in το χρήστη
-            await _memberSignInManager.SignInAsync(member, true);
+            // false: αμα κλεισει ο browser, αποσυνδέει τον χρήστη
+            await _memberSignInManager.SignInAsync(member, false);
 
             // Παίρνει τον τρέχον χρήστη και επιστρέφει το group/ρόλο του
             var currentMember = await _memberManager.GetCurrentMemberAsync();

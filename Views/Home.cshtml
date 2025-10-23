@@ -157,6 +157,9 @@
                     var typeOfDiscount = content.Value<string>("typeOfDiscount");
 
                     <div class="carousel-item @(index == 0 ? "active" : "")" data-bs-interval="4000">
+                    <a href="/carDetails/"
+                        data-id="@carID"
+                        onclick="return onCardClick(event, '@carID')">
                         <div class="car-card text-center" data-id="@carID">
                             <div class="discount-badge">@typeOfDiscount</div>
                             <img src="@carPic?.Url()" class="d-block mx-auto" alt="@modelo" style="max-height:300px; object-fit:contain;" />
@@ -170,7 +173,8 @@
                                 Δείτε το
                             </a>
                         </div>
-                    </div>;
+                    </a>
+                    </div>
 
                     index++;
                 }
