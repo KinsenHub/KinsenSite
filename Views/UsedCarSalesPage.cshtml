@@ -748,10 +748,10 @@
 						Δοκίμασε να αλλάξεις τα φίλτρα ή καθάρισέ τα για να δεις όλα τα αποτελέσματα.
 						</p>
 						<div class="no-results__actions">
-						<button type="button" class="nr-btn" onclick="clearAllFilters()">
-							<i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
-							Καθαρισμός φίλτρων
-						</button>
+							<button type="button" class="nr-btn" onclick="clearAllFilters()">
+								<i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+								Καθαρισμός φίλτρων
+							</button>
 						</div>
 					</div>
 				</div>
@@ -954,16 +954,13 @@
 function storeCarId(e, carId) {
   // γράφουμε το id πριν το navigation
   const id = Number(carId);
-  if (!Number.isFinite(id) || id <= 0) {
-    console.warn('Invalid carId:', carId);
-    return true; 
-  }
-  try { 
-	sessionStorage.setItem('selectedCarId', String(id));
-	sessionStorage.setItem(`car:${id}`, JSON.stringify(carObj)); // <-- σώσε ΟΛΑ τα data
-    window.name = 'car:' + id;  
+  if (!Number.isFinite(id) || id <= 0) return true;
+  try {
+    sessionStorage.setItem('selectedCarId', String(id));
+    if (carObj) sessionStorage.setItem(`car:${id}`, JSON.stringify(carObj));
+    window.name = 'car:' + id;
   } catch {}
-  return true; 
+  return true;
 }
 
 function createCarCard(car) {
@@ -979,7 +976,8 @@ function createCarCard(car) {
   card.innerHTML = `
     <a href="${href}" class="cardCarLink" onclick="return storeCarId(event, ${Number(car?.id ?? car?.Id) || 0})" style="text-decoration:none;color:inherit;">
       ${car.typeOfDiscount ? `<span class="discount-badge">${car.typeOfDiscount}</span>` : ``}
-      <img src="${car.carPicUrl || ''}" class="card-img-top car-image" onerror="this.src='/images/placeholder-car.jpg';"/>
+      <img src="${car.carPicUrl || ''}" class="card-img-top car-image"
+     onerror="if (!this.dataset.fallback){ this.dataset.fallback=1; this.src='/media/no-image.png'; }" />
       <div class="card-body d-flex flex-column justify-content-between text-center p-3">
         <div>
           <h4 class="maker-title fw-semibold mb-2">${car.maker ?? ''} <span class="card-title">${car.model ?? ''}</span></h4>
@@ -1009,7 +1007,7 @@ async function loadCars() {
   container.classList.add('loading');
 
   try {
-    const resp = await fetch('/umbraco/api/carstock/getcarsStock', {
+    const resp = await fetch('/umbraco/api/carstock/displayCars', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'same-origin',
@@ -1019,7 +1017,9 @@ async function loadCars() {
       const txt = await resp.text();
       throw new Error(`Server ${resp.status}: ${txt}`);
     }
-    const cars = await resp.json(); // αναμένουμε List<CarDto>
+    console.log('[displayCars] status', resp.status);
+	const cars = await resp.json();
+	console.log('[displayCars] payload', cars);
 
     // Καθάρισε προηγούμενα (εκτός από το noResultsBox)
     [...container.querySelectorAll('.cardCar')].forEach(n => n.remove());

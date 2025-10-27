@@ -8,6 +8,17 @@ using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Web;
 
 [Route("umbraco/api/[controller]")]
 public class CarApiVisitorController : UmbracoApiController
@@ -53,9 +64,8 @@ public class CarApiVisitorController : UmbracoApiController
         [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
         public int? Hp { get; set; }
 
-        [JsonPropertyName("transmission")]  public string? Transmission { get; set; }
+        [JsonPropertyName("transmissionType")]  public string? TransmissionType { get; set; }
         [JsonPropertyName("typeOfCar")]     public string? TypeOfCar    { get; set; }
-        [JsonPropertyName("consumption")]   public string? Consumption  { get; set; }
         [JsonPropertyName("carPicUrl")]     public string? CarPicUrl    { get; set; }
     }
 
@@ -85,31 +95,72 @@ public class CarApiVisitorController : UmbracoApiController
 
     // ---------- API προς το front για τα στοιχεία του οχήματος ----------
     [HttpPost("getcarbyid")]
-    public async Task<IActionResult> GetCarById([FromBody] CarRequest request)
+    [AllowAnonymous]
+    [IgnoreAntiforgeryToken]
+    [Consumes("application/json")]
+    public IActionResult GetCarById([FromBody] CarRequest request)
     {
         if (request == null || request.Id <= 0)
             return BadRequest("Invalid request.");
 
-        var car = await FetchFromCarStockAsync(request.Id);
-        if (car == null) return NotFound($"Car with ID {request.Id} not found.");
+        using var cref = _contextFactory.EnsureUmbracoContext();
+        var umb = cref.UmbracoContext;
 
-        return Ok(new
+        var salesPage = umb.Content.GetAtRoot()
+            .SelectMany(x => x.DescendantsOrSelf())
+            .FirstOrDefault(x => x.ContentType.Alias == "usedCarSalesPage");
+
+        if (salesPage == null)
+            return NotFound("usedCarSalesPage not found.");
+
+        var json = salesPage.Value<string>("carCardBlock"); // <-- alias property του Block List
+        if (string.IsNullOrWhiteSpace(json))
+            return NotFound("No cars.");
+
+        using var doc = JsonDocument.Parse(json);
+        if (!doc.RootElement.TryGetProperty("contentData", out var contentData) ||
+            contentData.ValueKind != JsonValueKind.Array)
+            return NotFound("contentData missing.");
+
+        static string S(JsonElement e, string name)
+            => e.TryGetProperty(name, out var v)
+                ? (v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : v.ToString())
+                : "";
+
+        static float F(JsonElement e, string name)
+            => (e.TryGetProperty(name, out var v) && v.TryGetSingle(out var f)) ? f : 0f;
+
+        foreach (var card in contentData.EnumerateArray())
         {
-            id = car.Id,
-            maker = car.Maker,
-            model = car.Model,
-            price = car.Price,
-            year = car.YearRelease,
-            km = car.Km,
-            fuel = car.Fuel,
-            color = car.Color,
-            cc = car.Cc,                 // int?
-            hp = car.Hp,                 // int?
-            transmission = car.Transmission,
-            typeOfCar = car.TypeOfCar,
-            consumption = car.Consumption,
-            imageUrl = car.CarPicUrl
-        });
+            // ----- Διάβασε carId (string ή number). Fallback σε carID για παλιά δεδομένα -----
+            int cid = 0;
+            if (card.TryGetProperty("carId", out var vId) || card.TryGetProperty("carID", out vId))
+            {
+                if (vId.ValueKind == JsonValueKind.Number) vId.TryGetInt32(out cid);
+                else if (vId.ValueKind == JsonValueKind.String) int.TryParse(vId.GetString(), out cid);
+            }
+            if (cid != request.Id) continue;
+
+            var result = new
+            {
+                id = cid,
+                maker = S(card, "maker"),
+                model = S(card, "model"),
+                price = S(card, "price"),
+                year = S(card, "yearRelease"),
+                km = S(card, "km"),
+                fuel = S(card, "fuel"),
+                color = S(card, "color"),
+                cc = F(card, "cc"),
+                hp = F(card, "hp"),
+                transmission = S(card, "transmissionType"),
+                typeOfCar = S(card, "typeOfCar"),
+                imageUrl = S(card, "carPicUrl")
+            };
+            return Ok(result);
+        }
+
+        return NotFound($"Car with ID {request.Id} not found.");
     }
 
     // ---------- Submit Offer (emails) ----------
