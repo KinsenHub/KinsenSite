@@ -151,6 +151,7 @@
 
                     var carID = content.Value<string>("carID");
                     var carPic = content.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("carPic");
+                    var maker = content.Value<string>("maker");
                     var modelo = content.Value<string>("model");
                     var yearRelease = content.Value<string>("yearRelease");
                     var price = content.Value<string>("price");
@@ -163,7 +164,8 @@
                         <div class="car-card text-center" data-id="@carID">
                             <div class="discount-badge">@typeOfDiscount</div>
                             <img src="@carPic?.Url()" class="d-block mx-auto" alt="@modelo" style="max-height:300px; object-fit:contain;" />
-                            <h3>@modelo</h3>
+                            <h2>@maker @modelo</h2>
+                            <h3></h3>
                             <p>@yearRelease</p>
                             <p class="price">@price €</p>
 

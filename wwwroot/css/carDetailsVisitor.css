@@ -164,6 +164,7 @@
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   font-weight: 700;
+  color: #023859;
 }
 
 .specs-grid {
@@ -192,16 +193,32 @@
   font-weight: 700;
 }
 
-/* Responsive */
-@media (max-width: 992px) {
-  .specs-grid {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 575px) {
+  .car-specs-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: #023859;
   }
 }
 
-@media (max-width: 600px) {
+/* Responsive */
+@media (min-width: 576px) and (max-width: 991px) {
+  .custom-carousel img {
+    max-height: 240px;
+  }
+
+  .car-specs-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: #023859;
+  }
+}
+
+@media (min-width: 992px) {
   .specs-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

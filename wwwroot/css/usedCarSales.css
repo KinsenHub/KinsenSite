@@ -567,6 +567,10 @@ label {
 } */
 
 @media (max-width: 575px) {
+  .offcanvas-body {
+    margin-top: 30px;
+  }
+
   .usedCars-container {
     display: flex;
     flex-direction: column;
@@ -648,6 +652,10 @@ label {
 /* ============ 📱 Tablet (576px – 991px) ============ */
 
 @media (min-width: 576px) and (max-width: 991px) {
+  .offcanvas-body {
+    margin-top: 40px;
+  }
+
   #filtersSidebar.offcanvas-start {
     left: 0;
     right: 0;
@@ -719,12 +727,12 @@ label {
     width: 100%;
     justify-items: center;
     text-align: center;
-    padding: 0 20px;
+    padding: 0 10px;
   }
 
   .cardCar {
-    width: 100%;
-    max-width: 500px;
+    width: 80%;
+    max-width: 370px;
     position: relative;
     overflow: hidden;
   }
@@ -754,34 +762,18 @@ label {
     grid-template-columns: repeat(1, 1fr);
     gap: 30px;
     width: 100%;
-    max-width: 1400px;
+    max-width: 1000px;
     justify-items: stretch;
   }
 
   .cardCar {
-    width: 100%;
-    max-width: 100%;
+    width: 80%;
+    max-width: 450px;
     margin-left: 70px;
     margin-top: 30px;
     position: relative;
     overflow: hidden;
   }
-
-  /* #displayCars.is-empty {
-    width: 80%;
-    justify-items: center;
-    margin-top: 50px !important;
-    margin-left: 80px;
-  }
-
-  #displayCars.is-empty #noResultsBox {
-    background: #007b9130;
-    max-width: 720px;
-    width: 90%;
-    margin: 1rem auto;
-    padding: 16px 20px;
-    border-radius: 8px;
-  } */
 }
 
 @media (min-width: 1200px) {
@@ -828,24 +820,46 @@ label {
   /* Το noResults κουτί: full center, σωστά πλάτη και χωρίς άσκοπα margins */
   #displayCars.is-empty #noResultsBox {
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    text-align: center;
-
-    box-sizing: border-box;
-    inline-size: min(
-      100%,
-      var(--nr-box-maxw)
-    ); /* ίδια λογική με width:min(...), RTL-safe */
-    max-inline-size: var(--nr-box-maxw);
-    /* δεν χρειάζεται margin:auto επειδή ο γονιός το κεντράρει ήδη */
-    margin: 0;
-
+    align-items: center;
+    padding: var(--nr-box-padding, 24px);
+    border-radius: var(--nr-box-radius, 12px);
+    border: 1px solid var(--nr-border, #dbe5ea);
     background: #007b9130;
-    padding: var(--nr-box-padding);
-    border-radius: var(--nr-box-radius);
-    border: 1px solid var(--nr-border);
+    grid-column: 1 / -1; /* να πιάνει όλο το πλάτος του grid */
+  }
+
+  /* Κάθετα ΟΛΑ μέσα στο header */
+  #noResultsBox .card-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 14px;
+    padding: 0; /* προαιρετικό */
+    width: 100%;
+  }
+
+  /* Μικρές βελτιώσεις */
+  #noResultsBox .no-results__icon {
+    margin: 0 auto;
+    font-size: clamp(28px, 5vw, 48px);
+  }
+  #noResultsBox .card-title {
+    margin: 0;
+  }
+  #noResultsBox .no-results__hint {
+    margin: 0;
+    max-width: 38ch;
+  }
+  #noResultsBox .no-results__actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  #noResultsBox .nr-btn {
+    inline-size: max-content;
   }
 }
 

@@ -103,18 +103,21 @@
 
 							<div class="carousel-inner">
 								<div class="carousel-item active">
-									<img src="${data.carPicUrl}" class="d-block w-100" style="object-fit: cover;" alt="Car Image" />
+								<img src="${data.imageUrl}" 
+									class="d-block mx-auto"
+									style="max-width: 500px; max-height: 320px; width: auto; height: auto; image-rendering: auto;" 
+									alt="Car Image" />
 								</div>
 							</div>
 
-							<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+							@* <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
 								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
 								<span class="visually-hidden">Previous</span>
 							</button>
 							<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
 								<span class="carousel-control-next-icon" aria-hidden="true"></span>
 								<span class="visually-hidden">Next</span>
-							</button>
+							</button> *@
 						</div>
 					</div>
 
@@ -249,7 +252,7 @@
 		console.log("carID from Razor:", carID); 
 
 		if (carID) {
-		fetch("/umbraco/api/carapivisitor/getcarbyid", {
+		fetch("/umbraco/api/carApiVisitor/getcarbyid", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -420,7 +423,8 @@
 	<script src="~/js/carDetailsVisitor.js"></script>
 
 	<script>
-	document.addEventListener('DOMContentLoaded', () => {
+	
+	/*document.addEventListener('click', (e) => {
   		const group = document.querySelector('.btn-group');          // το wrapper σου
   		const toggleBtn = group.querySelector('.custom-dropdown-button');
 
@@ -447,6 +451,45 @@
 
 			dd.hide();
 		});
+	}); */
+
+	document.addEventListener('click', (e) => {
+		const toggleBtn = e.target.closest('.custom-dropdown-button');
+		const item = e.target.closest('.dropdown-item');
+		const clickedInsideDropdown = e.target.closest('.btn-group');
+
+		// ΤΟGGLE: Άνοιγμα / κλείσιμο dropdown όταν πατηθεί το κουμπί
+		if (toggleBtn) {
+			e.preventDefault();
+
+			const dropdownMenu = toggleBtn.nextElementSibling;
+			if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+				dropdownMenu.classList.toggle('show');
+			}
+			return;
+		}
+
+		// ΕΠΙΛΟΓΗ item: ενημέρωση κουμπιού με κείμενο και value
+		if (item) {
+			e.preventDefault();
+
+			const dropdown = item.closest('.dropdown-menu');
+			const toggle = dropdown?.previousElementSibling;
+			if (toggle) {
+				toggle.textContent = item.textContent.trim();
+				toggle.setAttribute('data-plan', item.value ?? item.getAttribute('value') ?? '');
+			}
+
+			dropdown.classList.remove('show');
+			return;
+		}
+
+		// CLICK ΕΚΤΟΣ: Κλείσε όλα τα dropdowns
+		if (!clickedInsideDropdown) {
+			document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+				menu.classList.remove('show');
+			});
+		}
 	});
 </script>
     

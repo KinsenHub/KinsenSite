@@ -100,7 +100,7 @@ body {
     padding-inline: 12px;
   }
   .login-box {
-    padding-top: 66px; /* δώσε ανάσα ΜΕΣΑ στο box για το logo */
+    padding-top: 30px; /* δώσε ανάσα ΜΕΣΑ στο box για το logo */
     padding-inline: 16px;
   }
   .login-title {
@@ -142,7 +142,7 @@ body {
 @media (min-width: 992px) {
   .login-wrapper {
     min-height: auto; /* override του calc(100vh - var(--nx-h)) */
-    padding-top: 120px; /* μικρό κενό πάνω */
+    /* padding-top: 120px; */
     padding-bottom: 24px; /* μικρό κενό κάτω, όχι «χαλί» */
   }
 
@@ -154,7 +154,7 @@ body {
 @media (min-width: 1200px) {
   .login-wrapper {
     min-height: auto;
-    padding-top: 80px;
+    /* padding-top: 80px; */
     padding-bottom: 24px;
   }
 
@@ -166,11 +166,11 @@ body {
 @media (min-width: 1400px) {
   .login-wrapper {
     margin-top: 30px;
-    padding-top: 130px;
+    /* padding-top: 130px; */
     padding-inline: 12px;
   }
   .login-box {
-    padding: 100px 170px 100px 170px;
+    padding: 50px 200px 100px 200px;
     padding-inline: 20px;
   }
   .login-title {

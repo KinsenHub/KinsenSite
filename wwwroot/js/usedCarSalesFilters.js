@@ -343,55 +343,69 @@ function updateAvailableOffers(filters, cards) {
 function updateAvailableBrands(filters, filteredCards) {
   const brandCheckboxes = document.querySelectorAll(".brandCheckbox");
 
-  const visibleBrands = new Set();
+  // helper: ίδιο normalization με το server
+  const norm = (s) => (s || "").replace(/[^0-9a-z]/gi, "").toUpperCase();
+
+  // Προετοιμασία: keys όλων των brands και map σε label
   const brandCounts = {};
-
-  // ✅ Επιλέγεις σωστά την πηγή με βάση το αν υπάρχει φίλτρο τιμής
-  const sourceCards =
-    filters.minPrice > 0 || filters.maxPrice < Infinity
-      ? filteredCards
-      : originalCardElements;
-
-  sourceCards.forEach((card) => {
-    const modelText = (makerName =
-      card
-        .querySelector(".maker-title")
-        ?.childNodes[0]?.nodeValue.trim()
-        .toLowerCase() || "");
-
-    brandCheckboxes.forEach((cb) => {
-      const brand = cb.value.toUpperCase();
-      if (modelText.includes(brand)) {
-        visibleBrands.add(brand);
-        brandCounts[brand] = (brandCounts[brand] || 0) + 1;
-      }
-    });
+  const labelByKey = {};
+  brandCheckboxes.forEach((cb) => {
+    const key = norm(cb.value);
+    brandCounts[key] = 0; // μηδενισμός
+    const label = cb.closest("label");
+    if (label) labelByKey[key] = label;
   });
 
-  brandCheckboxes.forEach((checkbox) => {
-    const label = checkbox.closest("label");
-    const brand = checkbox.value.toUpperCase();
-    const count = brandCounts[brand] || 0;
+  const hasPriceFilter = filters.minPrice > 0 || filters.maxPrice < Infinity;
 
-    const span = label.querySelector("span");
-    if (span) {
-      span.innerText = `${brand} (${count})`;
+  // Πηγή καρτών
+  const sourceCards = hasPriceFilter ? filteredCards : originalCardElements;
+
+  // Re-count ανά κάρτα (χωρίς nested loops)
+  sourceCards.forEach((card) => {
+    const titleEl = card.querySelector(".maker-title");
+    if (!titleEl) return;
+
+    // maker = πρώτο text node πριν το <span class="card-title">
+    const makerRaw =
+      (titleEl.childNodes[0] && titleEl.childNodes[0].nodeValue) ||
+      titleEl.textContent ||
+      "";
+    const makerKey = norm(makerRaw.trim());
+
+    if (makerKey in brandCounts) {
+      brandCounts[makerKey] += 1;
     }
+  });
 
-    const hasPriceFilter = filters.minPrice > 0 || filters.maxPrice < Infinity;
+  // visible set από τα counts
+  const visibleBrands = new Set(
+    Object.keys(brandCounts).filter((k) => brandCounts[k] > 0)
+  );
 
-    if (hasPriceFilter) {
-      if (visibleBrands.has(brand)) {
+  // Ενημέρωση UI (μόνο αριθμοί, όχι ονόματα)
+  brandCheckboxes.forEach((checkbox) => {
+    const key = norm(checkbox.value);
+    const label = labelByKey[key];
+    const count = brandCounts[key] || 0;
+
+    if (label) {
+      const countEl = label.querySelector(".brand-count");
+      if (countEl) countEl.textContent = String(count);
+
+      if (hasPriceFilter) {
+        if (visibleBrands.has(key)) {
+          checkbox.disabled = false;
+          label.style.opacity = "1";
+        } else {
+          checkbox.disabled = true;
+          checkbox.checked = false;
+          label.style.opacity = "0.5";
+        }
+      } else {
         checkbox.disabled = false;
         label.style.opacity = "1";
-      } else {
-        checkbox.disabled = true;
-        checkbox.checked = false;
-        label.style.opacity = "0.5";
       }
-    } else {
-      checkbox.disabled = false;
-      label.style.opacity = "1";
     }
   });
 }
@@ -755,8 +769,8 @@ function clearAllFilters() {
     }
 
     // 6) Recompute counters & τρέξε κενό filter για συγχρονισμό UI
-    InitializeCounters?.(Array.from(originalCardElements));
-    filterCards?.(collectFilters?.() ?? {});
+    // InitializeCounters?.(Array.from(originalCardElements));
+    // filterCards?.(collectFilters?.() ?? {});
 
     // 7) Καθάρισε τυχόν leftover backdrops/scroll locks
     setTimeout(() => {

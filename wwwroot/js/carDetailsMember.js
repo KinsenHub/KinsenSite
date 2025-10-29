@@ -177,7 +177,7 @@ function normalizeCar(c) {
 
 // 4) API του αυτοκινήτου
 async function fetchCarById(id) {
-  const r = await fetch("/umbraco/api/carstock/getcarbyid", {
+  const r = await fetch("/umbraco/api/CarApiVisitor/getcarbyid", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "same-origin",
