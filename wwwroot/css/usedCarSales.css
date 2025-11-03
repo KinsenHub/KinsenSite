@@ -558,13 +558,6 @@ label {
 
 /*************************MEDIA QUERIES*********************** */
 /* ============= 📱 Mobile (έως 575px) ============== */
-/* :root {
-  --nr-blue: #023859;
-  --nr-teal: #39c0c3;
-  --nr-bg: #f4fbfd;
-  --nr-border: #cfe6ee;
-  --nr-bg-container: rgba(2, 56, 89, 0.08);
-} */
 
 @media (max-width: 575px) {
   .offcanvas-body {
@@ -625,7 +618,7 @@ label {
 
   #filtersSidebar .offcanvas-header {
     display: flex;
-    justify-content: center; /* κέντρο οριζόντια η λεξη Φίλτρα μεσα στο sidebar*/
+    justify-content: center; 
     align-items: center;
     padding: 1rem;
     position: relative;
@@ -647,6 +640,93 @@ label {
   .filter-content label {
     text-align: left;
   }
+
+  .no-results__actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
+    gap: var(--nr-actions-gap);
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  #displayCars.is-empty #noResultsBox {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin-bottom: 6px;
+    background: #007b9130;
+    max-width: var(--nr-box-maxw);
+    width: min(var(--nr-box-width), var(--nr-box-maxw));
+    margin: 1rem auto;
+    padding: var(--nr-box-padding);
+    border-radius: var(--nr-box-radius);
+    border: 1px solid var(--nr-border);
+  }
+
+  #displayCars.is-empty #noResultsBox .card-header {
+    flex-direction: column;     
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    color: #023859;
+  }
+
+  .no-results__icon {
+    display: flex;                  
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;         
+    width:  30px;
+    height: 80px;
+    line-height: 1;
+    color: #39c0c3;
+  }
+
+  .no-results__icon i,
+  .no-results__icon .fa-solid,
+  .no-results__icon .fa {
+    display:inline-block;
+    font-size:44px !important;   
+    line-height:1;
+    color:#39c0c3 !important;
+  }
+
+  .no-results__title {
+    font-size: calc(var(--nr-title-size) * 0.95);
+    margin: 0 0 6px 0;
+    text-align: center;
+  }
+
+  .no-results__hint {
+    margin: 8px 6px 12px;       
+    font-size: calc(var(--nr-hint-size) * 0.95);
+    line-height: 1.5;
+    color: #023859;
+    text-align: center;
+  }
+
+  .no-results__actions {
+    width: 100%;
+    gap: 10px;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .nr-btn {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: calc(var(--nr-btn-font) * 0.95);
+    border-radius: 10px;
+    background-color: #023859;
+    color: white;
+  }
+
 }
 
 /* ============ 📱 Tablet (576px – 991px) ============ */
@@ -740,6 +820,108 @@ label {
   h5.mb-0 {
     display: none !important;
   }
+
+   #displayCars.is-empty #noResultsBox {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin-bottom: 6px;
+    background: #007b9130;
+    max-width: var(--nr-box-maxw);
+    width: min(var(--nr-box-width), var(--nr-box-maxw));
+    margin: 1rem auto;
+    padding: var(--nr-box-padding);
+    border-radius: var(--nr-box-radius);
+    border: 1px solid var(--nr-border);
+  }
+
+  #displayCars.is-empty #noResultsBox .card-header {
+    flex-direction: column;     
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    color: #023859;
+  }
+
+  .no-results__icon {
+    display: flex;                  
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;         
+    width:  30px;
+    height: 80px;
+    line-height: 1;
+    color: #39c0c3;
+  }
+
+  .no-results__icon i,
+  .no-results__icon .fa-solid,
+  .no-results__icon .fa {
+    display:inline-block;
+    font-size:44px !important;   
+    line-height:1;
+    color:#39c0c3 !important;
+  }
+
+  .no-results__title {
+    font-size: calc(var(--nr-title-size) * 0.95);
+    margin: 0 0 6px 0;
+    text-align: center;
+  }
+
+  .no-results__hint {     
+    font-size: calc(var(--nr-hint-size) * 0.95);
+    line-height: 1.5;
+    color: #023859;
+    text-align: center;
+    margin: 20px;
+  }
+
+  .no-results__actions {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    
+  }
+
+  .nr-btn {
+    width: 80%;
+    font-size: calc(var(--nr-btn-font) * 0.95);
+    border-radius: 10px;
+    background-color: #023859;
+    color: white;
+    padding: 15px;
+  }
+
+  /* βελτίωση για το sidebar τίτλο και filters */
+  #filtersSidebar .offcanvas-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    color: #0a486e;
+  }
+
+  #filtersSidebar .offcanvas-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+    color: #0a486e;
+  }
+
+  .clear-filters-btn {
+    font-size: 1rem;
+  }
+
+  .filter-content label {
+    text-align: left;
+  }
 }
 
 /* ============ 💻 Desktop (≥992px) ============ */
@@ -773,6 +955,83 @@ label {
     margin-top: 30px;
     position: relative;
     overflow: hidden;
+  }
+
+   #displayCars.is-empty #noResultsBox {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin-bottom: 6px;
+    background: #007b9130;
+    max-width: var(--nr-box-maxw);
+    width: min(var(--nr-box-width), var(--nr-box-maxw));
+    margin: 1rem auto;
+    padding: var(--nr-box-padding);
+    border-radius: var(--nr-box-radius);
+    border: 1px solid var(--nr-border);
+  }
+
+  #displayCars.is-empty #noResultsBox .card-header {
+    flex-direction: column;     
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    color: #023859;
+  }
+
+  .no-results__icon {
+    display: flex;                  
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;         
+    width:  30px;
+    height: 80px;
+    line-height: 1;
+    color: #39c0c3;
+  }
+
+  .no-results__icon i,
+  .no-results__icon .fa-solid,
+  .no-results__icon .fa {
+    display:inline-block;
+    font-size:44px !important;   
+    line-height:1;
+    color:#39c0c3 !important;
+  }
+
+  .no-results__title {
+    font-size: calc(var(--nr-title-size) * 0.95);
+    margin: 0 0 6px 0;
+    text-align: center;
+  }
+
+  .no-results__hint {     
+    font-size: calc(var(--nr-hint-size) * 0.95);
+    line-height: 1.5;
+    color: #023859;
+    text-align: center;
+    margin: 20px;
+  }
+
+  .no-results__actions {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    
+  }
+
+  .nr-btn {
+    width: 80%;
+    font-size: calc(var(--nr-btn-font) * 0.95);
+    border-radius: 10px;
+    background-color: #023859;
+    color: white;
+    padding: 15px;
   }
 }
 
@@ -851,7 +1110,7 @@ label {
   }
   #noResultsBox .no-results__hint {
     margin: 0;
-    max-width: 38ch;
+    max-width: 100%;
   }
   #noResultsBox .no-results__actions {
     display: flex;
@@ -860,6 +1119,7 @@ label {
   }
   #noResultsBox .nr-btn {
     inline-size: max-content;
+    width: 70%;
   }
 }
 
@@ -958,29 +1218,7 @@ label {
   display: none;
 }
 
-#displayCars.is-empty {
-  display: grid;
-  place-items: center;
-  min-height: 40vh;
-}
-
-#displayCars.is-empty #noResultsBox {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  background: #007b9130;
-  max-width: var(--nr-box-maxw);
-  width: min(var(--nr-box-width), var(--nr-box-maxw));
-  margin: 1rem auto;
-  padding: var(--nr-box-padding);
-  border-radius: var(--nr-box-radius);
-  border: 1px solid var(--nr-border);
-}
-
-#displayCars.is-empty #noResultsBox .card-header {
+/* #displayCars.is-empty #noResultsBox .card-header {
   width: 100%;
   display: flex;
   align-items: center;
@@ -989,6 +1227,13 @@ label {
   border: 0;
   padding: 0;
   margin-bottom: 6px;
+  background: #007b9130;
+  max-width: var(--nr-box-maxw);
+  width: min(var(--nr-box-width), var(--nr-box-maxw));
+  margin: 1rem auto;
+  padding: var(--nr-box-padding);
+  border-radius: var(--nr-box-radius);
+  border: 1px solid var(--nr-border);
 }
 
 .no-results__icon {
@@ -1017,6 +1262,7 @@ label {
   color: #063247cc;
   font-size: var(--nr-hint-size);
   line-height: 1.45;
+  text-align: center;
 }
 
 .no-results__actions {
@@ -1056,4 +1302,4 @@ label {
 }
 .nr-btn i {
   margin-right: 0.4rem;
-}
+} */

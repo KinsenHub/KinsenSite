@@ -35,44 +35,31 @@ namespace KinsenOfficial.Controllers
             IContentTypeService contentTypeService,
             IDataTypeService dataTypeService)
         {
-             _cfg = cfg;
+            _cfg = cfg;
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _dataTypeService = dataTypeService;
         }
-
+        
         [HttpPost("cars-updated")]
         [AllowAnonymous]
         [IgnoreAntiforgeryToken]
         [Consumes("application/json")]
-        public IActionResult CarsUpdated([FromBody] CarStockEnvelope payload)
+        public IActionResult CarsUpdated([FromBody] List<CarStockCar>? carsPayload)
         {
-            // απλή προστασία
-            var key = Request.Headers["X-API-KEY"].ToString();
-            if (!string.IsNullOrEmpty(WebhookSecret) && key != WebhookSecret)
-                return Unauthorized("Invalid API key");
-
-            if (UsedCarSalesPageKey == Guid.Empty)
-                return BadRequest("CarStock:UsedCarSalesPageId missing.");
-
-            var page = _contentService.GetById(UsedCarSalesPageKey);
-            if (page == null)
-                return NotFound("usedCarSalesPage not found.");
-
-            if (payload?.Cars == null || payload.Cars.Count == 0)
+            if (carsPayload == null || carsPayload.Count == 0)
                 return BadRequest("No cars in payload.");
 
-            // map στο DTO που ταιριάζει στο element
-            var cars = payload.Cars
-                .Where(c => c?.CarId > 0)
+            var cars = carsPayload
+                .Where(c => c?.CarId != null && c.CarId > 0)
                 .Select(s => new CarDto
                 {
-                    CarId = s.CarId!.Value,
+                    CarId = s.CarId ?? 0,
                     Maker = s.Maker ?? "",
                     Model = s.Model ?? "",
-                    YearRelease = s.YearRelease?.ToString() ?? "", // αν είναι Text στο element
-                    Price = s.Price?.ToString() ?? "",       // αν είναι Text στο element
-                    Km = s.Km?.ToString() ?? "",          // αν είναι Text στο element
+                    YearRelease = s.YearRelease?.ToString() ?? "",
+                    Price = s.Price?.ToString() ?? "",
+                    Km = s.Km?.ToString() ?? "",
                     Cc = s.Cc ?? 0,
                     Hp = s.Hp ?? 0,
                     Fuel = s.Fuel ?? "",
@@ -86,7 +73,9 @@ namespace KinsenOfficial.Controllers
 
             try
             {
-                ReplaceBlockListWithCars(page, cars); // ⬅ περνάμε ΤΗ σελίδα
+                var page = _contentService.GetById(UsedCarSalesPageKey);
+                if (page == null) return NotFound("usedCarSalesPage not found.");
+                ReplaceBlockListWithCars(page, cars);
                 return Ok(new { ok = true, saved = cars.Count });
             }
             catch (Exception ex)
@@ -121,11 +110,11 @@ namespace KinsenOfficial.Controllers
             {
                 return f switch
                 {
-                    "volvo" => "Volvo",
-                    "mitsubishi" => "Mitsubishi",
-                    "bmw" => "BMW",
-                    "honda" => "Honda",
-                    "maserati" => "Maserati",
+                    "volvo" or "Volvo" => "Volvo",
+                    "mitsubishi" or "Mitsubishi" => "Mitsubishi",
+                    "bmw" or "BMW" or "Bmw" => "BMW",
+                    "honda" or "Honda" => "Honda",
+                    "maserati" or "Maserati" => "Maserati",
                     _ => incoming ?? ""
                 };
             }
@@ -135,11 +124,12 @@ namespace KinsenOfficial.Controllers
             {
                 return f switch
                 {
-                    "βενζινη" or "benzini" or "petrol" => "Βενζίνη",
-                    "πετρελαιο" or "petrelaio" or "diesel" => "Πετρέλαιο",
-                    "υβριδικο" or "hybrid" => "Υβριδικό",
-                    "ηλεκτρικο" or "ilektriko" or "electric" => "Ηλεκτρικό",
-                    "αεριο" or "lpg" or "cng" => "Αέριο",
+                    // English → Greek
+                    "petrol-hybrid" or "hybrid" or "υβριδικο" => "Υβριδικό",
+                    "diesel" or "πετρελαιο" or "petrelaio" => "Πετρέλαιο",
+                    "petrol" or "gasoline" or "βενζινη" => "Βενζίνη",
+                    "electric" or "ηλεκτρικο" => "Ηλεκτρικό",
+                    "lpg" or "cng" or "αεριο" => "Αέριο",
                     _ => incoming ?? ""
                 };
             }
@@ -155,40 +145,36 @@ namespace KinsenOfficial.Controllers
                 };
             }
 
-            // color – βάλε τα ακριβή labels του dropdown σου
             if (propertyAlias == "color")
             {
                 return f switch
                 {
-                    "μαυρο" or "black" => "Μαύρο",
-                    "γκρι" or "grey" or "gray" => "Γκρι",
-                    "ασπρο" or "λευκο" or "white" => "Άσπρο",
-                    "κοκκινο" or "red" => "Κόκκινο",
-                    "μπλε" or "blue" => "Μπλε",
-                    "ασημι" or "silver" => "Ασημί",
+                    "white" or "ασπρο" or "λευκο" => "Άσπρο",
+                    "black" or "μαυρο" => "Μαύρο",
+                    "blue" or "μπλε" => "Μπλε",
+                    "silver" or "ασημι" => "Ασημί",
+                    "gray" or "grey" or "γκρι" => "Γκρι",
+                    "red" or "κοκκινο" => "Κόκκινο",
                     _ => incoming ?? ""
                 };
             }
 
-            // typeOfCar – προσαρμόσου στα labels του DataType σου
+            // typeOfCar 
             if (propertyAlias == "typeOfCar")
             {
                 return f switch
                 {
-                    "sedan" => "Sedan",
-                    "πολης" or "city" => "Πόλης",
-                    "suv" => "SUV",
-                    "hatchback" => "Hatchback",
-                    "coupe" => "Coupe",
-                    "station wagon" or "wagon" or "break" => "Station Wagon",
+                    "sedan" or "σενταν" or "σεντάν" => "Sedan",
+                    "πολης" or "πολη" or "πόλη" or "Πόλης" or "city" => "Πόλης",
+                    "suv" or "SUV" or "Suv" => "SUV",
                     _ => incoming ?? ""
                 };
             }
 
             return incoming ?? "";
         }
-        
-        
+
+
         private string MapDropdownValue(IContentType elementType, string propertyAlias, string? incoming)
         {
             if (string.IsNullOrWhiteSpace(incoming))
@@ -269,7 +255,7 @@ namespace KinsenOfficial.Controllers
                 if (cfgObj != null)
                 {
                     var itemsProp = cfgObj.GetType().GetProperty("Items");
-                    var ukProp    = cfgObj.GetType().GetProperty("UseKeys");
+                    var ukProp = cfgObj.GetType().GetProperty("UseKeys");
                     if (ukProp?.GetValue(cfgObj) is bool b) useKeys = b;
 
                     if (itemsProp?.GetValue(cfgObj) is System.Collections.IEnumerable itemsEnum)
@@ -279,7 +265,7 @@ namespace KinsenOfficial.Controllers
                             Guid id = Guid.Empty;
                             string? val = null;
 
-                            var idProp  = it.GetType().GetProperty("Id");
+                            var idProp = it.GetType().GetProperty("Id");
                             var valProp = it.GetType().GetProperty("Value");
 
                             var idObj = idProp?.GetValue(it);
@@ -300,7 +286,7 @@ namespace KinsenOfficial.Controllers
             static string Norm(string? s)
             {
                 if (string.IsNullOrWhiteSpace(s)) return "";
-                var t = s.Trim().Replace('\u00A0',' ').ToLowerInvariant();
+                var t = s.Trim().Replace('\u00A0', ' ').ToLowerInvariant();
                 // βγάλε παρενθέσεις στο τέλος: "Honda (Legacy option)" -> "honda"
                 t = System.Text.RegularExpressions.Regex.Replace(t, @"\s*\(.*?\)\s*$", "");
                 t = System.Text.RegularExpressions.Regex.Replace(t, @"\s+", " ");
@@ -308,7 +294,7 @@ namespace KinsenOfficial.Controllers
             }
 
             string incomingExact = incoming.Trim();
-            string incomingNorm  = Norm(incoming);
+            string incomingNorm = Norm(incoming);
 
             int Score((Guid Id, string? Value) c)
             {
@@ -331,8 +317,8 @@ namespace KinsenOfficial.Controllers
             {
                 var l = (c.Value ?? "").ToLowerInvariant();
                 int p = 0;
-                if (l.Contains("legacy"))      p += 50;
-                if (l.Contains("deprecated"))  p += 50;
+                if (l.Contains("legacy")) p += 50;
+                if (l.Contains("deprecated")) p += 50;
                 if (l.Contains("unsupported")) p += 50;
                 return p;
             }
@@ -343,12 +329,100 @@ namespace KinsenOfficial.Controllers
                 .ThenBy(x => (x.Value ?? "").Length) // πιο “καθαρά” labels πρώτα
                 .FirstOrDefault();
 
-            if (best == null || best.score >= 100)
-                return incoming; // δεν βρέθηκε τίποτα σχετικό
+            // if (best == null || best.score >= 100)
+            //     return incoming; // δεν βρέθηκε τίποτα σχετικό
 
-            return useKeys
-                ? (best.Id != Guid.Empty ? best.Id.ToString() : incoming)
-                : (best.Value ?? incoming);
+            // return useKeys
+            //     ? (best.Id != Guid.Empty ? best.Id.ToString() : incoming)
+            //     : (best.Value ?? incoming);
+
+            if (best.Id != Guid.Empty)
+                return best.Id.ToString();
+
+            // Αν για κάποιο λόγο δεν έχει Id, επέστρεψε το normalized label
+            return best.Value ?? incoming;
+        }
+        
+        private string NormalizeDropdownValue(IContentType elementType, string propertyAlias, string? incoming)
+        {
+            if (string.IsNullOrWhiteSpace(incoming)) return string.Empty;
+
+            // 1) Βρες το DataType του property
+            var propType = elementType.CompositionPropertyTypes.FirstOrDefault(p => p.Alias == propertyAlias);
+            if (propType == null) return incoming;
+
+            var dt = _dataTypeService.GetDataType(propType.DataTypeId);
+            if (dt == null) return incoming;
+
+            // 2) Τσέκαρε αν UseKeys = true
+            bool useKeys = false;
+            try
+            {
+                var confJsonProp = dt.GetType().GetProperty("ConfigurationEditorJson");
+                if (confJsonProp?.GetValue(dt) is string conf && !string.IsNullOrWhiteSpace(conf))
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(conf);
+                    if (doc.RootElement.TryGetProperty("useKeys", out var uk))
+                        useKeys = uk.ValueKind == System.Text.Json.JsonValueKind.True;
+                }
+            }
+            catch { /* ignore */ }
+
+            // 3) Πάρε το "καλύτερο" mapping με την ήδη υπάρχουσα MapDropdownValue
+            var mapped = MapDropdownValue(elementType, propertyAlias, incoming); // μπορεί να είναι GUID ή label
+
+            // 4) Αν UseKeys=true και το mapped ΔΕΝ είναι GUID → βρες το GUID του label
+            if (useKeys && !Guid.TryParse(mapped, out _))
+            {
+                try
+                {
+                    // Προσπάθησε πρώτα από ConfigurationEditorJson (Umbraco 14–15)
+                    var confJsonProp = dt.GetType().GetProperty("ConfigurationEditorJson");
+                    if (confJsonProp?.GetValue(dt) is string json && !string.IsNullOrWhiteSpace(json))
+                    {
+                        using var doc = System.Text.Json.JsonDocument.Parse(json);
+                        if (doc.RootElement.TryGetProperty("items", out var arr) && arr.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var el in arr.EnumerateArray())
+                            {
+                                var val = el.TryGetProperty("value", out var jVal) ? jVal.GetString() : null;
+                                if (!string.IsNullOrWhiteSpace(val) &&
+                                    string.Equals(val.Trim(), mapped.Trim(), StringComparison.OrdinalIgnoreCase))
+                                {
+                                    if (el.TryGetProperty("id", out var jId) &&
+                                        jId.ValueKind == JsonValueKind.String &&
+                                        Guid.TryParse(jId.GetString(), out var gid))
+                                        return gid.ToString(); // ← ΕΠΙΣΤΡΟΦΗ GUID
+                                }
+                            }
+                        }
+                    }
+
+                    // Εναλλακτικά από Configuration (παλαιότερο)
+                    var cfgObj = dt.GetType().GetProperty("Configuration")?.GetValue(dt);
+                    var itemsProp = cfgObj?.GetType().GetProperty("Items");
+                    if (itemsProp?.GetValue(cfgObj) is System.Collections.IEnumerable itemsEnum)
+                    {
+                        foreach (var it in itemsEnum)
+                        {
+                            var idProp  = it.GetType().GetProperty("Id");
+                            var valProp = it.GetType().GetProperty("Value");
+                            var lbl     = valProp?.GetValue(it)?.ToString() ?? "";
+
+                            if (string.Equals(lbl.Trim(), mapped.Trim(), StringComparison.OrdinalIgnoreCase))
+                            {
+                                var idObj = idProp?.GetValue(it);
+                                if (idObj is Guid g) return g.ToString();
+                                if (idObj is string s && Guid.TryParse(s, out var g2)) return g2.ToString();
+                            }
+                        }
+                    }
+                }
+                catch { /* ignore and fall through */ }
+            }
+
+            // 5) Αν δεν έχει UseKeys ή δεν βρέθηκε GUID, κράτα ό,τι έχουμε
+            return mapped ?? string.Empty;
         }
 
 
@@ -592,33 +666,54 @@ namespace KinsenOfficial.Controllers
             {
                 return StatusCode(500, $"BlockList JSON parse error: {ex.Message}");
             }
-        }
-        
-    }
-
-    // ====== Payload models ======
-    public class CarStockEnvelope
-    {
-        [JsonPropertyName("cars")] public List<CarStockCar>? Cars { get; set; }
+        }    
     }
 
     public class CarStockCar
     {
-        [JsonPropertyName("carId")]               public int? CarId { get; set; }
-        [JsonPropertyName("maker")]             public string? Maker { get; set; }
-        [JsonPropertyName("model")]            public string? Model { get; set; }
-        [JsonPropertyName("yearRelease")]      public int? YearRelease { get; set; }
-        [JsonPropertyName("price")]            public decimal? Price { get; set; }
-        [JsonPropertyName("km")]               public int? Km { get; set; }
-        [JsonPropertyName("cc")]               public float? Cc { get; set; }
-        [JsonPropertyName("hp")]               public float? Hp { get; set; }
-        [JsonPropertyName("typeOfDiscount")]   public string? TypeOfDiscount { get; set; }
-        [JsonPropertyName("fuel")]             public string? Fuel { get; set; }
-        [JsonPropertyName("transmissionType")] public string? TransmissionType { get; set; }
-        [JsonPropertyName("color")]            public string? Color { get; set; }
-        [JsonPropertyName("typeOfCar")]        public string? TypeOfCar { get; set; }
-        [JsonPropertyName("image_url")]        public string? ImageUrl { get; set; }
+        [JsonPropertyName("carId")]
+        public int? CarId { get; set; }
+
+        [JsonPropertyName("maker")]
+        public string? Maker { get; set; }
+
+        [JsonPropertyName("model")]
+        public string? Model { get; set; }
+
+        [JsonPropertyName("yearRelease")]
+        public int? YearRelease { get; set; }
+
+        [JsonPropertyName("price")]
+        public decimal? Price { get; set; }
+
+        [JsonPropertyName("km")]
+        public int? Km { get; set; }
+
+        [JsonPropertyName("cc")]
+        public double? Cc { get; set; }
+         
+        [JsonPropertyName("hp")]
+        public double? Hp { get; set; }
+
+        [JsonPropertyName("typeOfDiscount")]
+        public string? TypeOfDiscount { get; set; }
+
+        [JsonPropertyName("fuel")]
+        public string? Fuel { get; set; }
+
+        [JsonPropertyName("transmissionType")]
+        public string? TransmissionType { get; set; }
+
+        [JsonPropertyName("color")]
+        public string? Color { get; set; }
+
+        [JsonPropertyName("typeOfCar")]
+        public string? TypeOfCar { get; set; }
+
+        [JsonPropertyName("image_url")]
+        public string? ImageUrl { get; set; }
     }
+
 
     public class CarDto
     {
@@ -628,8 +723,8 @@ namespace KinsenOfficial.Controllers
         public string YearRelease { get; set; } = "";
         public string Price { get; set; } = "";
         public string Km { get; set; } = "";
-        public float  Cc { get; set; }
-        public float  Hp { get; set; }
+        public double  Cc { get; set; }
+        public double  Hp { get; set; }
         public string Fuel { get; set; } = "";
         public string TransmissionType { get; set; } = "";
         public string Color { get; set; } = "";
@@ -638,3 +733,4 @@ namespace KinsenOfficial.Controllers
         public string CarPicUrl { get; set; } = "";
     }
 }
+

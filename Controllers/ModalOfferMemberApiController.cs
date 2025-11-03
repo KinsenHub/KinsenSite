@@ -80,7 +80,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
               <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#023859;'>
                 <div style='font-size:18px;font-weight:700;margin-bottom:6px;'>{c.Maker} {c.Model}</div>
                 <div style='font-size:13px;color:#555;margin-bottom:8px;'>
-                  {(c.Year.HasValue ? c.Year.Value.ToString() : "-")} • {(c.Km.HasValue ? c.Km.Value + " km" : "-")} • {c.Fuel}
+                  • {(c.Year.HasValue ? c.Year.Value.ToString() : "-")} <br> • {(c.Km.HasValue ? c.Km.Value + " km" : "-")} <br> • {c.Fuel}
                 </div>
                 <div style='font-size:16px;font-weight:600;color:#007c91;margin-bottom:8px;'>{c.PriceText} €</div>
               </td>
@@ -105,7 +105,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
               <tr><td align='center' style='padding:10px;'>{logoTag}</td></tr>
               <tr><td align='center' style='padding:5px;'>
                 <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
-                            font-size:20px;font-weight:300;color:#39c0c3;'>
+                            font-size:20px;font-weight:400;color:#39c0c3;'>
                   Σας ευχαριστούμε για το ενδιαφέρον σας!
                 </div>
               </td></tr>
