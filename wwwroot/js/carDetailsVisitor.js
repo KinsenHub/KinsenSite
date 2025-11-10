@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const s = document.getElementById("offerStatus");
       if (s) {
         s.style.display = "block";
-        s.textContent = "Συμπλήρωσε σωστά όλα τα πεδία.";
+        s.textContent = "Συμπληρώστε σωστά όλα τα πεδία.";
         s.className = "small mt-2 text-danger";
       }
       return;

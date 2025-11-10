@@ -255,21 +255,38 @@ document.addEventListener("click", async (e) => {
   const email = document.getElementById("email")?.value.trim() || "";
   const phone = document.getElementById("phone")?.value.trim() || "";
 
-  // helpers: __isValidEmail, __isValidGreekMobile, __normalizeGreekMobile πρέπει να υπάρχουν
-  const emailOk = __isValidEmail(email);
-  const phoneOk = __isValidGreekMobile(phone);
-  const normalizedPhone = phoneOk
-    ? `+30${__normalizeGreekMobile(phone)}`
-    : phone;
+  const isValidEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s || "");
+  const normalizeGreekMobile = (s) => {
+    let d = (s || "").replace(/\D/g, "");
+    if (d.startsWith("0030")) d = d.slice(4);
+    else if (d.startsWith("30")) d = d.slice(2);
+    return d;
+  };
 
-  // Διόρθωση IDs στα invalid states (όχι co_email/co_phone)
-  document.getElementById("email")?.classList.toggle("is-invalid", !emailOk);
-  document.getElementById("phone")?.classList.toggle("is-invalid", !phoneOk);
+  const isValidGreekMobile = (s) => /^69\d{8}$/.test(normalizeGreekMobile(s));
+
+  const setValidity = (id, ok) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle("is-invalid", !ok);
+    el.classList.toggle("is-valid", ok);
+  };
+
+  // --- Validation ---
+  const emailOk = isValidEmail(email);
+  const phoneOk = isValidGreekMobile(phone);
+  const normalizedPhone = phoneOk ? `+30${normalizeGreekMobile(phone)}` : phone;
+
+  setValidity("firstName", !!firstName);
+  setValidity("lastName", !!lastName);
+  setValidity("email", emailOk);
+  setValidity("phone", phoneOk);
 
   if (!firstName || !lastName || !emailOk || !phoneOk) {
     if (statusEl) {
+      statusEl.style.display = "block";
       statusEl.textContent = "Συμπληρώστε σωστά όλα τα πεδία.";
-      statusEl.className = "small text-danger";
+      statusEl.className = "small mt-2 text-danger";
     }
     return;
   }
@@ -351,14 +368,6 @@ document.addEventListener("click", async (e) => {
       statusEl.className = "small mt-2 text-success";
     }
 
-    // ✅ Κλείσιμο modal
-    // setTimeout(() => {
-    //   if (window.bootstrap && modalEl) {
-    //     const modalInstance =
-    //       bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-    //     modalInstance.hide();
-    //   }
-    // }, 1000);
     await waitModalHidden(modalEl);
 
     // ✅ Reset φόρμας
@@ -396,7 +405,7 @@ window.addEventListener("beforeunload", () => {
   sessionStorage.removeItem("selectedCarId");
 });
 
-// Ειναι μετα την αποστολή της προσφοράς να μην μαυριζει η οθονη στον χρηστη και παγωνουν ολα
+// Είναι μετά την αποστολή της προσφοράς να μην μαυριζει η οθονη στον χρηστη και παγωνουν ολα
 function waitModalHidden(modalEl) {
   return new Promise((resolve) => {
     if (!modalEl || !window.bootstrap || !bootstrap.Modal) return resolve();
