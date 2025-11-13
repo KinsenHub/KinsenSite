@@ -74,6 +74,18 @@ let makerName,
   hpText,
   carhp;
 
+function normalizeColorStrict(v) {
+  return (v || "")
+    .toLowerCase()
+    .normalize("NFD")                     // αφαιρεί τόνους
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ς/g, "σ")                   // τελικό σ -> σ
+    .replace(/[\u2010-\u2015]/g, "-")     // όλα τα είδη dash -> "-"
+    .replace(/\s*-\s*/g, "-")             // ενιαίες παύλες χωρίς κενά γύρω
+    .replace(/\s+/g, "-")                 // ⛔️ ό,τι κενό -> παύλα (έτσι “Κόκκινο Μεταλιζέ” == “Κόκκινο-Μεταλιζέ”)
+    .trim();
+}
+
 function filterCards(filters) {
   filteredCards = [];
 
@@ -191,20 +203,35 @@ function filterCards(filters) {
               .trim()
         ),
 
-      filters.color.length === 0 ||
-        filters.color.some(
-          (c) =>
-            (c || "")
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .toLowerCase()
-              .trim() ===
-            (colorName || "")
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .toLowerCase()
-              .trim()
-        ),
+  filters.color.length === 0 ||
+  filters.color.some((c) => {
+    const left = (c || "").trim().toLowerCase(); // φίλτρο όπως είναι
+    const right = (colorName || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ς/g, "σ")
+      .replace(/-/g, "")       
+      .replace(/\s+/g, "");    
+
+    const leftNorm = left
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ς/g, "σ")
+      .replace(/-/g, "")
+      .replace(/\s+/g, "");
+
+    console.log("🎨 compare(color):", {
+      filterColorOriginal: c,
+      cardColorOriginal: colorName,
+      leftNorm,
+      right,
+      eq: leftNorm === right,
+    });
+
+    return leftNorm === right;
+  }),
 
       filters.carType.length === 0 ||
         filters.carType.some((t) => {
@@ -224,7 +251,9 @@ function filterCards(filters) {
       filteredCards.push(card);
       anyMatch = true;
     }
+
   });
+
 
   // Αφορά το μήνυμα NoResults!!
   if (noResultsMsg) noResultsMsg.style.display = "none";
@@ -232,6 +261,7 @@ function filterCards(filters) {
 
   // ...
   if (filteredCards.length === 0) {
+     
     // καθάρισε/κρύψε κάρτες
     displayCars
       .querySelectorAll(".cardCar")

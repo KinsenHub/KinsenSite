@@ -7,21 +7,23 @@
 }
 
 /* --- ΜΟΝΟ styling, καμία αλλαγή διάταξης --- */
-footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 h6.text-uppercase.fw-bold {
-  display: flex; /* logo + τίτλος στην ίδια γραμμή */
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 1rem !important; /* ίδια κάθετη ιεραρχία όπως πριν */
-  letter-spacing: 0.2px;
-  color: #023859; /* σκουρόχρωμο, corporate */
+/* footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 h6.text-uppercase.fw-bold {
+  display: flex; 
+  justify-content:center;
+  gap:8px;
+  line-height: 1.2;       
+  overflow: visible;
+  padding: 10px;
 }
 
 footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 h6.text-uppercase.fw-bold img {
-  width: 45px;
-  height: 45px;
+  display:block;
+  height: clamp(10px, 4vw, 44px);  
+  width: auto;
+  max-width: 100%;
   object-fit: contain;
-  border-radius: 10px; /* προαιρετικό, βγάλ’ το αν δεν το θες */
-}
+  vertical-align: middle;
+} */
 
 /* Κείμενο παραγράφου όπως το ήθελες, χωρίς inline styles */
 footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 p {
@@ -54,7 +56,36 @@ h6.text-uppercase.fw-bold.mb-4 {
     .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4
     h6.text-uppercase.fw-bold
     img {
-    width: 40px;
-    height: 40px;
+    width: 190px;
+    height: 30px;
+    padding: 0;
+
   }
 }
+
+@media (min-width: 576px) and (max-width: 991px) {
+
+  footer.col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4
+    h6.text-uppercase.fw-bold
+    img {
+    width: 50px;
+    height: 30px;
+    padding: 0;
+  }
+/* 
+  footer .col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4 {
+    margin-right: 80px !important;
+    padding-right: 150px !important;
+  } */
+  
+}
+
+/* @media (min-width: 992px) {
+  footer.col-md-3.col-lg-4.col-xl-3.mx-auto.mb-4
+    h6.text-uppercase.fw-bold
+    img {
+    width: 50px;
+    height: 30px;
+    padding: 0;
+  }
+} */

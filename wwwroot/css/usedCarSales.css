@@ -20,6 +20,7 @@
   cursor: pointer;
   padding: 0;
 }
+
 #filtersSidebar .offcanvas-close:focus {
   outline: 2px solid rgba(2, 56, 89, 0.25);
   outline-offset: 2px;
@@ -146,6 +147,27 @@
 
 .filter-item.active .filter-content {
   display: block;
+}
+
+/* scroll down μπάρα ston maker-color*/
+.filter-item .filter-content .twoColumns-grid {
+    max-height: 240px;    /* ό,τι ύψος θες (200–280 τέλειο) */
+    overflow-y: auto;
+    padding-right: 6px;   /* μικρό περιθώριο για το scrollbar */
+}
+
+/* Scrollbar style (optional but beautiful) */
+.filter-item .filter-content .twoColumns-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-item .filter-content .twoColumns-grid::-webkit-scrollbar-thumb {
+    background: #c3c3c3;
+    border-radius: 4px;
+}
+
+.filter-item .filter-content .twoColumns-grid::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .checkbox-columns {

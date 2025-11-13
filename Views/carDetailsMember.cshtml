@@ -16,81 +16,6 @@
 }
 
 <div id="carDetailsContainer">
-@* <script>
-;(() => {
-  const KEY = 'selectedCarId';
-
-  // ---- sessionStorage spy ----
-  const _set = sessionStorage.setItem.bind(sessionStorage);
-  const _get = sessionStorage.getItem.bind(sessionStorage);
-  const _rem = sessionStorage.removeItem.bind(sessionStorage);
-  const _clr = sessionStorage.clear.bind(sessionStorage);
-
-  sessionStorage.setItem = (k, v) => {
-    const stack = new Error().stack?.split('\n').slice(1,4).join(' ⟶ ');
-    console.log('[SS:set]', k, '→', v, '| from:', stack);
-    return _set(k, v);
-  };
-  sessionStorage.removeItem = (k) => {
-    const stack = new Error().stack?.split('\n').slice(1,4).join(' ⟶ ');
-    console.warn('[SS:remove]', k, '| from:', stack);
-    return _rem(k);
-  };
-  sessionStorage.clear = () => {
-    const stack = new Error().stack?.split('\n').slice(1,4).join(' ⟶ ');
-    console.error('[SS:CLEAR] ALL | from:', stack);
-    return _clr();
-  };
-
-  // ---- cookie helpers + spy ----
-  function getCookie(name) {
-    const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g,'\\$&') + '=([^;]*)'));
-    return m ? decodeURIComponent(m[1]) : null;
-  }
-  function setCookie(name, value, sec) {
-    document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${sec}; Path=/; SameSite=Lax; Secure`;
-    console.log('[CK:set]', name, '→', value);
-  }
-
-  // ---- navigation / lifecycle logs ----
-  console.log('[BOOT] origin=', location.origin, 'path=', location.pathname);
-  console.log('[BOOT] SS:', _get(KEY), '| CK:', getCookie(KEY), '| window.name:', window.name, '| history.state:', history.state);
-
-  document.addEventListener('visibilitychange', () => {
-    console.log('[VIS]', document.visibilityState, '| SS:', _get(KEY), '| CK:', getCookie(KEY));
-  });
-
-  window.addEventListener('beforeunload', () => {
-    console.log('[UNLOAD] about to unload | SS:', _get(KEY), '| CK:', getCookie(KEY));
-  });
-
-  window.addEventListener('pageshow', (evt) => {
-    const nav = performance.getEntriesByType('navigation')[0];
-    console.log('[PAGESHOW]', { persisted: evt.persisted, navType: nav && nav.type, SS:_get(KEY), CK: getCookie(KEY) });
-  });
-
-  window.addEventListener('pagehide', (evt) => {
-    console.log('[PAGEHIDE]', { persisted: evt.persisted, SS:_get(KEY), CK: getCookie(KEY) });
-  });
-
-  // ---- handy poll (προσωρινά για debug) ----
-  let ticks = 0;
-  const t = setInterval(() => {
-    ticks++;
-    console.log(`[TICK ${ticks}] SS:`, _get(KEY), '| CK:', getCookie(KEY));
-    if (ticks > 15) clearInterval(t); // σταμάτα μετά από ~15 logs
-  }, 2000);
-
-  // ---- expose helpers for manual test in console ----
-  window.__dbg = {
-    setId: (v) => sessionStorage.setItem(KEY, String(v)),
-    rem: () => sessionStorage.removeItem(KEY),
-    clr: () => sessionStorage.clear(),
-    ck: () => setCookie(KEY, _get(KEY) ?? '', 1800),
-    get: () => ({ ss: _get(KEY), ck: getCookie(KEY), name: window.name, state: history.state })
-  };
-})();
-</script> *@
 
 	<script>
 		(() => {
@@ -140,7 +65,7 @@
 
 		// ------- FETCH όπως το είχες (κρατάω ίδιο endpoint) -------
 		const payload = { id: Number(carID) }; 
-		fetch("/umbraco/api/CarApiVisitor/getcarbyid", {
+		fetch("/umbraco/api/CarApiMember/getcarbyid", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			credentials: "same-origin",
@@ -184,15 +109,6 @@
 									alt="Car Image" />
 								</div>
 							</div>
-
-							@* <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
-								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-								<span class="visually-hidden">Previous</span>
-							</button>
-							<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
-								<span class="carousel-control-next-icon" aria-hidden="true"></span>
-								<span class="visually-hidden">Next</span>
-							</button> *@
 						</div>
 					</div>
 

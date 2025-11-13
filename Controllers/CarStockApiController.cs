@@ -7,6 +7,16 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Controllers;
 using System.Globalization;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Globalization;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core;
 
 namespace KinsenOfficial.Controllers
 {
@@ -20,6 +30,9 @@ namespace KinsenOfficial.Controllers
         private readonly IContentTypeService _contentTypeService;
         private readonly Umbraco.Cms.Core.Web.IUmbracoContextAccessor _accessor;
         private readonly IDataTypeService _dataTypeService;
+        private readonly ILogger<CarStockWriteController> _logger;
+        private readonly IPublishedContentQuery _publishedContentQuery;
+
 
         // appsettings.json (χρησιμοποίησε ΜΟΝΟ GUID)
         private Guid UsedCarSalesPageKey =>
@@ -33,12 +46,16 @@ namespace KinsenOfficial.Controllers
             IConfiguration cfg,
             IContentService contentService,
             IContentTypeService contentTypeService,
-            IDataTypeService dataTypeService)
+            IDataTypeService dataTypeService,
+            ILogger<CarStockWriteController> logger,
+            IPublishedContentQuery publishedContentQuery)
         {
             _cfg = cfg;
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _dataTypeService = dataTypeService;
+            _logger = logger;
+            _publishedContentQuery = publishedContentQuery;
         }
         
         [HttpPost("cars-updated")]
@@ -50,36 +67,173 @@ namespace KinsenOfficial.Controllers
             if (carsPayload == null || carsPayload.Count == 0)
                 return BadRequest("No cars in payload.");
 
-            var cars = carsPayload
+            static string NormalizeName(string? value)
+            {
+                if (string.IsNullOrWhiteSpace(value)) return "";
+                value = value.Trim().ToLowerInvariant();
+                return char.ToUpper(value[0]) + value.Substring(1);
+            }
+
+            // === 1) Νέα αμάξια από το payload ===
+            var newCars = carsPayload
                 .Where(c => c?.CarId != null && c.CarId > 0)
                 .Select(s => new CarDto
                 {
-                    CarId = s.CarId ?? 0,
-                    Maker = s.Maker ?? "",
-                    Model = s.Model ?? "",
-                    YearRelease = s.YearRelease?.ToString() ?? "",
-                    Price = s.Price?.ToString() ?? "",
-                    Km = s.Km?.ToString() ?? "",
-                    Cc = s.Cc ?? 0,
-                    Hp = s.Hp ?? 0,
-                    Fuel = s.Fuel ?? "",
+                    CarId          = s.CarId ?? 0,
+                    Maker          = NormalizeName(s.Maker),
+                    Model          = NormalizeName(s.Model),
+                    YearRelease    = s.YearRelease?.ToString() ?? "",
+                    Price          = s.Price?.ToString() ?? "",
+                    Km             = s.Km?.ToString() ?? "",
+                    Cc             = s.Cc ?? 0,
+                    Hp             = s.Hp ?? 0,
+                    Fuel           = s.Fuel ?? "",
                     TransmissionType = s.TransmissionType ?? "",
-                    Color = s.Color ?? "",
+                    Color          = NormalizeName(s.Color),
                     TypeOfDiscount = s.TypeOfDiscount ?? "",
-                    TypeOfCar = s.TypeOfCar ?? "",
-                    CarPicUrl = s.ImageUrl ?? ""
+                    TypeOfCar      = s.TypeOfCar ?? "",
+                    CarPic         = s.ImageUrl ?? ""
                 })
+                .GroupBy(c => c.CarId)
+                .Select(g => g.First())
                 .ToList();
 
             try
             {
                 var page = _contentService.GetById(UsedCarSalesPageKey);
-                if (page == null) return NotFound("usedCarSalesPage not found.");
-                ReplaceBlockListWithCars(page, cars);
-                return Ok(new { ok = true, saved = cars.Count });
+                if (page == null)
+                    return NotFound("usedCarSalesPage not found.");
+
+                var existingCars = new List<CarDto>();
+                var json = page.GetValue<string>(BlockPropertyAlias);
+
+                // === FALLBACK: Αν το draft JSON είναι άδειο, πάρε το PUBLISHED JSON ===
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    var published = _publishedContentQuery.Content(UsedCarSalesPageKey);
+                    if (published != null)
+                    {
+                        json = published.Value<string>(BlockPropertyAlias);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    try
+                    {
+                        using var doc = JsonDocument.Parse(json);
+
+                        if (doc.RootElement.TryGetProperty("contentData", out var contentData) &&
+                            contentData.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var element in contentData.EnumerateArray())
+                            {
+                                // ---- Πάρε τα properties είτε από variants είτε από το ίδιο το element
+                                JsonElement props = element;
+
+                                if (element.TryGetProperty("variants", out var variantsEl) &&
+                                    variantsEl.ValueKind == JsonValueKind.Array)
+                                {
+                                    var firstVariant = variantsEl.EnumerateArray().FirstOrDefault();
+                                    if (firstVariant.ValueKind == JsonValueKind.Object &&
+                                        firstVariant.TryGetProperty("properties", out var p))
+                                    {
+                                        props = p;
+                                    }
+                                }
+
+                                // carId (υποχρεωτικό)
+                                if (!props.TryGetProperty("carId", out var carIdEl) ||
+                                    carIdEl.ValueKind != JsonValueKind.Number)
+                                {
+                                    // αν ο editor είχε παλιά carID, πιάστο κι αυτό
+                                    if (props.TryGetProperty("carID", out var carIdEl2) &&
+                                        carIdEl2.ValueKind == JsonValueKind.Number)
+                                    {
+                                        carIdEl = carIdEl2;
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+
+                                var carId = carIdEl.GetInt32();
+                                if (carId == 0) continue;
+
+                                // μικρά helpers για να μη σκορπίσουμε TryGetProperty παντού
+                                string GetStringProp(string name)
+                                {
+                                    return props.TryGetProperty(name, out var v) &&
+                                        v.ValueKind != JsonValueKind.Null
+                                        ? v.ToString()
+                                        : "";
+                                }
+
+                                double GetDoubleProp(string name)
+                                {
+                                    if (!props.TryGetProperty(name, out var v) ||
+                                        v.ValueKind == JsonValueKind.Null)
+                                        return 0;
+
+                                    if (v.ValueKind == JsonValueKind.Number)
+                                        return v.GetDouble();
+
+                                    // σε περίπτωση που για κάποιο λόγο είναι string-αριθμός
+                                    return double.TryParse(v.ToString(), out var d) ? d : 0;
+                                }
+
+                                existingCars.Add(new CarDto
+                                {
+                                    CarId           = carId,
+                                    Maker           = NormalizeName(GetStringProp("maker")),
+                                    Model           = NormalizeName(GetStringProp("model")),
+                                    YearRelease     = GetStringProp("yearRelease").Trim('"'),
+                                    Price           = GetStringProp("price").Trim('"'),
+                                    Km              = GetStringProp("km").Trim('"'),
+                                    Cc              = GetDoubleProp("cc"),
+                                    Hp              = GetDoubleProp("hp"),
+                                    Fuel            = GetStringProp("fuel"),
+                                    TransmissionType= GetStringProp("transmissionType"),
+                                    Color           = NormalizeName(GetStringProp("color")),
+                                    TypeOfDiscount  = GetStringProp("typeOfDiscount"),
+                                    TypeOfCar       = GetStringProp("typeOfCar"),
+                                    // παλιά μπορεί να είναι carPicUrl, καινούργια carPic
+                                    CarPic          = GetStringProp("carPic") != ""
+                                                        ? GetStringProp("carPic")
+                                                        : GetStringProp("carPicUrl")
+                                });
+                            }
+                        }
+                    }
+                    catch (Exception exRead)
+                    {
+                        _logger.LogWarning(exRead, "⚠️ Failed to parse existing cars from BlockList JSON");
+                    }
+                }
+
+                // === 3) ΜΟΝΟ πραγματικά νέα cars ===
+                var existingIds   = existingCars.Select(c => c.CarId).ToHashSet();
+                var trulyNewCars  = newCars.Where(c => !existingIds.Contains(c.CarId)).ToList();
+
+                if (trulyNewCars.Count == 0)
+                    return Ok(new { ok = true, added = 0 });
+
+                // === 4) Τελική συγχώνευση (παλιά + νέα, χωρίς διπλά) ===
+                var combinedCars = existingCars
+                    .Concat(trulyNewCars)
+                    .GroupBy(c => c.CarId)
+                    .Select(g => g.First())
+                    .ToList();
+
+                // === 5) Αποθήκευση στο BlockList ===
+                ReplaceBlockListWithCars(page, combinedCars);
+
+                return Ok(new { ok = true, added = trulyNewCars.Count });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "❌ Error updating cars");
                 return StatusCode(500, new { ok = false, error = ex.Message });
             }
         }
@@ -125,10 +279,10 @@ namespace KinsenOfficial.Controllers
                 return f switch
                 {
                     // English → Greek
-                    "petrol-hybrid" or "hybrid" or "υβριδικο" => "Υβριδικό",
-                    "diesel" or "πετρελαιο" or "petrelaio" => "Πετρέλαιο",
-                    "petrol" or "gasoline" or "βενζινη" => "Βενζίνη",
-                    "electric" or "ηλεκτρικο" => "Ηλεκτρικό",
+                    "petrol-hybrid" or "hybrid" or "υβριδικο" or "Petrol-hybrid" => "Υβριδικό",
+                    "diesel" or "Diesel" or "petrelaio" => "Πετρέλαιο",
+                    "petrol" or "gasoline" or "Petrol" or "Gasoline" or "βενζινη" => "Βενζίνη",
+                    "electric" or "Electric" => "Ηλεκτρικό",
                     "lpg" or "cng" or "αεριο" => "Αέριο",
                     _ => incoming ?? ""
                 };
@@ -145,294 +299,123 @@ namespace KinsenOfficial.Controllers
                 };
             }
 
-            if (propertyAlias == "color")
-            {
-                return f switch
-                {
-                    "white" or "ασπρο" or "λευκο" => "Άσπρο",
-                    "black" or "μαυρο" => "Μαύρο",
-                    "blue" or "μπλε" => "Μπλε",
-                    "silver" or "ασημι" => "Ασημί",
-                    "gray" or "grey" or "γκρι" => "Γκρι",
-                    "red" or "κοκκινο" => "Κόκκινο",
-                    _ => incoming ?? ""
-                };
-            }
-
             // typeOfCar 
             if (propertyAlias == "typeOfCar")
             {
-                return f switch
+                switch (f)
                 {
-                    "sedan" or "σενταν" or "σεντάν" => "Sedan",
-                    "πολης" or "πολη" or "πόλη" or "Πόλης" or "city" => "Πόλης",
-                    "suv" or "SUV" or "Suv" => "SUV",
-                    _ => incoming ?? ""
-                };
+                    case "sedan":
+                    case "σεντάν":
+                    case "σενταν":
+                    case "Σεντάν":
+                    case "Σενταν":
+                        return "Sedan";
+
+                    case "πολης":
+                    case "πολη":
+                    case "πόλη":
+                    case "Πόλης":
+                    case "city":
+                    case "City":
+                        return "Πόλης";
+
+                    case "suv":
+                    case "Suv":
+                    case "SUV":
+                        return "SUV";
+
+                    default:
+                        return incoming ?? "";
+                }
             }
 
             return incoming ?? "";
         }
 
 
-        private string MapDropdownValue(IContentType elementType, string propertyAlias, string? incoming)
+        [HttpGet("available-colors")]
+        public IActionResult GetAvailableColors()
         {
-            if (string.IsNullOrWhiteSpace(incoming))
-                return string.Empty;
+            if (UsedCarSalesPageKey == Guid.Empty)
+                return BadRequest("CarStock:UsedCarSalesPageId missing or invalid.");
 
-            var propType = elementType.CompositionPropertyTypes.FirstOrDefault(p => p.Alias == propertyAlias);
-            if (propType == null)
-                return incoming;
+            var page = _contentService.GetById(UsedCarSalesPageKey);
+            if (page == null)
+                return NotFound("usedCarSalesPage not found.");
 
-            var dt = _dataTypeService.GetDataType(propType.DataTypeId); // int, όχι Guid
-            if (dt == null)
-                return incoming;
+            var json = page.GetValue<string>(BlockPropertyAlias);
+            if (string.IsNullOrWhiteSpace(json))
+                return Ok(Array.Empty<string>());
 
-            bool useKeys = false;
-            var candidates = new List<(Guid Id, string? Value)>();
-
-            // ---- 1) ConfigurationEditorJson (Umbraco 14–15) ----
-            var confJsonProp = dt.GetType().GetProperty("ConfigurationEditorJson");
-            if (confJsonProp?.GetValue(dt) is string json && !string.IsNullOrWhiteSpace(json))
-            {
-                try
-                {
-                    using var doc = System.Text.Json.JsonDocument.Parse(json);
-                    var root = doc.RootElement;
-
-                    if (root.TryGetProperty("items", out var arr) && arr.ValueKind == System.Text.Json.JsonValueKind.Array)
-                    {
-                        foreach (var el in arr.EnumerateArray())
-                        {
-                            Guid id = Guid.Empty;
-                            if (el.TryGetProperty("id", out var jId) && jId.ValueKind == System.Text.Json.JsonValueKind.String)
-                                Guid.TryParse(jId.GetString(), out id);
-
-                            string? val = el.TryGetProperty("value", out var jVal) ? jVal.GetString() : null;
-                            candidates.Add((id, val));
-                        }
-                    }
-                    if (root.TryGetProperty("useKeys", out var uk))
-                        useKeys = uk.ValueKind == System.Text.Json.JsonValueKind.True;
-                }
-                catch { /* ignore */ }
-            }
-
-            // ---- 2) ConfigurationData (dictionary) ----
-            if (candidates.Count == 0)
-            {
-                var confDataProp = dt.GetType().GetProperty("ConfigurationData");
-                if (confDataProp?.GetValue(dt) is IDictionary<string, object> dict)
-                {
-                    if (dict.TryGetValue("items", out var itemsObj) && itemsObj is System.Collections.IEnumerable list)
-                    {
-                        foreach (var o in list)
-                        {
-                            try
-                            {
-                                var s = System.Text.Json.JsonSerializer.Serialize(o);
-                                using var ed = System.Text.Json.JsonDocument.Parse(s);
-                                var el = ed.RootElement;
-
-                                Guid id = Guid.Empty;
-                                if (el.TryGetProperty("id", out var jId) && jId.ValueKind == System.Text.Json.JsonValueKind.String)
-                                    Guid.TryParse(jId.GetString(), out id);
-
-                                string? val = el.TryGetProperty("value", out var jVal) ? jVal.GetString() : null;
-                                candidates.Add((id, val));
-                            }
-                            catch { }
-                        }
-                    }
-                    if (dict.TryGetValue("useKeys", out var ukObj) && ukObj is bool b) useKeys = b;
-                }
-            }
-
-            // ---- 3) Παλαιότερο "Configuration" με Items/UseKeys ----
-            if (candidates.Count == 0)
-            {
-                var cfgObj = dt.GetType().GetProperty("Configuration")?.GetValue(dt);
-                if (cfgObj != null)
-                {
-                    var itemsProp = cfgObj.GetType().GetProperty("Items");
-                    var ukProp = cfgObj.GetType().GetProperty("UseKeys");
-                    if (ukProp?.GetValue(cfgObj) is bool b) useKeys = b;
-
-                    if (itemsProp?.GetValue(cfgObj) is System.Collections.IEnumerable itemsEnum)
-                    {
-                        foreach (var it in itemsEnum)
-                        {
-                            Guid id = Guid.Empty;
-                            string? val = null;
-
-                            var idProp = it.GetType().GetProperty("Id");
-                            var valProp = it.GetType().GetProperty("Value");
-
-                            var idObj = idProp?.GetValue(it);
-                            if (idObj is Guid g) id = g;
-                            else if (idObj is string s && Guid.TryParse(s, out var g2)) id = g2;
-
-                            val = valProp?.GetValue(it)?.ToString();
-                            candidates.Add((id, val));
-                        }
-                    }
-                }
-            }
-
-            if (candidates.Count == 0)
-                return incoming;
-
-            // --- Normalization & ranking ---
-            static string Norm(string? s)
-            {
-                if (string.IsNullOrWhiteSpace(s)) return "";
-                var t = s.Trim().Replace('\u00A0', ' ').ToLowerInvariant();
-                // βγάλε παρενθέσεις στο τέλος: "Honda (Legacy option)" -> "honda"
-                t = System.Text.RegularExpressions.Regex.Replace(t, @"\s*\(.*?\)\s*$", "");
-                t = System.Text.RegularExpressions.Regex.Replace(t, @"\s+", " ");
-                return t;
-            }
-
-            string incomingExact = incoming.Trim();
-            string incomingNorm = Norm(incoming);
-
-            int Score((Guid Id, string? Value) c)
-            {
-                var label = (c.Value ?? "").Trim();
-                var labelNorm = Norm(label);
-
-                // 0: exact (case-insensitive)
-                if (string.Equals(label, incomingExact, StringComparison.OrdinalIgnoreCase)) return 0;
-
-                // 1: normalized equal
-                if (labelNorm == incomingNorm) return 1;
-
-                // 2: normalized starts-with (π.χ. "honda (europe)")
-                if (labelNorm.StartsWith(incomingNorm) || incomingNorm.StartsWith(labelNorm)) return 2;
-
-                return 100; // no match
-            }
-
-            int Penalty((Guid Id, string? Value) c)
-            {
-                var l = (c.Value ?? "").ToLowerInvariant();
-                int p = 0;
-                if (l.Contains("legacy")) p += 50;
-                if (l.Contains("deprecated")) p += 50;
-                if (l.Contains("unsupported")) p += 50;
-                return p;
-            }
-
-            var best = candidates
-                .Select(c => new { c.Id, c.Value, score = Score(c) + Penalty(c) })
-                .OrderBy(x => x.score)
-                .ThenBy(x => (x.Value ?? "").Length) // πιο “καθαρά” labels πρώτα
-                .FirstOrDefault();
-
-            // if (best == null || best.score >= 100)
-            //     return incoming; // δεν βρέθηκε τίποτα σχετικό
-
-            // return useKeys
-            //     ? (best.Id != Guid.Empty ? best.Id.ToString() : incoming)
-            //     : (best.Value ?? incoming);
-
-            if (best.Id != Guid.Empty)
-                return best.Id.ToString();
-
-            // Αν για κάποιο λόγο δεν έχει Id, επέστρεψε το normalized label
-            return best.Value ?? incoming;
-        }
-        
-        private string NormalizeDropdownValue(IContentType elementType, string propertyAlias, string? incoming)
-        {
-            if (string.IsNullOrWhiteSpace(incoming)) return string.Empty;
-
-            // 1) Βρες το DataType του property
-            var propType = elementType.CompositionPropertyTypes.FirstOrDefault(p => p.Alias == propertyAlias);
-            if (propType == null) return incoming;
-
-            var dt = _dataTypeService.GetDataType(propType.DataTypeId);
-            if (dt == null) return incoming;
-
-            // 2) Τσέκαρε αν UseKeys = true
-            bool useKeys = false;
             try
             {
-                var confJsonProp = dt.GetType().GetProperty("ConfigurationEditorJson");
-                if (confJsonProp?.GetValue(dt) is string conf && !string.IsNullOrWhiteSpace(conf))
+                using var doc = JsonDocument.Parse(json);
+                if (!doc.RootElement.TryGetProperty("contentData", out var contentData) ||
+                    contentData.ValueKind != JsonValueKind.Array)
+                    return Ok(Array.Empty<string>());
+
+                var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var e in contentData.EnumerateArray())
                 {
-                    using var doc = System.Text.Json.JsonDocument.Parse(conf);
-                    if (doc.RootElement.TryGetProperty("useKeys", out var uk))
-                        useKeys = uk.ValueKind == System.Text.Json.JsonValueKind.True;
+                    if (!e.TryGetProperty("color", out var v)) continue;
+
+                    string raw = v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : v.ToString();
+                    if (string.IsNullOrWhiteSpace(raw)) continue;
+
+                    // 🧹 Κανονικοποίηση επιτόπου
+                    string normalized = raw
+                        .Normalize(NormalizationForm.FormD)
+                        .Replace("ς", "σ")
+                        .Replace("–", "-") // EN dash
+                        .Replace("—", "-") // EM dash
+                        .ToLowerInvariant()
+                        .Trim();
+
+                    // Ενοποίηση πολλαπλών κενών και παύλων
+                    normalized = Regex.Replace(normalized, @"\s+", " ");      // πολλαπλά κενά -> ένα
+                    normalized = Regex.Replace(normalized, @"\s*-\s*", "-");  // γύρω από παύλες χωρίς κενά
+
+                    // ✅ Πρώτο γράμμα κεφαλαίο
+                    if (!string.IsNullOrEmpty(normalized))
+                    {
+                        var culture = new System.Globalization.CultureInfo("el-GR");
+                        normalized = char.ToUpper(normalized[0], culture) + normalized.Substring(1);
+                    }
+
+                    set.Add(normalized);
                 }
+
+                // Ταξινόμηση με ελληνική κουλτούρα
+                var colors = set
+                    .OrderBy(x => x, StringComparer.Create(new System.Globalization.CultureInfo("el-GR"), true))
+                    .ToList();
+
+                return Ok(colors);
             }
-            catch { /* ignore */ }
-
-            // 3) Πάρε το "καλύτερο" mapping με την ήδη υπάρχουσα MapDropdownValue
-            var mapped = MapDropdownValue(elementType, propertyAlias, incoming); // μπορεί να είναι GUID ή label
-
-            // 4) Αν UseKeys=true και το mapped ΔΕΝ είναι GUID → βρες το GUID του label
-            if (useKeys && !Guid.TryParse(mapped, out _))
+            catch (Exception ex)
             {
-                try
-                {
-                    // Προσπάθησε πρώτα από ConfigurationEditorJson (Umbraco 14–15)
-                    var confJsonProp = dt.GetType().GetProperty("ConfigurationEditorJson");
-                    if (confJsonProp?.GetValue(dt) is string json && !string.IsNullOrWhiteSpace(json))
-                    {
-                        using var doc = System.Text.Json.JsonDocument.Parse(json);
-                        if (doc.RootElement.TryGetProperty("items", out var arr) && arr.ValueKind == JsonValueKind.Array)
-                        {
-                            foreach (var el in arr.EnumerateArray())
-                            {
-                                var val = el.TryGetProperty("value", out var jVal) ? jVal.GetString() : null;
-                                if (!string.IsNullOrWhiteSpace(val) &&
-                                    string.Equals(val.Trim(), mapped.Trim(), StringComparison.OrdinalIgnoreCase))
-                                {
-                                    if (el.TryGetProperty("id", out var jId) &&
-                                        jId.ValueKind == JsonValueKind.String &&
-                                        Guid.TryParse(jId.GetString(), out var gid))
-                                        return gid.ToString(); // ← ΕΠΙΣΤΡΟΦΗ GUID
-                                }
-                            }
-                        }
-                    }
-
-                    // Εναλλακτικά από Configuration (παλαιότερο)
-                    var cfgObj = dt.GetType().GetProperty("Configuration")?.GetValue(dt);
-                    var itemsProp = cfgObj?.GetType().GetProperty("Items");
-                    if (itemsProp?.GetValue(cfgObj) is System.Collections.IEnumerable itemsEnum)
-                    {
-                        foreach (var it in itemsEnum)
-                        {
-                            var idProp  = it.GetType().GetProperty("Id");
-                            var valProp = it.GetType().GetProperty("Value");
-                            var lbl     = valProp?.GetValue(it)?.ToString() ?? "";
-
-                            if (string.Equals(lbl.Trim(), mapped.Trim(), StringComparison.OrdinalIgnoreCase))
-                            {
-                                var idObj = idProp?.GetValue(it);
-                                if (idObj is Guid g) return g.ToString();
-                                if (idObj is string s && Guid.TryParse(s, out var g2)) return g2.ToString();
-                            }
-                        }
-                    }
-                }
-                catch { /* ignore and fall through */ }
+                return StatusCode(500, new { ok = false, error = "Parse error: " + ex.Message });
             }
-
-            // 5) Αν δεν έχει UseKeys ή δεν βρέθηκε GUID, κράτα ό,τι έχουμε
-            return mapped ?? string.Empty;
         }
 
+        // private static readonly System.Globalization.CultureInfo El = new("el-GR");
+        // private static string UppercaseFirstGreek(string? s)
+        // {
+        //     s = (s ?? "").Trim();
+        //     if (s.Length == 0) return s;
+        //     var first = s.Substring(0, 1).ToUpper(El);  // “ά” -> “Ά”
+        //     var rest  = s.Substring(1);                 // κράτα το υπόλοιπο όπως είναι
+        //     return first + rest;
+        // }
 
         private void ReplaceBlockListWithCars(IContent page, List<CarDto> cars)
         {
             var cardType = _contentTypeService.Get(CardElementAlias)
                 ?? throw new InvalidOperationException($"Element type '{CardElementAlias}' not found.");
 
-            var layoutItems = new List<object>();
-            var contentData = new List<object>();
+            var layoutItems  = new List<object>();
+            var contentData  = new List<object>();
             var settingsData = new List<object>();
 
             foreach (var car in cars)
@@ -440,94 +423,54 @@ namespace KinsenOfficial.Controllers
                 var elementKey = Guid.NewGuid();
                 var elementUdi = $"umb://element/{elementKey:D}";
 
-                // Layout
+                // layout
                 layoutItems.Add(new Dictionary<string, object?>
                 {
                     ["contentUdi"]  = elementUdi,
                     ["settingsUdi"] = null
                 });
 
-                // --- Canonicalize + mapping (ΚΡΑΤΑΣ ακριβώς ό,τι ήδη κάνεις για makerRaw κ.λπ.) ---
-                var makerRaw        = MapDropdownValue(cardType, "maker",            Canonicalize("maker",            car.Maker));
-                var fuelRaw         = MapDropdownValue(cardType, "fuel",             Canonicalize("fuel",             car.Fuel));
-                var transmissionRaw = MapDropdownValue(cardType, "transmissionType", Canonicalize("transmissionType", car.TransmissionType));
-                var colorRaw        = MapDropdownValue(cardType, "color",            Canonicalize("color",            car.Color));
-                var typeOfCarRaw    = MapDropdownValue(cardType, "typeOfCar",        Canonicalize("typeOfCar",        car.TypeOfCar));
+                var makerNormalized           = Canonicalize("maker", car.Maker);
+                var fuelNormalized            = Canonicalize("fuel", car.Fuel);
+                var colorNormalized           = Canonicalize("color", car.Color);
+                var transmissionTypeNormalized= Canonicalize("transmissionType", car.TransmissionType);
+                var typeOfCarNormalized       = Canonicalize("typeOfCar", car.TypeOfCar);
 
-                // --- αυστηρό guard για useKeys=true ---
-                string? GuardUseKeys(string propAlias, string? raw)
-                {
-                    if (string.IsNullOrWhiteSpace(raw)) return null;
-                    var ptype = cardType.CompositionPropertyTypes.FirstOrDefault(p => p.Alias == propAlias);
-                    if (ptype == null) return null;
-                    var dt = _dataTypeService.GetDataType(ptype.DataTypeId);
-                    if (dt == null) return null;
-
-                    var useKeys = false;
-                    var confJsonProp = dt.GetType().GetProperty("ConfigurationEditorJson");
-                    if (confJsonProp?.GetValue(dt) is string conf && !string.IsNullOrWhiteSpace(conf))
-                    {
-                        try
-                        {
-                            using var doc = System.Text.Json.JsonDocument.Parse(conf);
-                            if (doc.RootElement.TryGetProperty("useKeys", out var uk))
-                                useKeys = uk.ValueKind == System.Text.Json.JsonValueKind.True;
-                        }
-                        catch { }
-                    }
-
-                    if (!useKeys) return raw;
-                    return Guid.TryParse(raw, out _) ? raw : null; // ΜΟΝΟ GUID αν useKeys=true
-                }
-
-                makerRaw        = GuardUseKeys("maker",            makerRaw);
-                fuelRaw         = GuardUseKeys("fuel",             fuelRaw);
-                transmissionRaw = GuardUseKeys("transmissionType", transmissionRaw);
-                colorRaw        = GuardUseKeys("color",            colorRaw);
-                typeOfCarRaw    = GuardUseKeys("typeOfCar",        typeOfCarRaw);
-
-                // --- helper για να χτίσω τα properties του element (ένας Dictionary με ΤΙΠΟΥΣ σωστούς) ---
                 Dictionary<string, object?> BuildProps()
                 {
-                    var d = new Dictionary<string, object?>
+                    return new Dictionary<string, object?>
                     {
-                        ["carId"]          = car.CarId,
-                        ["model"]          = car.Model,
-                        ["price"]          = decimal.TryParse(car.Price, out var dPrice) ? dPrice : 0m,
-                        ["yearRelease"]    = int.TryParse(car.YearRelease, out var y) ? y : 0,
-                        ["km"]             = int.TryParse(car.Km, out var k) ? k : 0,
-                        ["cc"]             = car.Cc,
-                        ["hp"]             = car.Hp,
-                        ["typeOfDiscount"] = car.TypeOfDiscount,
-                        ["carPicUrl"]      = car.CarPicUrl
+                        ["carId"]           = car.CarId,
+                        ["maker"]           = makerNormalized,
+                        ["model"]           = car.Model,
+                        ["price"]           = decimal.TryParse(car.Price, out var dPrice) ? dPrice : 0m,
+                        ["yearRelease"]     = int.TryParse(car.YearRelease, out var y) ? y : 0,
+                        ["km"]              = int.TryParse(car.Km, out var k) ? k : 0,
+                        ["cc"]              = car.Cc,
+                        ["hp"]              = car.Hp,
+                        ["fuel"]            = fuelNormalized,
+                        ["color"]           = car.Color,
+                        ["transmissionType"]= transmissionTypeNormalized,
+                        ["typeOfCar"]       = typeOfCarNormalized,
+                        ["typeOfDiscount"]  = car.TypeOfDiscount,
+                        ["carPic"]          = car.CarPic
                     };
-
-                    if (!string.IsNullOrEmpty(makerRaw))        d["maker"]            = makerRaw;
-                    if (!string.IsNullOrEmpty(fuelRaw))         d["fuel"]             = fuelRaw;
-                    if (!string.IsNullOrEmpty(transmissionRaw)) d["transmissionType"] = transmissionRaw;
-                    if (!string.IsNullOrEmpty(colorRaw))        d["color"]            = colorRaw;
-                    if (!string.IsNullOrEmpty(typeOfCarRaw))    d["typeOfCar"]        = typeOfCarRaw;
-
-                    return d;
                 }
 
-                // --- ΤΟ ΚΡΙΣΙΜΟ: αν το element type είναι Vary by culture, γράφουμε ΜΟΝΟ μέσα σε "variants" ---
-                var elementVaries = cardType.VariesByCulture(); // μέθοδος στη v15
+                var elementVaries = cardType.VariesByCulture();
                 var content = new Dictionary<string, object?>
                 {
-                    ["key"]               = elementKey,
-                    ["udi"]               = elementUdi,
-                    ["contentTypeKey"]    = cardType.Key,
-                    ["contentTypeAlias"]  = cardType.Alias
+                    ["key"]              = elementKey,
+                    ["udi"]              = elementUdi,
+                    ["contentTypeKey"]   = cardType.Key,
+                    ["contentTypeAlias"] = cardType.Alias
                 };
 
                 if (elementVaries)
                 {
-                    // πάρ’ τα cultures από το node
                     var cultures = page.AvailableCultures?.ToArray() ?? Array.Empty<string>();
                     if (cultures.Length == 0)
                     {
-                        // fallback: γράψε invariant variants (Umbraco το δέχεται)
                         content["variants"] = new[]
                         {
                             new Dictionary<string, object?>
@@ -541,8 +484,7 @@ namespace KinsenOfficial.Controllers
                     }
                     else
                     {
-                        // γράψε τις ίδιες τιμές σε ΟΛΕΣ τις γλώσσες
-                        var vars = new List<object>();
+                        var vars  = new List<object>();
                         var props = BuildProps();
                         foreach (var iso in cultures)
                         {
@@ -559,7 +501,6 @@ namespace KinsenOfficial.Controllers
                 }
                 else
                 {
-                    // invariant element → γράφουμε επίπεδα properties στο root (όπως ήδη έκανες)
                     foreach (var kv in BuildProps())
                         content[kv.Key] = kv.Value;
                 }
@@ -577,22 +518,11 @@ namespace KinsenOfficial.Controllers
                 ["settingsData"] = settingsData
             };
 
-            blockValue = new Dictionary<string, object?>
-            {
-                ["layout"] = new Dictionary<string, object?>
-                {
-                    ["Umbraco.BlockList"] = layoutItems
-                },
-                ["contentData"]  = contentData,
-                ["settingsData"] = settingsData
-            };
-
             var json = System.Text.Json.JsonSerializer.Serialize(blockValue);
 
-            // property + cultures του node
-            var prop     = page.Properties[BlockPropertyAlias];
-            var propType = prop?.PropertyType;
-            var culturesForNode = page.AvailableCultures?.ToArray() ?? Array.Empty<string>();
+            var prop           = page.Properties[BlockPropertyAlias];
+            var propType       = prop?.PropertyType;
+            var culturesForNode= page.AvailableCultures?.ToArray() ?? Array.Empty<string>();
 
             if (propType?.VariesByCulture() == true && culturesForNode.Length > 0)
             {
@@ -654,7 +584,7 @@ namespace KinsenOfficial.Controllers
                         TypeOfCar = e.TryGetProperty("typeOfCar", out v) ? v.GetString() ?? "" : "",
                         Cc = e.TryGetProperty("cc", out v) && v.TryGetSingle(out var cc) ? cc : 0,
                         Hp = e.TryGetProperty("hp", out v) && v.TryGetSingle(out var hp) ? hp : 0,
-                        CarPicUrl = e.TryGetProperty("carPicUrl", out v) ? v.GetString() ?? "" : ""
+                        CarPic = e.TryGetProperty("carPic", out v) ? v.GetString() ?? "" : ""
                     };
 
                     if (dto.CarId > 0) cars.Add(dto);
@@ -730,7 +660,7 @@ namespace KinsenOfficial.Controllers
         public string Color { get; set; } = "";
         public string TypeOfDiscount { get; set; } = "";
         public string TypeOfCar { get; set; } = "";
-        public string CarPicUrl { get; set; } = "";
+        public string CarPic { get; set; } = "";
     }
 }
 

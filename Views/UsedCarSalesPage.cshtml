@@ -7,6 +7,7 @@
 @using Umbraco.Cms.Core.Services
 @using Umbraco.Cms.Core.Security
 @using Umbraco.Cms.Core;
+@using System.Globalization;
 @inject IMemberManager MemberManager
 @inject IMemberService MemberService
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
@@ -54,8 +55,13 @@
         .GroupBy(s => Norm(s!))
         .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
 
-    // Τελική λίστα (normalized keys)
-    var allBrands = brandCounts.Keys.OrderBy(k => k).ToList();
+	// Τελική λίστα (normalized keys)
+	var comparer = StringComparer.Create(new CultureInfo("el-GR"), true);
+
+	var allBrands = brandDisplayNames
+		.OrderBy(kv => kv.Value, comparer)   // kv.Value = displayName
+		.Select(kv => kv.Key)                // kv.Key = normalized key (Norm)
+		.ToList();
 
 	//----------------Καύσιμο---------------
 	string Normalize(string? s)
@@ -78,7 +84,10 @@
         .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
 
 	// Τελική λίστα (normalized keys)
-    var allFuels = fuelCounts.Keys.OrderBy(k => k).ToList();
+	var allFuels = fuelDisplayNames
+	.OrderBy(kv => kv.Value, comparer)   // kv.Value = π.χ. "Diesel", "Petrol-Hybrid"
+	.Select(kv => kv.Key)                // kv.Key = normalized key (π.χ. DIESEL)
+	.ToList();
 
 
 	//------------Κιβώτιο ταχυτήτων----------------
@@ -102,7 +111,10 @@
         .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
 
 	// Τελική λίστα (normalized keys)
-    var allTransmissionTypes = transmissionTypeCounts.Keys.OrderBy(k => k).ToList();
+	var allTransmissionTypes = transmissionTypelDisplayNames
+		.OrderBy(kv => kv.Value, comparer)   // kv.Value = π.χ. "Αυτόματο", "Χειροκίνητο"
+		.Select(kv => kv.Key)                // kv.Key = normalized key
+		.ToList();
 
 	//----------------------Χρώμα--------------------
 	string Normal(string? s)
@@ -125,7 +137,10 @@
         .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
 
 	// Τελική λίστα (normalized keys)
-    var allColors = colorCounts.Keys.OrderBy(k => k).ToList();
+    var allColors = colorNames
+    .OrderBy(kv => kv.Value, comparer)   // kv.Value = "Άσπρο μαύρο μεταλλιζέ" κ.λπ.
+    .Select(kv => kv.Key)
+    .ToList();
 
 
 	//--------------------Τύπος Αυτοκινήτου-------------------
