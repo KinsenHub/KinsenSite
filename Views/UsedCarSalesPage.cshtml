@@ -307,14 +307,14 @@
 								{
 									var displayName = brandDisplayNames[normBrand];
 									var count = brandCounts[normBrand];
-									brandLogos.TryGetValue(normBrand, out var logoUrl);
+									//brandLogos.TryGetValue(normBrand, out var logoUrl);
 
 									<label>
 										<input type="checkbox" class="brandCheckbox" value="@normBrand" />
-										@if (!string.IsNullOrWhiteSpace(logoUrl))
+										@* @if (!string.IsNullOrWhiteSpace(logoUrl))
 										{
 											<img src="@logoUrl" alt="@displayName logo" width="20" height="20" />
-										}
+										} *@
 										<span>
 											@displayName
 											(<span class="brand-count">@count</span>)
@@ -549,14 +549,14 @@
 						{
 							var displayName = brandDisplayNames[normBrand];
 							var count = brandCounts[normBrand];
-							brandLogos.TryGetValue(normBrand, out var logoUrl);
+							//brandLogos.TryGetValue(normBrand, out var logoUrl);
 
 							<label>
 								<input type="checkbox" class="brandCheckbox" value="@normBrand" />
-								@if (!string.IsNullOrWhiteSpace(logoUrl))
+								@* @if (!string.IsNullOrWhiteSpace(logoUrl))
 								{
 									<img src="@logoUrl" alt="@displayName logo" width="20" height="20" />
-								}
+								} *@
 								<span>
 									@displayName
 									(<span class="brand-count">@count</span>)
