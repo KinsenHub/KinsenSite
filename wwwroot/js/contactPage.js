@@ -35,9 +35,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!res.ok) throw new Error(await res.text());
 
-      status.textContent = "Το μήνυμα στάλθηκε! Θα επικοινωνήσουμε σύντομα.";
+      status.textContent = "Το μήνυμα στάλθηκε! Θα επικοινωνήσουμε σύντομα μαζί σας!";
       status.className = "mt-2 small text-success";
       form.reset();
+
+      // 🔹 Σβήσε το μήνυμα μετά από 3"
+      setTimeout(() => {
+        status.textContent = "";
+        status.className = "";
+      }, 3000);
+
     } catch (err) {
       console.error("Contact submit error:", err);
       status.textContent = "Κάτι πήγε στραβά. Δοκίμασε ξανά.";

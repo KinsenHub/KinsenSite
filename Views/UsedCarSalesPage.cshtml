@@ -511,9 +511,13 @@
 				<div class="filter-content">
 					<div class="input-group">
 						<label>Από:</label>
-						<input type="number" id="minPriceInputDesk" placeholder="π.χ. 5000" />
+						<input type="number" id="minPriceInputDesk" placeholder="π.χ. 5000" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 						<label>Έως:</label>
-						<input type="number" id="maxPriceInputDesk" placeholder="π.χ. 20000" />
+						<input type="number" id="maxPriceInputDesk" placeholder="π.χ. 20000" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 					</div>
 					<div class="checkbox-columns">
 						<div class="checkbox-pair">
@@ -530,8 +534,8 @@
 
 						<div class="price-order-wrapper">
 							<select id="priceOrderSelect" class="form-select">
-							<option value="asc">Αύξουσα τιμή</option>
-							<option value="desc">Φθίνουσα τιμή</option>
+								<option value="asc">Αύξουσα τιμή</option>
+								<option value="desc">Φθίνουσα τιμή</option>
 							</select>
 						</div>
 					</div>
@@ -577,7 +581,9 @@
 						name="minYear"
 						min="2000"
 						max="@DateTime.Now.Year"
-						placeholder="π.χ. 2010" />
+						placeholder="π.χ. 2010" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 
 						<label>Έως:</label>
 						<input type="number"
@@ -585,7 +591,9 @@
 						name="maxYear"
 						min="2000"
 						max="@DateTime.Now.Year"
-						placeholder="π.χ. 2025" />
+						placeholder="π.χ. 2025" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 					</div>
 				</div>
 			</div>
@@ -600,7 +608,9 @@
 						name="minKm"
 						min="0"
 						max="200000"
-						placeholder="π.χ. 50000" />
+						placeholder="π.χ. 50000" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 
 						<label for="maxKlmInput">Έως:</label>
 						<input type="number"
@@ -608,7 +618,9 @@
 						name="maxKm"
 						min="0"
 						max="200000"
-						placeholder="π.χ. 150000" />
+						placeholder="π.χ. 150000" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 					</div>
 				</div>
 			</div>
@@ -642,10 +654,14 @@
 				<div class="filter-content">
 					<div class="input-group">
 						<label>Από:</label>
-						<input type="number" id="minCcInputDesk" name="minCc" min="600" max="6000" placeholder="π.χ. 1400" />
+						<input type="number" id="minCcInputDesk" name="minCc" min="600" max="6000" placeholder="π.χ. 1400" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 						
 						<label>Έως:</label>
-						<input type="number" id="maxCcInputDesk" name="maxCc" min="600" max="6000" placeholder="π.χ. 2000" />
+						<input type="number" id="maxCcInputDesk" name="maxCc" min="600" max="6000" placeholder="π.χ. 2000" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 					</div>
 				</div>
 			</div>
@@ -655,10 +671,14 @@
 				<div class="filter-content">
 					<div class="input-group">
 						<label>Από:</label>
-						<input type="number" id="minHpInputDesk" name="minHp" min="100" max="1000" placeholder="π.χ. 100" />
+						<input type="number" id="minHpInputDesk" name="minHp" min="100" max="1000" placeholder="π.χ. 100" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 						
 						<label>Έως:</label>
-						<input type="number" id="maxHpInputDesk" name="maxHp" min="100" max="1000" placeholder="π.χ. 400" />
+						<input type="number" id="maxHpInputDesk" name="maxHp" min="100" max="1000" placeholder="π.χ. 400" inputmode="numeric"
+						oninput="this.value = this.value.replace(/[^0-9]/g,'');"
+						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 					</div>
 				</div>
 			</div>
@@ -917,7 +937,7 @@
     });
 </script>
 
-@* Αφορ΄ά το Import: *@
+@* Αφορά το Import: *@
 @* <script>
     document.getElementById("importForm").addEventListener("submit", function (e) {
         e.preventDefault();

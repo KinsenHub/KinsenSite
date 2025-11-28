@@ -151,23 +151,23 @@
 
 /* scroll down μπάρα ston maker-color*/
 .filter-item .filter-content .twoColumns-grid {
-    max-height: 240px;    /* ό,τι ύψος θες (200–280 τέλειο) */
-    overflow-y: auto;
-    padding-right: 6px;   /* μικρό περιθώριο για το scrollbar */
+  max-height: 240px; /* ό,τι ύψος θες (200–280 τέλειο) */
+  overflow-y: auto;
+  padding-right: 6px; /* μικρό περιθώριο για το scrollbar */
 }
 
 /* Scrollbar style (optional but beautiful) */
 .filter-item .filter-content .twoColumns-grid::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .filter-item .filter-content .twoColumns-grid::-webkit-scrollbar-thumb {
-    background: #c3c3c3;
-    border-radius: 4px;
+  background: #c3c3c3;
+  border-radius: 4px;
 }
 
 .filter-item .filter-content .twoColumns-grid::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 .checkbox-columns {
@@ -317,7 +317,7 @@ label {
   position: relative;
 }
 
-.discount-badge {
+/* .discount-badge {
   background-color: #2ec4c7;
   color: white;
   position: absolute;
@@ -328,7 +328,7 @@ label {
   font-weight: bold;
   border-radius: 0.25rem;
   z-index: 1;
-}
+} */
 
 /* Price Filter Group */
 .input-group {
@@ -621,7 +621,41 @@ label {
     max-width: 100%;
     grid-template-columns: repeat(1, 1fr);
     margin: 0 auto;
-    margin-top: 30px;
+  }
+
+  #displayCars.is-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 55vh;
+  }
+
+  #noResultsBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 1.8rem 1.4rem;
+    max-width: 480px;
+    width: 100%;
+    background: #007b915f;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 123, 145, 0.25);
+    box-shadow: 0 10px 28px rgba(0, 41, 71, 0.12);
+  }
+
+  #displayCars.is-empty #noResultsBox .card-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    color: #023859;
+    border: 0;
+    background: transparent;
   }
 
   .cardCar {
@@ -631,16 +665,22 @@ label {
     justify-content: center;
   }
 
-  .no-results__hint {
-    margin: 20px 10px !important;
-    color: #063247cc;
-    font-size: var(--nr-hint-size);
-    line-height: 1.45;
+  .discount-badge {
+    position: absolute !important;
+    top: 10px;
+    left: 10px;
+    background: #2ec4c7;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 400;
+    padding: 8px 11px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
   #filtersSidebar .offcanvas-header {
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
     padding: 1rem;
     position: relative;
@@ -661,6 +701,13 @@ label {
 
   .filter-content label {
     text-align: left;
+  }
+
+  .no-results__hint {
+    margin: 20px 10px !important;
+    color: #063247cc;
+    font-size: var(--nr-hint-size);
+    line-height: 1.45;
   }
 
   .no-results__actions {
@@ -691,7 +738,7 @@ label {
   }
 
   #displayCars.is-empty #noResultsBox .card-header {
-    flex-direction: column;     
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 6px;
@@ -700,11 +747,11 @@ label {
   }
 
   .no-results__icon {
-    display: flex;                  
+    display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 8px;         
-    width:  30px;
+    margin: 0 auto 8px;
+    width: 30px;
     height: 80px;
     line-height: 1;
     color: #39c0c3;
@@ -713,10 +760,10 @@ label {
   .no-results__icon i,
   .no-results__icon .fa-solid,
   .no-results__icon .fa {
-    display:inline-block;
-    font-size:44px !important;   
-    line-height:1;
-    color:#39c0c3 !important;
+    display: inline-block;
+    font-size: 44px !important;
+    line-height: 1;
+    color: #39c0c3 !important;
   }
 
   .no-results__title {
@@ -726,7 +773,7 @@ label {
   }
 
   .no-results__hint {
-    margin: 8px 6px 12px;       
+    margin: 8px 6px 12px;
     font-size: calc(var(--nr-hint-size) * 0.95);
     line-height: 1.5;
     color: #023859;
@@ -748,7 +795,6 @@ label {
     background-color: #023859;
     color: white;
   }
-
 }
 
 /* ============ 📱 Tablet (576px – 991px) ============ */
@@ -811,6 +857,19 @@ label {
     margin-left: 20px;
   }
 
+  .discount-badge {
+    position: absolute !important;
+    top: 10px;
+    left: 10px;
+    background: #2ec4c7;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 400;
+    padding: 8px 13px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
   .filters-container {
     width: 100%;
     align-items: center;
@@ -833,8 +892,8 @@ label {
   }
 
   .cardCar {
-    width: 80%;
-    max-width: 370px;
+    width: 100%;
+    max-width: 470px;
     position: relative;
     overflow: hidden;
   }
@@ -843,7 +902,7 @@ label {
     display: none !important;
   }
 
-   #displayCars.is-empty #noResultsBox {
+  #displayCars.is-empty #noResultsBox {
     width: 100%;
     display: flex;
     align-items: center;
@@ -862,7 +921,7 @@ label {
   }
 
   #displayCars.is-empty #noResultsBox .card-header {
-    flex-direction: column;     
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 6px;
@@ -871,11 +930,11 @@ label {
   }
 
   .no-results__icon {
-    display: flex;                  
+    display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 8px;         
-    width:  30px;
+    margin: 0 auto 8px;
+    width: 30px;
     height: 80px;
     line-height: 1;
     color: #39c0c3;
@@ -884,10 +943,10 @@ label {
   .no-results__icon i,
   .no-results__icon .fa-solid,
   .no-results__icon .fa {
-    display:inline-block;
-    font-size:44px !important;   
-    line-height:1;
-    color:#39c0c3 !important;
+    display: inline-block;
+    font-size: 44px !important;
+    line-height: 1;
+    color: #39c0c3 !important;
   }
 
   .no-results__title {
@@ -896,7 +955,7 @@ label {
     text-align: center;
   }
 
-  .no-results__hint {     
+  .no-results__hint {
     font-size: calc(var(--nr-hint-size) * 0.95);
     line-height: 1.5;
     color: #023859;
@@ -908,7 +967,6 @@ label {
     width: 100%;
     text-align: center;
     margin-top: 20px;
-    
   }
 
   .nr-btn {
@@ -979,7 +1037,20 @@ label {
     overflow: hidden;
   }
 
-   #displayCars.is-empty #noResultsBox {
+  .discount-badge {
+    position: absolute !important;
+    top: 10px;
+    left: 10px;
+    background: #2ec4c7;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 400;
+    padding: 8px 13px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  #displayCars.is-empty #noResultsBox {
     width: 100%;
     display: flex;
     align-items: center;
@@ -998,7 +1069,7 @@ label {
   }
 
   #displayCars.is-empty #noResultsBox .card-header {
-    flex-direction: column;     
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 6px;
@@ -1007,11 +1078,11 @@ label {
   }
 
   .no-results__icon {
-    display: flex;                  
+    display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 8px;         
-    width:  30px;
+    margin: 0 auto 8px;
+    width: 30px;
     height: 80px;
     line-height: 1;
     color: #39c0c3;
@@ -1020,19 +1091,19 @@ label {
   .no-results__icon i,
   .no-results__icon .fa-solid,
   .no-results__icon .fa {
-    display:inline-block;
-    font-size:44px !important;   
-    line-height:1;
-    color:#39c0c3 !important;
+    display: inline-block;
+    font-size: 44px !important;
+    line-height: 1;
+    color: #39c0c3 !important;
   }
 
   .no-results__title {
-    font-size: calc(var(--nr-title-size) * 0.95);
+    font-size: calc(var(--nr-title-size) * 0.9);
     margin: 0 0 6px 0;
     text-align: center;
   }
 
-  .no-results__hint {     
+  .no-results__hint {
     font-size: calc(var(--nr-hint-size) * 0.95);
     line-height: 1.5;
     color: #023859;
@@ -1044,7 +1115,6 @@ label {
     width: 100%;
     text-align: center;
     margin-top: 20px;
-    
   }
 
   .nr-btn {
@@ -1065,12 +1135,12 @@ label {
 
   .displayCars {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 3 κάρτες ανά σειρά */
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
     width: 100%;
     max-width: 1300px;
     justify-items: center;
-    /* padding: 0 40px; */
+    padding: 0 40px 10px 0;
   }
 
   .cardCar {
@@ -1080,6 +1150,19 @@ label {
     border-radius: 10px;
     margin: 30px;
     overflow: hidden;
+  }
+
+  .discount-badge {
+    position: absolute !important;
+    top: 10px;
+    left: 10px;
+    background: #2ec4c7;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 400;
+    padding: 8px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
   .cardCar:hover {
@@ -1153,12 +1236,25 @@ label {
   .displayCars {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 60px;
+    gap: 40px;
     width: 100%;
-    max-width: 1400px;
+    max-width: 1300px;
     justify-items: stretch;
-    padding: 0 10px;
+    padding: 0 70px 30px 10px;
     /* margin-left: 20px; */
+  }
+
+  .discount-badge {
+    position: absolute !important;
+    top: 10px;
+    left: 10px;
+    background: #2ec4c7;
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: 400;
+    padding: 8px 17px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
   .cardCar {
@@ -1192,7 +1288,7 @@ label {
   .displayCars {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 30px;
     width: 100%;
     max-width: 2000px;
     justify-items: stretch;
@@ -1207,6 +1303,19 @@ label {
     position: relative;
     overflow: hidden;
     margin-left: 20px;
+  }
+
+  .discount-badge {
+    position: absolute !important;
+    top: 10px;
+    left: 10px;
+    background: #2ec4c7;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 400;
+    padding: 10px 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -1239,89 +1348,3 @@ label {
 #noResultsBox {
   display: none;
 }
-
-/* #displayCars.is-empty #noResultsBox .card-header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  margin-bottom: 6px;
-  background: #007b9130;
-  max-width: var(--nr-box-maxw);
-  width: min(var(--nr-box-width), var(--nr-box-maxw));
-  margin: 1rem auto;
-  padding: var(--nr-box-padding);
-  border-radius: var(--nr-box-radius);
-  border: 1px solid var(--nr-border);
-}
-
-.no-results__icon {
-  width: var(--nr-icon-box);
-  height: var(--nr-icon-box);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--nr-teal);
-  margin-bottom: 6px;
-}
-.no-results__icon i {
-  font-size: var(--nr-icon-size);
-  line-height: 1;
-}
-
-.no-results__title {
-  margin: 0 0 6px;
-  color: var(--nr-blue);
-  font-weight: 600;
-  font-size: var(--nr-title-size);
-  letter-spacing: 0.6px;
-}
-.no-results__hint {
-  margin: 30px 30px;
-  color: #063247cc;
-  font-size: var(--nr-hint-size);
-  line-height: 1.45;
-  text-align: center;
-}
-
-.no-results__actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--nr-actions-gap);
-  width: 100%;
-  margin-top: 8px;
-}
-
-.nr-btn {
-  width: var(--nr-btn-width);
-  padding: var(--nr-btn-padding);
-  border-radius: var(--nr-btn-radius);
-  font-weight: 600;
-  font-size: var(--nr-btn-font);
-  border: 2px solid var(--nr-blue);
-  color: #fff;
-  background: var(--nr-blue);
-  transition: transform 0.05s ease, box-shadow 0.15s ease, background 0.2s ease,
-    color 0.2s ease;
-}
-.nr-btn--ghost {
-  background: transparent;
-  color: var(--nr-blue);
-  border: 2px solid var(--nr-blue);
-}
-.nr-btn--ghost:hover {
-  background: rgba(2, 56, 89, 0.06);
-}
-.nr-btn:hover {
-  transform: translateY(-1px);
-}
-.nr-btn:active {
-  transform: translateY(0);
-}
-.nr-btn i {
-  margin-right: 0.4rem;
-} */

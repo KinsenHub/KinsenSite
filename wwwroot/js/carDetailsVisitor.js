@@ -44,28 +44,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 500);
 });
 
-const carId =
-  parseInt(sessionStorage.getItem("selectedCarId") || "0", 10) ||
-  parseInt(new URLSearchParams(location.search).get("id") || "0", 10) ||
-  parseInt(document.querySelector("[data-car-id]")?.dataset.carId || "0", 10);
+// const carId =
+//   parseInt(sessionStorage.getItem("selectedCarId") || "0", 10) ||
+//   parseInt(new URLSearchParams(location.search).get("id") || "0", 10) ||
+//   parseInt(document.querySelector("[data-car-id]")?.dataset.carId || "0", 10);
 
-fetch("/umbraco/api/CarApiVisitor/getcarbyid", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ id: carId }), // στέλνουμε το carId στο body
-})
-  .then((res) => {
-    if (!res.ok) throw new Error(`API ${res.status} - ${res.statusText}`);
-    return res.json();
-  })
-  .then((data) => {
-    console.log("✅ Car loaded (Visitor):", data);
-  })
-  .catch((err) => {
-    console.error("❌ API ERROR (Visitor):", err);
-  });
+// fetch("/umbraco/api/CarApiVisitor/getcarbyid", {
+//   method: "POST",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+//       body: JSON.stringify({ carId: parseInt(carID, 10) })
+// })
+//   .then((res) => {
+//     if (!res.ok) throw new Error(`API ${res.status} - ${res.statusText}`);
+//     return res.json();
+//   })
+//   .then((data) => {
+//     console.log("✅ Car loaded (Visitor):", data);
+//   })
+//   .catch((err) => {
+//     console.error("❌ API ERROR (Visitor):", err);
+//   });
 
 (function () {
   const API_BASE = "/umbraco/api/CarApiVisitor";

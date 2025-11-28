@@ -62,7 +62,11 @@
         {
           var menuTitle = item.Value("menuTitle") as string ?? item.Name();
           <li class="nx-li">
-              <a class="nx-link" href="@item.Url()">@menuTitle</a>
+              <a class="nx-link"
+                href="@item.Url()"
+                data-node="@item.Id">
+                  @menuTitle
+              </a>
           </li>
         }
 
@@ -168,3 +172,58 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script src="~/js/navBar.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔵 NAVBAR ACTIVE HIGHLIGHT INIT");
+
+  // 1) Πάρε το NodeId της σελίδας από το HTML tag
+  const html = document.documentElement;
+  const currentNodeId = html.getAttribute("data-umbraco-page-id");
+
+  console.log("🔎 Current Umbraco NodeId =", currentNodeId);
+
+  if (!currentNodeId) {
+    console.warn("⚠️ Δεν βρέθηκε data-umbraco-page-id στο <html>!");
+  }
+
+  // 2) Πάρε όλα τα links του main menu που έχουν data-node
+  const links = document.querySelectorAll(".nx-left .nx-link[data-node]");
+
+  console.log("🔎 Βρέθηκαν", links.length, "nav links με data-node");
+
+  if (!links.length) {
+    console.warn("⚠️ Δεν βρέθηκαν καθόλου .nx-link με data-node!");
+  }
+
+  console.log("🔵 NAVBAR ACTIVE HIGHLIGHT INIT");
+
+// ... εδώ παίρνεις currentNodeId & links ...
+
+  links.forEach(link => {
+    const linkNodeId = link.getAttribute("data-node");
+    const text = link.textContent.trim();
+
+    console.log(`👉 Link: "${text}", data-node = ${linkNodeId}`);
+
+    if (linkNodeId === currentNodeId) {
+      console.log(`✅ MATCH → ενεργοποίηση is-active στο "${text}"`);
+      link.classList.add("is-active");
+    }
+  });
+
+    /* ⭐ ΕΔΩ: highlight για "Η Εταιρεία μας" όταν είμαστε στο FAQ */
+    const companyBtn = document.getElementById("companyDropdown"); // 🔥 ΟΧΙ companyMenu
+    const faqNodeId = "1281"; // το ID του FAQ από το Umbraco
+
+    console.log("📌 currentNodeId =", currentNodeId, "faqNodeId =", faqNodeId);
+
+    if (currentNodeId === faqNodeId && companyBtn) {
+      console.log('✅ FAQ MATCH → ενεργοποίηση is-active στο "Η Εταιρεία μας"');
+      companyBtn.classList.add("is-active");
+    }
+
+  @* const currentNodeId = document.body.dataset.nodeId;  // από <body data-node-id=""> *@
+  
+});
+</script>

@@ -145,18 +145,17 @@ nav.navbar {
 
 .kx-menu {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 14px);
   right: 0;
-  min-width: 12rem;
-  margin: 0;
-  padding: 0.5rem 0;
-  list-style: none;
-  /* background: #fff; */
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  display: none;
-  z-index: 5002;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  display: none; /* 🔴 ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ */
+  z-index: 100000 !important;
+}
+
+.kx-menu li {
+  list-style: none !important;
 }
 
 .kx-menu.is-open {
@@ -164,14 +163,20 @@ nav.navbar {
 }
 
 .kx-menu-item {
-  display: block;
-  padding: 0.5rem 1rem;
   color: #212529;
   white-space: nowrap;
+  list-style: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px !important;
+  gap: 0 !important;
 }
 
 .kx-menu-item:hover {
   background: #f8f9fa;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .kx-menu .kx-menu-item::after {
@@ -212,35 +217,49 @@ nav.navbar {
 
 /* ============== Hover underline ============== */
 .nx-menu a.nx-link,
-.nx-menu .kx-link,
-.nx-menu .kx-menu-item {
+.nx-menu .kx-link {
   position: relative;
+  display: inline-block;
+  padding: 8px 4px; /* 👉 ίδιο padding για ΟΛΑ */
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  color: var(--nx-text);
+  cursor: pointer;
   text-decoration: none;
 }
 
+/* 2. Κοινό underline με ::after */
 .nx-menu a.nx-link::after,
-.nx-menu .kx-link::after,
-.nx-menu .kx-menu-item::after {
+.nx-menu .kx-link::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: #39c0c3;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0.9);
   bottom: -8px;
+  height: 3px;
+  width: 100%;
+  background: #39c0c3;
   opacity: 0;
-  transform: scaleX(0.9);
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
+/* 3. Hover underline (όλα ίδια) */
 .nx-menu a.nx-link:hover::after,
 .nx-menu .kx-link:hover::after,
-.nx-menu .kx-menu-item:hover::after,
 .nx-menu a.nx-link:focus-visible::after,
-.nx-menu .kx-link:focus-visible::after,
-.nx-menu .kx-menu-item:focus-visible::after {
+.nx-menu .kx-link:focus-visible::after {
   opacity: 1;
-  transform: scaleX(1);
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* 4. ΜΟΝΙΜΟ underline όταν είναι active (πχ FAQ → "Η Εταιρεία μας") */
+.nx-menu a.nx-link.is-active::after,
+.nx-menu .kx-link.is-active::after {
+  opacity: 1;
+  transform: translateX(-50%) scaleX(1);
 }
 
 /* ================== Mobile / Tablet ================== */
@@ -271,16 +290,6 @@ nav.navbar {
     opacity: 0;
     transform: scaleX(0.9);
     transition: opacity 0.15s ease, transform 0.15s ease;
-  }
-
-  .nx-menu a.nx-link:hover::after,
-  .nx-menu .kx-link:hover::after,
-  .nx-menu .kx-menu-item:hover::after,
-  .nx-menu a.nx-link:focus-visible::after,
-  .nx-menu .kx-link:focus-visible::after,
-  .nx-menu .kx-menu-item:focus-visible::after {
-    opacity: 1;
-    transform: scaleX(1);
   }
 
   #nxMenu .nx-right {
@@ -493,6 +502,7 @@ nav.navbar {
   .nx-menu .kx-dropdown {
     width: 100%;
   }
+
   .nx-menu .kx-menu {
     position: static;
     display: none;
@@ -504,9 +514,11 @@ nav.navbar {
     border: 0;
     box-shadow: none;
   }
+
   .nx-menu .kx-menu.is-open {
     display: block;
   }
+
   .nx-menu .kx-menu-item {
     display: block;
     padding: 10px 12px;

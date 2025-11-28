@@ -1,9 +1,7 @@
 let sidebar;
 
-// function toggleFilters() {
-//   sidebar = document.getElementById("filterSidebar");
-//   sidebar.classList.toggle("show");
-// }
+window.currentPriceOrder = null;
+window.sortedCards = [];
 
 function toggleFilters() {
   sidebar = document.getElementById("filterSidebar");
@@ -38,16 +36,9 @@ let filters;
 let displayCars;
 let noResultsMsg;
 let paginationContainer;
-let originalCardElements = Array.from(
-  document.querySelectorAll(".cardCarLink")
-);
+let originalCardElements = Array.from(document.querySelectorAll(".cardCar"));
 let allCards;
 let filteredCards = [];
-
-// const offerMap = {
-//   offer: "προσφορά",
-//   discount: "έκπτωση",
-// };
 
 const typeOfCarMap = {
   suv: "SUV",
@@ -86,6 +77,18 @@ function normalizeColorStrict(v) {
     .trim();
 }
 
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === "priceOrderSelect") {
+    const val = e.target.value;             
+    console.log("🟢 delegated value =", val);
+
+    window.currentPriceOrder = val;
+
+    const filters = collectFilters();
+    filterCards(filters);
+  }
+});
+
 function filterCards(filters) {
   filteredCards = [];
 
@@ -117,12 +120,7 @@ function filterCards(filters) {
       card.querySelector(".card-title")?.innerText.trim().toLowerCase() || "";
 
     modelPriceText = card.querySelector(".card-text")?.innerText || "";
-    modelPrice = parseFloat(
-      modelPriceText
-        .replace(/\./g, "")
-        .replace(",", ".")
-        .replace(/[^\d.]/g, "")
-    );
+    modelPrice = parsePrice(modelPriceText);
 
     fuelName =
       card.querySelector(".fuel")?.innerText.trim().toLowerCase() || "";
@@ -251,9 +249,7 @@ function filterCards(filters) {
       filteredCards.push(card);
       anyMatch = true;
     }
-
   });
-
 
   // Αφορά το μήνυμα NoResults!!
   if (noResultsMsg) noResultsMsg.style.display = "none";
@@ -279,41 +275,36 @@ function filterCards(filters) {
     if (paginationContainer) paginationContainer.style.display = "";
   }
 
-  if (filters.priceOrder === "asc" || filters.priceOrder === "desc") {
-    filteredCards.sort((a, b) => {
-      const priceA = parseFloat(
-        a
-          .querySelector(".card-text")
-          ?.innerText.replace(/\./g, "")
-          .replace(",", ".")
-          .replace(/[^\d.]/g, "")
-      );
-      const priceB = parseFloat(
-        b
-          .querySelector(".card-text")
-          ?.innerText.replace(/\./g, "")
-          .replace(",", ".")
-          .replace(/[^\d.]/g, "")
-      );
-      if (isNaN(priceA) || isNaN(priceB)) return 0;
+  if (window.currentPriceOrder === "asc" || window.currentPriceOrder === "desc") {
 
-      return filters.priceOrder === "asc" ? priceA - priceB : priceB - priceA;
+    console.log("🔵 Sorting active:", window.currentPriceOrder);
+
+    filteredCards.sort((a, b) => {
+      const priceA = parsePrice(a.querySelector(".card-text")?.innerText || "");
+      const priceB = parsePrice(b.querySelector(".card-text")?.innerText || "");
+
+      return window.currentPriceOrder === "asc"
+        ? priceA - priceB
+        : priceB - priceA;
     });
 
+    window.sortedCards = [...filteredCards];
+
     const container = document.getElementById("displayCars");
-    // container.innerHTML = "";
+    container.innerHTML = "";
 
-    // ✅ Καθάρισε παλιές κάρτες
-    container.querySelectorAll(".cardCar").forEach((card) => card.remove());
+    window.sortedCards.forEach(card => {
+        card.style.display = "block";
+        container.appendChild(card);
+    });
 
-    filteredCards.forEach((card) => container.appendChild(card));
     currentPage = 1;
-    paginateVisibleCars(filteredCards);
+    paginateVisibleCars(window.sortedCards);
+
+    return;
   }
 
-  // displayCars.innerHTML = "";
-
-  if (!filters.priceOrder) {
+  if (!window.currentPriceOrder) {
     [...displayCars.querySelectorAll(".cardCar")].forEach((card) =>
       card.remove()
     );
@@ -329,6 +320,8 @@ function filterCards(filters) {
 
   updateAvailableOffers(filters, filteredCards);
 }
+
+
 
 //-------------------------------------------------//
 //------------------Update Filters-----------------//
@@ -490,27 +483,40 @@ function pickVisible(...ids) {
 function readNumVisible(fallback, ...ids) {
   const el = pickVisible(...ids);
   if (!el) return fallback;
-  const s = String(el.value || "")
-    .replace(/\u00A0|\u202F/g, "")
-    .replace(/[^\d]/g, "");
-  return s ? parseInt(s, 10) : fallback;
+
+  const raw = String(el.value || "").trim();
+  if (!raw) return fallback;
+
+  // καθάρισμα: κρατάμε δεκαδικά, βγάζουμε χιλιάδες
+  const cleaned = raw
+    .replace(/\u00A0|\u202F/g, "")  // σπάνια invisible spaces
+    .replace(/[^\d]/g, "")
+    .replace(/,/g, ".")            // κόμμα → τελεία
+    .replace(/[^\d.]/g, "");       // αφαιρεί οτιδήποτε άλλο
+
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? fallback : num;
 }
 
 function collectFilters() {
+  let minPrice = readNumVisible(0, "minPriceInputDesk", "minPriceInputMobile");
+  let maxPrice = readNumVisible(Infinity, "maxPriceInputDesk", "maxPriceInputMobile");
+
+  // 🔥 MONO αυτό προσθέτουμε (και μόνο για maxPrice)
+  // if (maxPrice !== Infinity && maxPrice !== null) {
+  //   maxPrice = maxPrice + 1; 
+  // }
+
   return {
     // Τιμή
-    minPrice: readNumVisible(0, "minPriceInputDesk", "minPriceInputMobile"),
-    maxPrice: readNumVisible(
-      Infinity,
-      "maxPriceInputDesk",
-      "maxPriceInputMobile"
-    ),
+    minPrice,
+    maxPrice,
     //
     // Προσφορά
     offerTypes: getCheckedValues(".offerTypeCheckbox"),
     //
     // Αύξουσα-Φθίνουσα τιμή
-    priceOrder: document.getElementById("priceOrderSelect")?.value || null,
+    //priceOrder: document.querySelector(".price-order-wrapper #priceOrderSelect")?.value,
     //
     // Έτος
     minYear: readNumVisible(0, "minYearInputDesk", "minYearInputMobile"),
@@ -545,6 +551,38 @@ function collectFilters() {
     // Είδος Οχήματος
     carType: getCheckedValues(".carTypeCheckbox"),
   };
+}
+
+// αφορά την ταξινόμηση
+function parsePrice(value) {
+  if (!value) return null;
+
+  let s = value.toString().trim();
+
+  // Βγάζουμε όλα τα κενά, € κλπ
+  s = s.replace(/[^\d.,]/g, "");
+
+  // Αν υπάρχουν ΠΟΛΛΑ σημεία ".", τότε αυτά είναι χιλιοδιαχωριστές → αφαιρούνται
+  // Αν υπάρχει ένα μόνο ".", τότε είναι δεκαδικό και ΔΕΝ αφαιρείται
+  const parts = s.split(".");
+
+  if (parts.length > 2) {
+      // Π.χ. "30.500.02" → κρατάμε το τελευταίο ως δεκαδικό
+      const decimals = parts.pop(); 
+      s = parts.join("") + "." + decimals;
+  }
+
+  // Αν υπάρχει κόμμα, είναι δεκαδικό
+  s = s.replace(",", ".");
+
+  let num = parseFloat(s);
+
+  if (isNaN(num)) return null;
+
+  // ⬆ Γιατί έχουμε δεκαδικά → στρογγυλοποιούμε προς τα πάνω
+  num = Math.ceil(num);
+
+  return num;
 }
 
 function getCheckedValues(selector) {
@@ -788,14 +826,38 @@ function clearAllFilters() {
 
     // 5) Επαναφορά καρτών & layout
     if (displayCars && originalCardElements) {
+
+      // 1) Καθάρισε το container
       displayCars.innerHTML = "";
-      Array.from(originalCardElements).forEach((card) => {
-        card.style.display = "flex"; // ή "block", ανάλογα με το layout σου
-        displayCars.appendChild(card);
+
+      // 2) Βάλε ΠΙΣΩ τις αρχικές κάρτες
+      originalCardElements.forEach(card => {
+          card.style.display = "";   // αφήνουμε το CSS να ορίσει layout
+          displayCars.appendChild(card);
       });
-      resetDisplayCarsLayout?.();
+
+      // 3) Reset layout του displayCars
+      displayCars.style.display = "";
+      displayCars.style.justifyContent = "";
+      displayCars.style.alignItems = "";
+      displayCars.style.marginTop = "";
+      displayCars.classList.remove("is-empty");
+
+      // 4) RESET του pagination (wrapper + controls)
+      const paginationWrapper   = document.querySelector(".pagination-wrapper");
+      const paginationControls  = document.getElementById("paginationControls");
+
+      if (paginationWrapper)  paginationWrapper.style.display  = "";   // π.χ. block
+      if (paginationControls) paginationControls.style.display = "";   // αφήνουμε τις κλάσεις "pagination justify-content-center flex-wrap" να δουλέψουν
+
+      // 5) Ξαναχτίσε το pagination με ΟΛΕΣ τις κάρτες
+      const cardsArray = Array.from(originalCardElements);
       currentPage = 1;
-      paginateVisibleCars?.(Array.from(originalCardElements));
+      paginateVisibleCars(cardsArray);
+
+      // 6) Counters
+      updateAvailableBrands?.(filters, cardsArray);
+      updateAvailableOffers?.(filters, cardsArray);
     }
 
     // 6) Recompute counters & τρέξε κενό filter για συγχρονισμό UI

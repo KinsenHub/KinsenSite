@@ -489,7 +489,6 @@ using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Models;   // για MediaWithCrops
 using Umbraco.Extensions;                           // Url(...)
 using Umbraco.Cms.Core;                             // UrlMode
-using Umbraco.Cms.Core.Models.PublishedContent;  
 
 [Route("umbraco/api/[controller]")]
 public class CarApiVisitorController : UmbracoApiController
@@ -509,7 +508,7 @@ public class CarApiVisitorController : UmbracoApiController
     [HttpPost("getcarbyid")]
     public IActionResult GetCarById([FromBody] CarRequest request)
     {
-        if (request == null || request.Id <= 0)
+        if (request == null || request.CarId <= 0)
             return BadRequest("Invalid request.");
 
         using var contextRef = _contextFactory.EnsureUmbracoContext();
@@ -522,12 +521,20 @@ public class CarApiVisitorController : UmbracoApiController
         if (salesPage == null) return NotFound("Sales page not found.");
 
         var carBlocks = salesPage.Value<IEnumerable<BlockListItem>>("carCardBlock");
-        var car = carBlocks?.Select(x => x.Content).FirstOrDefault(x => x.Value<int>("carID") == request.Id);
-        if (car == null) return NotFound($"Car with ID {request.Id} not found.");
+        var car = carBlocks?
+            .Select(x => x.Content)
+            .FirstOrDefault(x =>
+            {
+                var idStr = x.Value<string>("carID");
+                return !string.IsNullOrWhiteSpace(idStr)
+                    && idStr.Trim() == request.CarId.ToString();
+            });        
+            
+        if (car == null) return NotFound($"Car with ID {request.CarId} not found.");
 
         var result = new
         {
-            id = request.Id,
+            id = request.CarId,
             maker = car.Value<string>("maker"),
             model = car.Value<string>("model"),
             price = car.Value<string>("price"),
@@ -544,6 +551,11 @@ public class CarApiVisitorController : UmbracoApiController
         };
 
         return Ok(result);
+    }
+
+    public class CarRequest
+    {
+        public int CarId { get; set; }
     }
 
     // ====== ΝΕΟ action: SubmitOffer (email με BRAVO SMTP) ======

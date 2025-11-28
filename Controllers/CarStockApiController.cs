@@ -17,9 +17,53 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core;
+using System.IO;
 
 namespace KinsenOfficial.Controllers
 {
+
+    public class CarStockState
+    {
+        public bool Initialized { get; set; }
+    }
+
+    public static class CarStockStateStore
+    {
+        private static readonly string FilePath =
+            Path.Combine(AppContext.BaseDirectory, "App_Data", "carstock_state.json");
+
+        public static CarStockState Load()
+        {
+            try
+            {
+                if (!System.IO.File.Exists(FilePath))
+                    return new CarStockState { Initialized = false };
+
+                var json = System.IO.File.ReadAllText(FilePath);
+                return JsonSerializer.Deserialize<CarStockState>(json) ?? new CarStockState();
+            }
+            catch
+            {
+                return new CarStockState { Initialized = false };
+            }
+        }
+
+        public static void Save(CarStockState state)
+        {
+            var dir = Path.GetDirectoryName(FilePath);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir!);
+
+            var json = JsonSerializer.Serialize(state, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            System.IO.File.WriteAllText(FilePath, json);
+        }
+    }  
+
+
     [ApiController]
     [Route("umbraco/api/carstock")]
     [Produces("application/json")]
@@ -62,6 +106,182 @@ namespace KinsenOfficial.Controllers
         [AllowAnonymous]
         [IgnoreAntiforgeryToken]
         [Consumes("application/json")]
+        // public IActionResult CarsUpdated([FromBody] List<CarStockCar>? carsPayload)
+        // {
+        //     if (carsPayload == null || carsPayload.Count == 0)
+        //         return BadRequest("No cars in payload.");
+
+        //     static string NormalizeName(string? value)
+        //     {
+        //         if (string.IsNullOrWhiteSpace(value)) return "";
+        //         value = value.Trim().ToLowerInvariant();
+        //         return char.ToUpper(value[0]) + value.Substring(1);
+        //     }
+
+        //     // === 1) Νέα αμάξια από το payload ===
+        //     var newCars = carsPayload
+        //         .Where(c => c?.CarId != null && c.CarId > 0)
+        //         .Select(s => new CarDto
+        //         {
+        //             CarId          = s.CarId ?? 0,
+        //             Maker          = NormalizeName(s.Maker),
+        //             Model          = NormalizeName(s.Model),
+        //             YearRelease    = s.YearRelease?.ToString() ?? "",
+        //             Price          = s.Price?.ToString() ?? "",
+        //             Km             = s.Km?.ToString() ?? "",
+        //             Cc             = s.Cc ?? 0,
+        //             Hp             = s.Hp ?? 0,
+        //             Fuel           = s.Fuel ?? "",
+        //             TransmissionType = s.TransmissionType ?? "",
+        //             Color          = NormalizeName(s.Color),
+        //             TypeOfDiscount = s.TypeOfDiscount ?? "",
+        //             TypeOfCar      = s.TypeOfCar ?? "",
+        //             CarPic         = s.ImageUrl ?? ""
+        //         })
+        //         .GroupBy(c => c.CarId)
+        //         .Select(g => g.First())
+        //         .ToList();
+
+        //     try
+        //     {
+        //         var page = _contentService.GetById(UsedCarSalesPageKey);
+        //         if (page == null)
+        //             return NotFound("usedCarSalesPage not found.");
+
+        //         var existingCars = new List<CarDto>();
+        //         var json = page.GetValue<string>(BlockPropertyAlias);
+
+        //         // === FALLBACK: Αν το draft JSON είναι άδειο, πάρε το PUBLISHED JSON ===
+        //         if (string.IsNullOrWhiteSpace(json))
+        //         {
+        //             var published = _publishedContentQuery.Content(UsedCarSalesPageKey);
+        //             if (published != null)
+        //             {
+        //                 json = published.Value<string>(BlockPropertyAlias);
+        //             }
+        //         }
+
+        //         if (!string.IsNullOrWhiteSpace(json))
+        //         {
+        //             try
+        //             {
+        //                 using var doc = JsonDocument.Parse(json);
+
+        //                 if (doc.RootElement.TryGetProperty("contentData", out var contentData) &&
+        //                     contentData.ValueKind == JsonValueKind.Array)
+        //                 {
+        //                     foreach (var element in contentData.EnumerateArray())
+        //                     {
+        //                         // ---- Πάρε τα properties είτε από variants είτε από το ίδιο το element
+        //                         JsonElement props = element;
+
+        //                         if (element.TryGetProperty("variants", out var variantsEl) &&
+        //                             variantsEl.ValueKind == JsonValueKind.Array)
+        //                         {
+        //                             var firstVariant = variantsEl.EnumerateArray().FirstOrDefault();
+        //                             if (firstVariant.ValueKind == JsonValueKind.Object &&
+        //                                 firstVariant.TryGetProperty("properties", out var p))
+        //                             {
+        //                                 props = p;
+        //                             }
+        //                         }
+
+        //                         // carId (υποχρεωτικό)
+        //                         if (!props.TryGetProperty("carId", out var carIdEl) ||
+        //                             carIdEl.ValueKind != JsonValueKind.Number)
+        //                         {
+        //                             // αν ο editor είχε παλιά carID, πιάστο κι αυτό
+        //                             if (props.TryGetProperty("carID", out var carIdEl2) &&
+        //                                 carIdEl2.ValueKind == JsonValueKind.Number)
+        //                             {
+        //                                 carIdEl = carIdEl2;
+        //                             }
+        //                             else
+        //                             {
+        //                                 continue;
+        //                             }
+        //                         }
+
+        //                         var carId = carIdEl.GetInt32();
+        //                         if (carId == 0) continue;
+
+        //                         // μικρά helpers για να μη σκορπίσουμε TryGetProperty παντού
+        //                         string GetStringProp(string name)
+        //                         {
+        //                             return props.TryGetProperty(name, out var v) &&
+        //                                 v.ValueKind != JsonValueKind.Null
+        //                                 ? v.ToString()
+        //                                 : "";
+        //                         }
+
+        //                         double GetDoubleProp(string name)
+        //                         {
+        //                             if (!props.TryGetProperty(name, out var v) ||
+        //                                 v.ValueKind == JsonValueKind.Null)
+        //                                 return 0;
+
+        //                             if (v.ValueKind == JsonValueKind.Number)
+        //                                 return v.GetDouble();
+
+        //                             // σε περίπτωση που για κάποιο λόγο είναι string-αριθμός
+        //                             return double.TryParse(v.ToString(), out var d) ? d : 0;
+        //                         }
+
+        //                         existingCars.Add(new CarDto
+        //                         {
+        //                             CarId           = carId,
+        //                             Maker           = NormalizeName(GetStringProp("maker")),
+        //                             Model           = NormalizeName(GetStringProp("model")),
+        //                             YearRelease     = GetStringProp("yearRelease").Trim('"'),
+        //                             Price           = GetStringProp("price").Trim('"'),
+        //                             Km              = GetStringProp("km").Trim('"'),
+        //                             Cc              = GetDoubleProp("cc"),
+        //                             Hp              = GetDoubleProp("hp"),
+        //                             Fuel            = GetStringProp("fuel"),
+        //                             TransmissionType= GetStringProp("transmissionType"),
+        //                             Color           = NormalizeName(GetStringProp("color")),
+        //                             TypeOfDiscount  = GetStringProp("typeOfDiscount"),
+        //                             TypeOfCar       = GetStringProp("typeOfCar"),
+        //                             // παλιά μπορεί να είναι carPicUrl, καινούργια carPic
+        //                             CarPic          = GetStringProp("carPic") != ""
+        //                                                 ? GetStringProp("carPic")
+        //                                                 : GetStringProp("carPicUrl")
+        //                         });
+        //                     }
+        //                 }
+        //             }
+        //             catch (Exception exRead)
+        //             {
+        //                 _logger.LogWarning(exRead, "⚠️ Failed to parse existing cars from BlockList JSON");
+        //             }
+        //         }
+
+        //         // === 3) ΜΟΝΟ πραγματικά νέα cars ===
+        //         var existingIds   = existingCars.Select(c => c.CarId).ToHashSet();
+        //         var trulyNewCars  = newCars.Where(c => !existingIds.Contains(c.CarId)).ToList();
+
+        //         if (trulyNewCars.Count == 0)
+        //             return Ok(new { ok = true, added = 0 });
+
+        //         // === 4) Τελική συγχώνευση (παλιά + νέα, χωρίς διπλά) ===
+        //         var combinedCars = existingCars
+        //             .Concat(trulyNewCars)
+        //             .GroupBy(c => c.CarId)
+        //             .Select(g => g.First())
+        //             .ToList();
+
+        //         // === 5) Αποθήκευση στο BlockList ===
+        //         ReplaceBlockListWithCars(page, combinedCars);
+
+        //         return Ok(new { ok = true, added = trulyNewCars.Count });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "❌ Error updating cars");
+        //         return StatusCode(500, new { ok = false, error = ex.Message });
+        //     }
+        // }
+
         public IActionResult CarsUpdated([FromBody] List<CarStockCar>? carsPayload)
         {
             if (carsPayload == null || carsPayload.Count == 0)
@@ -74,168 +294,107 @@ namespace KinsenOfficial.Controllers
                 return char.ToUpper(value[0]) + value.Substring(1);
             }
 
-            // === 1) Νέα αμάξια από το payload ===
             var newCars = carsPayload
                 .Where(c => c?.CarId != null && c.CarId > 0)
                 .Select(s => new CarDto
                 {
-                    CarId          = s.CarId ?? 0,
-                    Maker          = NormalizeName(s.Maker),
-                    Model          = NormalizeName(s.Model),
-                    YearRelease    = s.YearRelease?.ToString() ?? "",
-                    Price          = s.Price?.ToString() ?? "",
-                    Km             = s.Km?.ToString() ?? "",
-                    Cc             = s.Cc ?? 0,
-                    Hp             = s.Hp ?? 0,
-                    Fuel           = s.Fuel ?? "",
+                    CarId = s.CarId ?? 0,
+                    Maker = NormalizeName(s.Maker),
+                    Model = NormalizeName(s.Model),
+                    YearRelease = s.YearRelease?.ToString() ?? "",
+                    Price = s.Price?.ToString() ?? "",
+                    Km = s.Km?.ToString() ?? "",
+                    Cc = s.Cc ?? 0,
+                    Hp = s.Hp ?? 0,
+                    Fuel = s.Fuel ?? "",
                     TransmissionType = s.TransmissionType ?? "",
-                    Color          = NormalizeName(s.Color),
+                    Color = NormalizeName(s.Color),
                     TypeOfDiscount = s.TypeOfDiscount ?? "",
-                    TypeOfCar      = s.TypeOfCar ?? "",
-                    CarPic         = s.ImageUrl ?? ""
+                    TypeOfCar = s.TypeOfCar ?? "",
+                    CarPic = s.ImageUrl ?? ""
                 })
                 .GroupBy(c => c.CarId)
                 .Select(g => g.First())
                 .ToList();
 
+            var state = CarStockStateStore.Load();
+
+            var page = _contentService.GetById(UsedCarSalesPageKey);
+            if (page == null)
+                return NotFound("usedCarSalesPage not found.");
+
+            // === FIRST TIME (FULL INITIALIZATION)
+            if (!state.Initialized)
+            {
+                ReplaceBlockListWithCars(page, newCars);
+
+                state.Initialized = true;
+                CarStockStateStore.Save(state);
+
+                return Ok(new { ok = true, mode = "initialized", added = newCars.Count });
+            }
+
+            // === APPEND MODE (EVERY REQUEST AFTER FIRST)
+            var existingCars = LoadExistingCars(page);
+            var existingIds = existingCars.Select(c => c.CarId).ToHashSet();
+
+            var onlyNewCars = newCars.Where(c => !existingIds.Contains(c.CarId)).ToList();
+
+            if (onlyNewCars.Count == 0)
+                return Ok(new { ok = true, added = 0 });
+
+            var merged = existingCars.Concat(onlyNewCars).ToList();
+
+            ReplaceBlockListWithCars(page, merged);
+
+            return Ok(new { ok = true, added = onlyNewCars.Count });
+        }
+
+
+        private List<CarDto> LoadExistingCars(IContent page)
+        {
+            var result = new List<CarDto>();
+            var json = page.GetValue<string>(BlockPropertyAlias);
+            if (string.IsNullOrWhiteSpace(json)) return result;
+
             try
             {
-                var page = _contentService.GetById(UsedCarSalesPageKey);
-                if (page == null)
-                    return NotFound("usedCarSalesPage not found.");
+                using var doc = JsonDocument.Parse(json);
 
-                var existingCars = new List<CarDto>();
-                var json = page.GetValue<string>(BlockPropertyAlias);
+                if (!doc.RootElement.TryGetProperty("contentData", out var contentData) ||
+                    contentData.ValueKind != JsonValueKind.Array)
+                    return result;
 
-                // === FALLBACK: Αν το draft JSON είναι άδειο, πάρε το PUBLISHED JSON ===
-                if (string.IsNullOrWhiteSpace(json))
+                foreach (var e in contentData.EnumerateArray())
                 {
-                    var published = _publishedContentQuery.Content(UsedCarSalesPageKey);
-                    if (published != null)
+                    var dto = new CarDto
                     {
-                        json = published.Value<string>(BlockPropertyAlias);
-                    }
+                        CarId = e.TryGetProperty("carId", out var vId) && vId.TryGetInt32(out var id) ? id : 0,
+                        Maker = e.TryGetProperty("maker", out var v) ? v.GetString() ?? "" : "",
+                        Model = e.TryGetProperty("model", out v) ? v.GetString() ?? "" : "",
+                        Price = e.TryGetProperty("price", out v) ? v.ToString() : "",
+                        YearRelease = e.TryGetProperty("yearRelease", out v) ? v.ToString() : "",
+                        Km = e.TryGetProperty("km", out v) ? v.ToString() : "",
+                        Fuel = e.TryGetProperty("fuel", out v) ? v.GetString() ?? "" : "",
+                        Color = e.TryGetProperty("color", out v) ? v.GetString() ?? "" : "",
+                        TransmissionType = e.TryGetProperty("transmissionType", out v) ? v.GetString() ?? "" : "",
+                        TypeOfDiscount = e.TryGetProperty("typeOfDiscount", out v) ? v.GetString() ?? "" : "",
+                        TypeOfCar = e.TryGetProperty("typeOfCar", out v) ? v.GetString() ?? "" : "",
+                        Cc = e.TryGetProperty("cc", out v) && v.TryGetDouble(out var cc) ? cc : 0,
+                        Hp = e.TryGetProperty("hp", out v) && v.TryGetDouble(out var hp) ? hp : 0,
+                        CarPic = e.TryGetProperty("carPic", out v) ? v.GetString() ?? "" : ""
+                    };
+
+                    if (dto.CarId > 0)
+                        result.Add(dto);
                 }
-
-                if (!string.IsNullOrWhiteSpace(json))
-                {
-                    try
-                    {
-                        using var doc = JsonDocument.Parse(json);
-
-                        if (doc.RootElement.TryGetProperty("contentData", out var contentData) &&
-                            contentData.ValueKind == JsonValueKind.Array)
-                        {
-                            foreach (var element in contentData.EnumerateArray())
-                            {
-                                // ---- Πάρε τα properties είτε από variants είτε από το ίδιο το element
-                                JsonElement props = element;
-
-                                if (element.TryGetProperty("variants", out var variantsEl) &&
-                                    variantsEl.ValueKind == JsonValueKind.Array)
-                                {
-                                    var firstVariant = variantsEl.EnumerateArray().FirstOrDefault();
-                                    if (firstVariant.ValueKind == JsonValueKind.Object &&
-                                        firstVariant.TryGetProperty("properties", out var p))
-                                    {
-                                        props = p;
-                                    }
-                                }
-
-                                // carId (υποχρεωτικό)
-                                if (!props.TryGetProperty("carId", out var carIdEl) ||
-                                    carIdEl.ValueKind != JsonValueKind.Number)
-                                {
-                                    // αν ο editor είχε παλιά carID, πιάστο κι αυτό
-                                    if (props.TryGetProperty("carID", out var carIdEl2) &&
-                                        carIdEl2.ValueKind == JsonValueKind.Number)
-                                    {
-                                        carIdEl = carIdEl2;
-                                    }
-                                    else
-                                    {
-                                        continue;
-                                    }
-                                }
-
-                                var carId = carIdEl.GetInt32();
-                                if (carId == 0) continue;
-
-                                // μικρά helpers για να μη σκορπίσουμε TryGetProperty παντού
-                                string GetStringProp(string name)
-                                {
-                                    return props.TryGetProperty(name, out var v) &&
-                                        v.ValueKind != JsonValueKind.Null
-                                        ? v.ToString()
-                                        : "";
-                                }
-
-                                double GetDoubleProp(string name)
-                                {
-                                    if (!props.TryGetProperty(name, out var v) ||
-                                        v.ValueKind == JsonValueKind.Null)
-                                        return 0;
-
-                                    if (v.ValueKind == JsonValueKind.Number)
-                                        return v.GetDouble();
-
-                                    // σε περίπτωση που για κάποιο λόγο είναι string-αριθμός
-                                    return double.TryParse(v.ToString(), out var d) ? d : 0;
-                                }
-
-                                existingCars.Add(new CarDto
-                                {
-                                    CarId           = carId,
-                                    Maker           = NormalizeName(GetStringProp("maker")),
-                                    Model           = NormalizeName(GetStringProp("model")),
-                                    YearRelease     = GetStringProp("yearRelease").Trim('"'),
-                                    Price           = GetStringProp("price").Trim('"'),
-                                    Km              = GetStringProp("km").Trim('"'),
-                                    Cc              = GetDoubleProp("cc"),
-                                    Hp              = GetDoubleProp("hp"),
-                                    Fuel            = GetStringProp("fuel"),
-                                    TransmissionType= GetStringProp("transmissionType"),
-                                    Color           = NormalizeName(GetStringProp("color")),
-                                    TypeOfDiscount  = GetStringProp("typeOfDiscount"),
-                                    TypeOfCar       = GetStringProp("typeOfCar"),
-                                    // παλιά μπορεί να είναι carPicUrl, καινούργια carPic
-                                    CarPic          = GetStringProp("carPic") != ""
-                                                        ? GetStringProp("carPic")
-                                                        : GetStringProp("carPicUrl")
-                                });
-                            }
-                        }
-                    }
-                    catch (Exception exRead)
-                    {
-                        _logger.LogWarning(exRead, "⚠️ Failed to parse existing cars from BlockList JSON");
-                    }
-                }
-
-                // === 3) ΜΟΝΟ πραγματικά νέα cars ===
-                var existingIds   = existingCars.Select(c => c.CarId).ToHashSet();
-                var trulyNewCars  = newCars.Where(c => !existingIds.Contains(c.CarId)).ToList();
-
-                if (trulyNewCars.Count == 0)
-                    return Ok(new { ok = true, added = 0 });
-
-                // === 4) Τελική συγχώνευση (παλιά + νέα, χωρίς διπλά) ===
-                var combinedCars = existingCars
-                    .Concat(trulyNewCars)
-                    .GroupBy(c => c.CarId)
-                    .Select(g => g.First())
-                    .ToList();
-
-                // === 5) Αποθήκευση στο BlockList ===
-                ReplaceBlockListWithCars(page, combinedCars);
-
-                return Ok(new { ok = true, added = trulyNewCars.Count });
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "❌ Error updating cars");
-                return StatusCode(500, new { ok = false, error = ex.Message });
+                return result;
             }
+
+            return result;
         }
 
         private static string Fold(string? s)
@@ -598,6 +757,7 @@ namespace KinsenOfficial.Controllers
             }
         }    
     }
+
 
     public class CarStockCar
     {

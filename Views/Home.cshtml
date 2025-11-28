@@ -121,8 +121,9 @@
 
 @if (carCardBlock != null && carCardBlock.Any())
 {
-    <div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
-        
+    <div class="w-100 mt-5 d-flex justify-content-center">
+						<div id="carouselExampleDark" class="carousel carousel-dark slide shadow-lg custom-carousel"
+							data-bs-ride="carousel">        
         @* ===== Indicators δυναμικά ===== *@
         <div class="carousel-indicators">
             @{
@@ -157,31 +158,31 @@
                     var price = content.Value<string>("price");
                     var typeOfDiscount = content.Value<string>("typeOfDiscount");
 
-                    <div class="carousel-item @(index == 0 ? "active" : "")" data-bs-interval="4000">
-                    <a href="/carDetails/"
-                        data-id="@carID"
-                        onclick="return onCardClick(event, '@carID')">
-                        <div class="car-card text-center" data-id="@carID">
-                            <div class="discount-badge">@typeOfDiscount</div>
-                            <img src="@carPic?.Url()" class="d-block mx-auto" alt="@modelo" style="max-height:300px; object-fit:contain;" />
-                            <h2>@maker @modelo</h2>
-                            <h3></h3>
-                            <p>@yearRelease</p>
-                            <p class="price">@price €</p>
+                    <div class="carousel-item @(index == 0 ? "active" : "")" data-bs-interval="4000" style="max-height:1100px;">
+                        <a href="/carDetails/"
+                            data-car-id="@carID"
+                            onclick="return onCardClick(event, '@carID')" class="carousel-link" >
+                            <div class="text-center p-4" data-car-id="@carID">
+                                <div class="discount-badgeMain">@typeOfDiscount</div>
+                                 <h2>@maker @modelo</h2>
+                                <img src="@carPic?.Url()" class="d-block mx-auto" alt="@modelo" style="max-height:270px; object-fit:contain;" />
+                                <h2 class="price">@price €</h2>
+                                @* <h4>@yearRelease</h4> *@
 
-                            <a href="/carDetails/"
-                               class="btn-offer"
-                               onclick="sessionStorage.setItem('selectedCarId', '@carID')">
-                                Δείτε το
-                            </a>
-                        </div>
-                    </a>
+                                @* <a href="/carDetails/"
+                                class="btn-offer"
+                                onclick="sessionStorage.setItem('selectedCarId', '@carID')">
+                                    Δείτε το
+                                </a> *@
+                            </div>
+                        </a>
                     </div>
 
                     index++;
                 }
             }
         </div>
+        
 
         @* ===== Controls (βελάκια) ===== *@
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
@@ -192,6 +193,7 @@
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Επόμενο</span>
         </button>
+    </div>
     </div>
 }
 
@@ -300,6 +302,13 @@
     sessionStorage.setItem("selectedCarType", type);
     window.location.href = "/πωλήσεις-μεταχειρισμένων"; 
   }
+
+  function onCardClick(event, carID) {
+    event.preventDefault();                       
+    sessionStorage.setItem("selectedCarId", carID);   
+    window.location.href = "/carDetails";      
+    return false;
+}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
