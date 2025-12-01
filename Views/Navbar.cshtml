@@ -204,10 +204,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const linkNodeId = link.getAttribute("data-node");
     const text = link.textContent.trim();
 
-    console.log(`👉 Link: "${text}", data-node = ${linkNodeId}`);
+    //console.log(`👉 Link: "${text}", data-node = ${linkNodeId}`);
 
     if (linkNodeId === currentNodeId) {
-      console.log(`✅ MATCH → ενεργοποίηση is-active στο "${text}"`);
+      //console.log(`✅ MATCH → ενεργοποίηση is-active στο "${text}"`);
       link.classList.add("is-active");
     }
   });
@@ -216,14 +216,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const companyBtn = document.getElementById("companyDropdown"); // 🔥 ΟΧΙ companyMenu
     const faqNodeId = "1281"; // το ID του FAQ από το Umbraco
 
-    console.log("📌 currentNodeId =", currentNodeId, "faqNodeId =", faqNodeId);
+    //console.log("📌 currentNodeId =", currentNodeId, "faqNodeId =", faqNodeId);
 
     if (currentNodeId === faqNodeId && companyBtn) {
-      console.log('✅ FAQ MATCH → ενεργοποίηση is-active στο "Η Εταιρεία μας"');
+      ///console.log('✅ FAQ MATCH → ενεργοποίηση is-active στο "Η Εταιρεία μας"');
       companyBtn.classList.add("is-active");
     }
-
-  @* const currentNodeId = document.body.dataset.nodeId;  // από <body data-node-id=""> *@
-  
 });
 </script>

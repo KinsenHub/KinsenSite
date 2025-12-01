@@ -4,7 +4,7 @@
 
 @media (max-width: 575px) {
   .warranty-img-wrapper img {
-    height: 180px;
+    max-width: 80%;
     object-fit: cover;
   }
 
@@ -15,17 +15,17 @@
 
   .submit-btn {
     width: 100px;
-    height: 45px; /* για σταθερό ύψος */
-    display: flex; /* flex container */
-    align-items: center; /* κέντρο κάθετα */
-    justify-content: center; /* κέντρο οριζόντια */
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
   }
 }
 
 @media (min-width: 576px) and (max-width: 991px) {
   .warranty-img-wrapper img {
-    height: 250px;
+    max-width: 80%;
     object-fit: cover;
   }
 
@@ -37,7 +37,7 @@
 
 @media (min-width: 992px) {
   .warranty-img-wrapper img {
-    height: 350px;
+    max-width: 80%;
     object-fit: cover;
   }
 
@@ -53,7 +53,7 @@
 
 @media (min-width: 1200px) {
   .warranty-img-wrapper img {
-    height: 450px;
+    max-width: 60%;
     object-fit: cover;
   }
 

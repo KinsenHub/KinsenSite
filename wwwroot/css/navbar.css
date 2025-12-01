@@ -231,7 +231,6 @@ nav.navbar {
   text-decoration: none;
 }
 
-/* 2. Κοινό underline με ::after */
 .nx-menu a.nx-link::after,
 .nx-menu .kx-link::after {
   content: "";
@@ -246,16 +245,6 @@ nav.navbar {
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-/* 3. Hover underline (όλα ίδια) */
-.nx-menu a.nx-link:hover::after,
-.nx-menu .kx-link:hover::after,
-.nx-menu a.nx-link:focus-visible::after,
-.nx-menu .kx-link:focus-visible::after {
-  opacity: 1;
-  transform: translateX(-50%) scaleX(1);
-}
-
-/* 4. ΜΟΝΙΜΟ underline όταν είναι active (πχ FAQ → "Η Εταιρεία μας") */
 .nx-menu a.nx-link.is-active::after,
 .nx-menu .kx-link.is-active::after {
   opacity: 1;
@@ -424,6 +413,7 @@ nav.navbar {
     z-index: 6001;
     color: #023859; /* default (όχι home) */
   }
+
   body.is-home .nx-toggle {
     color: #fff;
   } /* πάνω στο video */
@@ -448,6 +438,7 @@ nav.navbar {
     will-change: transform;
     z-index: 5001;
   }
+
   .nx-menu.is-open {
     transform: translateX(0);
   }
@@ -490,13 +481,6 @@ nav.navbar {
     transition: transform 0.18s ease, opacity 0.18s ease;
     pointer-events: none;
   }
-  .nx-menu .nx-link:hover::after,
-  .nx-menu .kx-link:hover::after,
-  .nx-menu .nx-link:focus-visible::after,
-  .nx-menu .kx-link:focus-visible::after {
-    transform: scaleX(1);
-    opacity: 1;
-  }
 
   /* Dropdowns μέσα στο panel */
   .nx-menu .kx-dropdown {
@@ -536,22 +520,17 @@ nav.navbar {
     transform: translateY(2px) rotate(180deg);
   }
 
-  /* Κουμπί “Σύνδεση” */
-  /* #nav-login-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 12px 26px;
-    border-radius: 12px;
-    text-align: center;
-  } */
-
   /* safe-area */
   .nx-menu::after {
     content: "";
     display: block;
     height: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .nx-menu a.nx-link.is-active::after,
+  .nx-menu .kx-link.is-active::after {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1) !important;
   }
 }
 
