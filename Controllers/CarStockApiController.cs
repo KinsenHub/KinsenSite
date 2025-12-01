@@ -5,19 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Controllers;
-using System.Globalization;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using System.Text.Json;
-using System.Linq;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Globalization;
-using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core;
-using System.IO;
+using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Web.Common.PublishedModels;
+using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Web;
 
 namespace KinsenOfficial.Controllers
 {
@@ -76,6 +71,7 @@ namespace KinsenOfficial.Controllers
         private readonly IDataTypeService _dataTypeService;
         private readonly ILogger<CarStockWriteController> _logger;
         private readonly IPublishedContentQuery _publishedContentQuery;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
 
 
         // appsettings.json (χρησιμοποίησε ΜΟΝΟ GUID)
@@ -92,6 +88,7 @@ namespace KinsenOfficial.Controllers
             IContentTypeService contentTypeService,
             IDataTypeService dataTypeService,
             ILogger<CarStockWriteController> logger,
+            IUmbracoContextFactory umbracoContextFactory,
             IPublishedContentQuery publishedContentQuery)
         {
             _cfg = cfg;
@@ -99,6 +96,7 @@ namespace KinsenOfficial.Controllers
             _contentTypeService = contentTypeService;
             _dataTypeService = dataTypeService;
             _logger = logger;
+            _umbracoContextFactory = umbracoContextFactory;
             _publishedContentQuery = publishedContentQuery;
         }
         
@@ -287,6 +285,14 @@ namespace KinsenOfficial.Controllers
             if (carsPayload == null || carsPayload.Count == 0)
                 return BadRequest("No cars in payload.");
 
+            _logger.LogInformation("Incoming carsPayload count = {Count}", carsPayload.Count);
+
+            foreach (var car in carsPayload)
+            {
+                _logger.LogInformation("Payload Car → ID:{Id}, Maker:{Maker}, Model:{Model}",
+                    car.CarId, car.Maker, car.Model);
+            }
+
             static string NormalizeName(string? value)
             {
                 if (string.IsNullOrWhiteSpace(value)) return "";
@@ -294,6 +300,7 @@ namespace KinsenOfficial.Controllers
                 return char.ToUpper(value[0]) + value.Substring(1);
             }
 
+            // ✔ Μετατροπή payload -> CarDto
             var newCars = carsPayload
                 .Where(c => c?.CarId != null && c.CarId > 0)
                 .Select(s => new CarDto
@@ -313,89 +320,111 @@ namespace KinsenOfficial.Controllers
                     TypeOfCar = s.TypeOfCar ?? "",
                     CarPic = s.ImageUrl ?? ""
                 })
-                .GroupBy(c => c.CarId)
-                .Select(g => g.First())
                 .ToList();
 
-            var state = CarStockStateStore.Load();
-
+            // ✔ Φόρτωση σελίδας
             var page = _contentService.GetById(UsedCarSalesPageKey);
             if (page == null)
                 return NotFound("usedCarSalesPage not found.");
 
-            // === FIRST TIME (FULL INITIALIZATION)
-            if (!state.Initialized)
+            // ✔ Φόρτωση ΥΠΑΡΧΟΝΤΩΝ ΑΥΤΟΚΙΝΗΤΩΝ
+            var existingCars = LoadExistingCars(page);
+            _logger.LogInformation("EXISTING CARS IN CONTENT = {Count}", existingCars.Count);
+
+            // ✔ Φιλτράρισμα μόνο των νέων (μη-διπλότυπων)
+            var existingIds = existingCars.Select(c => c.CarId).ToHashSet();
+            var carsToAdd = newCars.Where(c => !existingIds.Contains(c.CarId)).ToList();
+
+            _logger.LogInformation("CARS TO ADD (not duplicates) = {Count}", carsToAdd.Count);
+
+            if (carsToAdd.Count == 0)
             {
-                ReplaceBlockListWithCars(page, newCars);
-
-                state.Initialized = true;
-                CarStockStateStore.Save(state);
-
-                return Ok(new { ok = true, mode = "initialized", added = newCars.Count });
+                _logger.LogInformation("NO NEW CARS — NOTHING ADDED");
+                return Ok(new { ok = true, added = 0 });
             }
 
-            // === APPEND MODE (EVERY REQUEST AFTER FIRST)
-            var existingCars = LoadExistingCars(page);
-            var existingIds = existingCars.Select(c => c.CarId).ToHashSet();
+            // ✔ Merge → Υπάρχοντα + Νέα
+            var merged = existingCars.Concat(carsToAdd).ToList();
+            _logger.LogInformation("FINAL MERGED CAR COUNT = {Total}", merged.Count);
 
-            var onlyNewCars = newCars.Where(c => !existingIds.Contains(c.CarId)).ToList();
-
-            if (onlyNewCars.Count == 0)
-                return Ok(new { ok = true, added = 0 });
-
-            var merged = existingCars.Concat(onlyNewCars).ToList();
-
+            // ✔ Αντικατάσταση block list
             ReplaceBlockListWithCars(page, merged);
 
-            return Ok(new { ok = true, added = onlyNewCars.Count });
+            return Ok(new { ok = true, added = carsToAdd.Count });
         }
 
 
         private List<CarDto> LoadExistingCars(IContent page)
         {
             var result = new List<CarDto>();
-            var json = page.GetValue<string>(BlockPropertyAlias);
-            if (string.IsNullOrWhiteSpace(json)) return result;
+            const string blockAlias = "carCardBlock";
 
-            try
+            // 1) Πήγαινε στον PUBLISHED κόσμο
+            using var cref = _umbracoContextFactory.EnsureUmbracoContext();
+            var published = cref.UmbracoContext.Content?.GetById(page.Id);
+
+            if (published == null)
             {
-                using var doc = JsonDocument.Parse(json);
-
-                if (!doc.RootElement.TryGetProperty("contentData", out var contentData) ||
-                    contentData.ValueKind != JsonValueKind.Array)
-                    return result;
-
-                foreach (var e in contentData.EnumerateArray())
-                {
-                    var dto = new CarDto
-                    {
-                        CarId = e.TryGetProperty("carId", out var vId) && vId.TryGetInt32(out var id) ? id : 0,
-                        Maker = e.TryGetProperty("maker", out var v) ? v.GetString() ?? "" : "",
-                        Model = e.TryGetProperty("model", out v) ? v.GetString() ?? "" : "",
-                        Price = e.TryGetProperty("price", out v) ? v.ToString() : "",
-                        YearRelease = e.TryGetProperty("yearRelease", out v) ? v.ToString() : "",
-                        Km = e.TryGetProperty("km", out v) ? v.ToString() : "",
-                        Fuel = e.TryGetProperty("fuel", out v) ? v.GetString() ?? "" : "",
-                        Color = e.TryGetProperty("color", out v) ? v.GetString() ?? "" : "",
-                        TransmissionType = e.TryGetProperty("transmissionType", out v) ? v.GetString() ?? "" : "",
-                        TypeOfDiscount = e.TryGetProperty("typeOfDiscount", out v) ? v.GetString() ?? "" : "",
-                        TypeOfCar = e.TryGetProperty("typeOfCar", out v) ? v.GetString() ?? "" : "",
-                        Cc = e.TryGetProperty("cc", out v) && v.TryGetDouble(out var cc) ? cc : 0,
-                        Hp = e.TryGetProperty("hp", out v) && v.TryGetDouble(out var hp) ? hp : 0,
-                        CarPic = e.TryGetProperty("carPic", out v) ? v.GetString() ?? "" : ""
-                    };
-
-                    if (dto.CarId > 0)
-                        result.Add(dto);
-                }
-            }
-            catch
-            {
+                _logger.LogWarning("LoadExistingCars: ΔΕΝ βρέθηκε published node για Id={Id}", page.Id);
                 return result;
             }
 
+            // 2) Πάρε το BlockListModel από published
+            var blocks = published.Value<BlockListModel>(blockAlias);
+
+            if (blocks == null || !blocks.Any())
+            {
+                _logger.LogWarning("LoadExistingCars: το BlockList '{Alias}' είναι NULL ή άδειο στο node {Id}", blockAlias, page.Id);
+                return result;
+            }
+
+            _logger.LogInformation("LoadExistingCars: βρέθηκαν {Count} block items στο '{Alias}'", blocks.Count(), blockAlias);
+
+            int index = 0;
+
+            foreach (var block in blocks)
+            {
+                index++;
+
+                var content = block.Content;
+                if (content == null)
+                {
+                    _logger.LogWarning("LoadExistingCars: block #{Index} έχει null Content", index);
+                    continue;
+                }
+
+                // 🔁 Τα aliases ΠΡΕΠΕΙ να είναι αυτά που έχεις στο στοιχείο Car block
+                var carId  = content.Value<int?>("carId") ?? 0;
+                var maker  = content.Value<string>("maker") ?? "";
+                var model  = content.Value<string>("model") ?? "";
+                var price  = content.Value<string>("price") ?? "";
+
+                _logger.LogInformation(
+                    "LoadExistingCars: block #{Index} → ID:{Id}, Maker:{Maker}, Model:{Model}, Price:{Price}",
+                    index, carId, maker, model, price
+                );
+
+                if (carId == 0)
+                {
+                    _logger.LogWarning("LoadExistingCars: block #{Index} έχει carId=0, παραλείπεται", index);
+                    continue;
+                }
+
+                result.Add(new CarDto
+                {
+                    CarId = carId,
+                    Maker = maker,
+                    Model = model,
+                    Price = price,
+                    // εδώ μπορείς να συμπληρώσεις Km, Cc, Hp κτλ αν τα χρειάζεσαι
+                });
+            }
+
+            _logger.LogInformation("LoadExistingCars: ΤΕΛΙΚΑ φορτώθηκαν {Count} cars από content", result.Count);
+
             return result;
         }
+        
 
         private static string Fold(string? s)
         {
