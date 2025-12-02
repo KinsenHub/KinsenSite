@@ -302,25 +302,27 @@ namespace KinsenOfficial.Controllers
 
             // ✔ Μετατροπή payload -> CarDto
             var newCars = carsPayload
-                .Where(c => c?.CarId != null && c.CarId > 0)
-                .Select(s => new CarDto
-                {
-                    CarId = s.CarId ?? 0,
-                    Maker = NormalizeName(s.Maker),
-                    Model = NormalizeName(s.Model),
-                    YearRelease = s.YearRelease?.ToString() ?? "",
-                    Price = s.Price?.ToString() ?? "",
-                    Km = s.Km?.ToString() ?? "",
-                    Cc = s.Cc ?? 0,
-                    Hp = s.Hp ?? 0,
-                    Fuel = s.Fuel ?? "",
-                    TransmissionType = s.TransmissionType ?? "",
-                    Color = NormalizeName(s.Color),
-                    TypeOfDiscount = s.TypeOfDiscount ?? "",
-                    TypeOfCar = s.TypeOfCar ?? "",
-                    CarPic = s.ImageUrl ?? ""
-                })
-                .ToList();
+            .Where(c => c?.CarId > 0)
+            .Select(s => new CarDto
+            {
+                CarId = s.CarId ?? 0,
+                Maker = NormalizeName(s.Maker),
+                Model = NormalizeName(s.Model),
+
+                YearRelease = s.YearRelease ?? 0,
+                Price = s.Price ?? 0m,
+                Km = s.Km ?? 0,
+                Cc = s.Cc ?? 0,
+                Hp = s.Hp ?? 0,
+
+                Fuel = s.Fuel ?? "",
+                TransmissionType = s.TransmissionType ?? "",
+                Color = NormalizeName(s.Color),
+                TypeOfDiscount = s.TypeOfDiscount ?? "",
+                TypeOfCar = s.TypeOfCar ?? "",
+                CarPic = s.ImageUrl ?? ""
+            })
+            .ToList();
 
             // ✔ Φόρτωση σελίδας
             var page = _contentService.GetById(UsedCarSalesPageKey);
@@ -397,7 +399,16 @@ namespace KinsenOfficial.Controllers
                 var carId  = content.Value<int?>("carId") ?? 0;
                 var maker  = content.Value<string>("maker") ?? "";
                 var model  = content.Value<string>("model") ?? "";
-                var price  = content.Value<string>("price") ?? "";
+                var yearRelease = content.Value<int?>("yearRelease") ?? 0;
+                var price = content.Value<decimal?>("price") ?? 0;
+                var km = content.Value<int?>("km") ?? 0;
+                var cc = content.Value<double?>("cc") ?? 0;
+                var hp = content.Value<double?>("hp") ?? 0;
+                var fuel = content.Value<string>("fuel") ?? "";
+                var color = content.Value<string>("color") ?? "";
+                var transmissionType = content.Value<string>("transmissionType") ?? "";
+                var typeOfCar = content.Value<string>("typeOfCar") ?? "";
+
 
                 _logger.LogInformation(
                     "LoadExistingCars: block #{Index} → ID:{Id}, Maker:{Maker}, Model:{Model}, Price:{Price}",
@@ -415,8 +426,15 @@ namespace KinsenOfficial.Controllers
                     CarId = carId,
                     Maker = maker,
                     Model = model,
+                    YearRelease = yearRelease,
                     Price = price,
-                    // εδώ μπορείς να συμπληρώσεις Km, Cc, Hp κτλ αν τα χρειάζεσαι
+                    Km = km,
+                    Cc = cc,
+                    Hp = hp,
+                    Fuel = fuel,
+                    Color = color,
+                    TransmissionType = transmissionType,
+                    TypeOfCar = typeOfCar
                 });
             }
 
@@ -520,83 +538,64 @@ namespace KinsenOfficial.Controllers
             return incoming ?? "";
         }
 
-
-        [HttpGet("available-colors")]
+       [HttpGet("available-colors")]
         public IActionResult GetAvailableColors()
         {
             if (UsedCarSalesPageKey == Guid.Empty)
                 return BadRequest("CarStock:UsedCarSalesPageId missing or invalid.");
 
-            var page = _contentService.GetById(UsedCarSalesPageKey);
-            if (page == null)
+            // 1) Φόρτωση published node
+            using var cref = _umbracoContextFactory.EnsureUmbracoContext();
+            var publishedPage = cref.UmbracoContext.Content?.GetById(UsedCarSalesPageKey);
+
+            if (publishedPage == null)
                 return NotFound("usedCarSalesPage not found.");
 
-            var json = page.GetValue<string>(BlockPropertyAlias);
-            if (string.IsNullOrWhiteSpace(json))
+            // 2) Πάρε σωστά το blocklist
+            var blocks = publishedPage.Value<BlockListModel>(BlockPropertyAlias);
+            if (blocks == null || !blocks.Any())
                 return Ok(Array.Empty<string>());
 
-            try
+            // 3) Συλλογή ΟΛΩΝ των χρωμάτων
+            var colorsSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var block in blocks)
             {
-                using var doc = JsonDocument.Parse(json);
-                if (!doc.RootElement.TryGetProperty("contentData", out var contentData) ||
-                    contentData.ValueKind != JsonValueKind.Array)
-                    return Ok(Array.Empty<string>());
+                var content = block.Content;
+                if (content == null) continue;
 
-                var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var raw = content.Value<string>("color");
+                if (string.IsNullOrWhiteSpace(raw)) continue;
 
-                foreach (var e in contentData.EnumerateArray())
+                // Normalization
+                string normalized = raw
+                    .Normalize(NormalizationForm.FormD)
+                    .Replace("ς", "σ")
+                    .Replace("–", "-")
+                    .Replace("—", "-")
+                    .ToLowerInvariant()
+                    .Trim();
+
+                normalized = Regex.Replace(normalized, @"\s+", " ");
+                normalized = Regex.Replace(normalized, @"\s*-\s*", "-");
+
+                if (!string.IsNullOrEmpty(normalized))
                 {
-                    if (!e.TryGetProperty("color", out var v)) continue;
-
-                    string raw = v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : v.ToString();
-                    if (string.IsNullOrWhiteSpace(raw)) continue;
-
-                    // 🧹 Κανονικοποίηση επιτόπου
-                    string normalized = raw
-                        .Normalize(NormalizationForm.FormD)
-                        .Replace("ς", "σ")
-                        .Replace("–", "-") // EN dash
-                        .Replace("—", "-") // EM dash
-                        .ToLowerInvariant()
-                        .Trim();
-
-                    // Ενοποίηση πολλαπλών κενών και παύλων
-                    normalized = Regex.Replace(normalized, @"\s+", " ");      // πολλαπλά κενά -> ένα
-                    normalized = Regex.Replace(normalized, @"\s*-\s*", "-");  // γύρω από παύλες χωρίς κενά
-
-                    // ✅ Πρώτο γράμμα κεφαλαίο
-                    if (!string.IsNullOrEmpty(normalized))
-                    {
-                        var culture = new System.Globalization.CultureInfo("el-GR");
-                        normalized = char.ToUpper(normalized[0], culture) + normalized.Substring(1);
-                    }
-
-                    set.Add(normalized);
+                    var culture = new System.Globalization.CultureInfo("el-GR");
+                    normalized = char.ToUpper(normalized[0], culture) + normalized.Substring(1);
                 }
 
-                // Ταξινόμηση με ελληνική κουλτούρα
-                var colors = set
-                    .OrderBy(x => x, StringComparer.Create(new System.Globalization.CultureInfo("el-GR"), true))
-                    .ToList();
+                colorsSet.Add(normalized);
+            }
 
-                return Ok(colors);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { ok = false, error = "Parse error: " + ex.Message });
-            }
+            // 4) Ταξινόμηση με ελληνική κουλτούρα
+            var finalColors = colorsSet
+                .OrderBy(x => x, StringComparer.Create(new System.Globalization.CultureInfo("el-GR"), true))
+                .ToList();
+
+            return Ok(finalColors);
         }
-
-        // private static readonly System.Globalization.CultureInfo El = new("el-GR");
-        // private static string UppercaseFirstGreek(string? s)
-        // {
-        //     s = (s ?? "").Trim();
-        //     if (s.Length == 0) return s;
-        //     var first = s.Substring(0, 1).ToUpper(El);  // “ά” -> “Ά”
-        //     var rest  = s.Substring(1);                 // κράτα το υπόλοιπο όπως είναι
-        //     return first + rest;
-        // }
-
+        
         private void ReplaceBlockListWithCars(IContent page, List<CarDto> cars)
         {
             var cardType = _contentTypeService.Get(CardElementAlias)
@@ -628,20 +627,23 @@ namespace KinsenOfficial.Controllers
                 {
                     return new Dictionary<string, object?>
                     {
-                        ["carId"]           = car.CarId,
-                        ["maker"]           = makerNormalized,
-                        ["model"]           = car.Model,
-                        ["price"]           = decimal.TryParse(car.Price, out var dPrice) ? dPrice : 0m,
-                        ["yearRelease"]     = int.TryParse(car.YearRelease, out var y) ? y : 0,
-                        ["km"]              = int.TryParse(car.Km, out var k) ? k : 0,
-                        ["cc"]              = car.Cc,
-                        ["hp"]              = car.Hp,
-                        ["fuel"]            = fuelNormalized,
-                        ["color"]           = car.Color,
-                        ["transmissionType"]= transmissionTypeNormalized,
-                        ["typeOfCar"]       = typeOfCarNormalized,
-                        ["typeOfDiscount"]  = car.TypeOfDiscount,
-                        ["carPic"]          = car.CarPic
+                        ["carId"]            = car.CarId,
+                        ["maker"]            = makerNormalized,
+                        ["model"]            = car.Model,
+
+                        // 🔥 ΤΩΡΑ ΕΙΝΑΙ ΟΙ ΣΩΣΤΟΙ ΤΥΠΟΙ — ΟΧΙ PARSE
+                        ["price"]            = car.Price,
+                        ["yearRelease"]      = car.YearRelease,
+                        ["km"]               = car.Km,
+                        ["cc"]               = car.Cc,
+                        ["hp"]               = car.Hp,
+
+                        ["fuel"]             = fuelNormalized,
+                        ["color"]            = colorNormalized,
+                        ["transmissionType"] = transmissionTypeNormalized,
+                        ["typeOfCar"]        = typeOfCarNormalized,
+                        ["typeOfDiscount"]   = car.TypeOfDiscount,
+                        ["carPic"]           = car.CarPic
                     };
                 }
 
@@ -759,20 +761,27 @@ namespace KinsenOfficial.Controllers
                 {
                     var dto = new CarDto
                     {
-                        CarId = e.TryGetProperty("carId", out var vId) && vId.TryGetInt32(out var id) ? id : 0,
-                        Maker = e.TryGetProperty("maker", out var v) ? v.GetString() ?? "" : "",
-                        Model = e.TryGetProperty("model", out v) ? v.GetString() ?? "" : "",
-                        Price = e.TryGetProperty("price", out v) ? v.ToString() : "",
-                        YearRelease = e.TryGetProperty("yearRelease", out v) ? v.ToString() : "",
-                        Km = e.TryGetProperty("km", out v) ? v.ToString() : "",
-                        Fuel = e.TryGetProperty("fuel", out v) ? v.GetString() ?? "" : "",
-                        Color = e.TryGetProperty("color", out v) ? v.GetString() ?? "" : "",
-                        TransmissionType = e.TryGetProperty("transmissionType", out v) ? v.GetString() ?? "" : "",
-                        TypeOfDiscount = e.TryGetProperty("typeOfDiscount", out v) ? v.GetString() ?? "" : "",
-                        TypeOfCar = e.TryGetProperty("typeOfCar", out v) ? v.GetString() ?? "" : "",
-                        Cc = e.TryGetProperty("cc", out v) && v.TryGetSingle(out var cc) ? cc : 0,
-                        Hp = e.TryGetProperty("hp", out v) && v.TryGetSingle(out var hp) ? hp : 0,
-                        CarPic = e.TryGetProperty("carPic", out v) ? v.GetString() ?? "" : ""
+                        CarId = e.TryGetProperty("carId", out var p) && p.TryGetInt32(out var id) ? id : 0,
+
+                        Maker = e.TryGetProperty("maker", out p) ? p.GetString() ?? "" : "",
+                        Model = e.TryGetProperty("model", out p) ? p.GetString() ?? "" : "",
+
+                        YearRelease = e.TryGetProperty("yearRelease", out p) && p.TryGetInt32(out var year) ? year : 0,
+
+                        Price = e.TryGetProperty("price", out p) && p.TryGetDecimal(out var price) ? price : 0m,
+
+                        Km = e.TryGetProperty("km", out p) && p.TryGetInt32(out var km) ? km : 0,
+
+                        Fuel = e.TryGetProperty("fuel", out p) ? p.GetString() ?? "" : "",
+                        Color = e.TryGetProperty("color", out p) ? p.GetString() ?? "" : "",
+                        TransmissionType = e.TryGetProperty("transmissionType", out p) ? p.GetString() ?? "" : "",
+                        TypeOfDiscount = e.TryGetProperty("typeOfDiscount", out p) ? p.GetString() ?? "" : "",
+                        TypeOfCar = e.TryGetProperty("typeOfCar", out p) ? p.GetString() ?? "" : "",
+
+                        Cc = e.TryGetProperty("cc", out p) && p.TryGetDouble(out var cc) ? cc : 0,
+                        Hp = e.TryGetProperty("hp", out p) && p.TryGetDouble(out var hp) ? hp : 0,
+
+                        CarPic = e.TryGetProperty("carPic", out p) ? p.GetString() ?? "" : ""
                     };
 
                     if (dto.CarId > 0) cars.Add(dto);
@@ -836,14 +845,14 @@ namespace KinsenOfficial.Controllers
 
     public class CarDto
     {
-        public int    CarId { get; set; }
+        public int CarId { get; set; }
         public string Maker { get; set; } = "";
         public string Model { get; set; } = "";
-        public string YearRelease { get; set; } = "";
-        public string Price { get; set; } = "";
-        public string Km { get; set; } = "";
-        public double  Cc { get; set; }
-        public double  Hp { get; set; }
+        public int YearRelease { get; set; }            // FIXED
+        public decimal Price { get; set; }              // FIXED
+        public int Km { get; set; }                     // FIXED
+        public double Cc { get; set; }
+        public double Hp { get; set; }
         public string Fuel { get; set; } = "";
         public string TransmissionType { get; set; } = "";
         public string Color { get; set; } = "";

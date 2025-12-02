@@ -261,24 +261,12 @@ nav.navbar {
 
   .nx-menu a.nx-link,
   .nx-menu .kx-link,
-  .nx-menu .kx-menu-item {
+  .nx-menu .kx-menu-item,
+  #companyDropdown {
     position: relative;
     text-decoration: none;
-  }
-
-  .nx-menu a.nx-link::after,
-  .nx-menu .kx-link::after,
-  .nx-menu .kx-menu-item::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: #39c0c3;
-    bottom: -8px;
-    opacity: 0;
-    transform: scaleX(0.9);
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    display: inline-block;
+    padding-bottom: 10px;
   }
 
   #nxMenu .nx-right {
@@ -306,6 +294,31 @@ nav.navbar {
   #nxMenu.nx-offcanvas.is-open {
     text-align: left;
   }
+
+  .nx-menu a.nx-link::after,
+  .nx-menu .kx-link::after,
+  .nx-menu .kx-menu-item::after,
+  #companyDropdown::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%; /* γραμμή όσο το κείμενο */
+    height: 3px;
+    background: #39c0c3;
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .nx-menu a.nx-link.is-active::after,
+  .nx-menu .kx-link.is-active::after,
+  .nx-menu .kx-menu-item.is-active::after,
+  #companyDropdown.is-active::after {
+    opacity: 1;
+    transform: translateX(0%) scaleX(1) !important;
+  }
 }
 
 @media (min-width: 577px) and (max-width: 991px) {
@@ -317,34 +330,37 @@ nav.navbar {
 
   .nx-menu a.nx-link,
   .nx-menu .kx-link,
-  .nx-menu .kx-menu-item {
+  .nx-menu .kx-menu-item,
+  #companyDropdown {
     position: relative;
     text-decoration: none;
+    display: inline-block;
+    padding-bottom: 10px;
   }
 
   .nx-menu a.nx-link::after,
   .nx-menu .kx-link::after,
-  .nx-menu .kx-menu-item::after {
+  .nx-menu .kx-menu-item::after,
+  #companyDropdown::after {
     content: "";
     position: absolute;
     left: 0;
-    right: 0;
+    bottom: 0;
+    width: 100%; /* γραμμή όσο το κείμενο */
     height: 3px;
     background: #39c0c3;
-    bottom: -8px;
     opacity: 0;
-    transform: scaleX(0.9);
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  .nx-menu a.nx-link:hover::after,
-  .nx-menu .kx-link:hover::after,
-  .nx-menu .kx-menu-item:hover::after,
-  .nx-menu a.nx-link:focus-visible::after,
-  .nx-menu .kx-link:focus-visible::after,
-  .nx-menu .kx-menu-item:focus-visible::after {
+  .nx-menu a.nx-link.is-active::after,
+  .nx-menu .kx-link.is-active::after,
+  .nx-menu .kx-menu-item.is-active::after,
+  #companyDropdown.is-active::after {
     opacity: 1;
-    transform: scaleX(1);
+    transform: translateX(0%) scaleX(1) !important;
   }
 }
 
@@ -378,6 +394,7 @@ nav.navbar {
   body.is-home {
     padding-top: 0;
   }
+
   body.is-home .nx-fixed {
     position: absolute;
     top: 0;
@@ -453,33 +470,39 @@ nav.navbar {
     margin: 0;
   }
 
-  /* Items μέσα στο panel */
-  .nx-menu .nx-link,
-  .nx-menu .kx-link {
-    display: block;
-    font-size: 18px;
-    font-weight: 400;
-    color: #023859;
-    text-decoration: none;
-    padding: 14px 0 12px;
+  .nx-menu a.nx-link,
+  .nx-menu .kx-link,
+  .nx-menu .kx-menu-item,
+  #companyDropdown {
     position: relative;
+    text-decoration: none;
+    display: inline-block;
+    padding-bottom: 10px;
   }
-  /* Τιρκουάζ underline on hover */
-  .nx-menu .nx-link::after,
-  .nx-menu .kx-link::after {
+
+  .nx-menu a.nx-link::after,
+  .nx-menu .kx-link::after,
+  .nx-menu .kx-menu-item::after,
+  #companyDropdown::after {
     content: "";
     position: absolute;
     left: 0;
-    right: 0;
-    bottom: -6px;
+    bottom: 0;
+    width: 100%; /* γραμμή όσο το κείμενο */
     height: 3px;
     background: #39c0c3;
-    border-radius: 2px;
-    transform: scaleX(0);
-    transform-origin: left;
     opacity: 0;
-    transition: transform 0.18s ease, opacity 0.18s ease;
-    pointer-events: none;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .nx-menu a.nx-link.is-active::after,
+  .nx-menu .kx-link.is-active::after,
+  .nx-menu .kx-menu-item.is-active::after,
+  #companyDropdown.is-active::after {
+    opacity: 1;
+    transform: translateX(0%) scaleX(1) !important;
   }
 
   /* Dropdowns μέσα στο panel */
@@ -487,31 +510,10 @@ nav.navbar {
     width: 100%;
   }
 
-  .nx-menu .kx-menu {
-    position: static;
-    display: none;
-    margin: 6px 0 12px;
-    padding: 10px;
-    list-style: none;
-    background: #eef2f4;
-    border-radius: 14px;
-    border: 0;
-    box-shadow: none;
-  }
-
   .nx-menu .kx-menu.is-open {
     display: block;
   }
 
-  .nx-menu .kx-menu-item {
-    display: block;
-    padding: 10px 12px;
-    color: #023859;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 10px;
-  }
   .nx-menu .kx-menu-item:hover {
     background: rgba(0, 180, 200, 0.14);
     color: #023859;
@@ -526,16 +528,10 @@ nav.navbar {
     display: block;
     height: max(16px, env(safe-area-inset-bottom));
   }
-
-  .nx-menu a.nx-link.is-active::after,
-  .nx-menu .kx-link.is-active::after {
-    opacity: 1;
-    transform: translateX(-50%) scaleX(1) !important;
-  }
 }
 
 /* ============ >=1400px: desktop, STICKY ============ */
-@media (min-width: 1400px) {
+@media (min-width: 1201px) {
   .navbar-logo {
     height: 40px !important;
     width: auto !important;
