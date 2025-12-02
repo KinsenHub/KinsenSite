@@ -149,15 +149,15 @@
                 {
                     var content = card?.Content;
                     if (content == null) { continue; }
-
+      
                     var carID = content.Value<string>("carID");
-                    var carPic = content.Value<Umbraco.Cms.Core.Models.MediaWithCrops>("carPic");
+                    var carPic = content.Value<MediaWithCrops>("carPic")?.Url();
                     var maker = content.Value<string>("maker");
                     var modelo = content.Value<string>("model");
                     var yearRelease = content.Value<string>("yearRelease");
                     var price = content.Value<string>("price");
                     var typeOfDiscount = content.Value<string>("typeOfDiscount");
-
+                    
                     <div class="carousel-item @(index == 0 ? "active" : "")" data-bs-interval="4000" style="max-height:1100px;">
                         <a href="/carDetails/"
                             data-car-id="@carID"
@@ -165,7 +165,8 @@
                             <div class="text-center p-4" data-car-id="@carID">
                                 <div class="discount-badgeMain">@typeOfDiscount</div>
                                  <h2>@maker @modelo</h2>
-                                <img src="@carPic?.Url()" class="d-block mx-auto" alt="@modelo" style="max-height:270px; object-fit:contain;" />
+                                <img src="@carPic" class="d-block mx-auto" alt="@modelo" style="max-height:270px; object-fit:contain;" />
+                                <p>IMAGE URL HOMEPAGE: @carPic</p>
                                 <h2 class="price">@price €</h2>
                                 @* <h4>@yearRelease</h4> *@
 
@@ -182,8 +183,8 @@
                 }
             }
         </div>
-        
 
+        
         @* ===== Controls (βελάκια) ===== *@
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>

@@ -490,6 +490,7 @@ using Umbraco.Cms.Core.Models;   // για MediaWithCrops
 using Umbraco.Extensions;                           // Url(...)
 using Umbraco.Cms.Core;                             // UrlMode
 
+
 [Route("umbraco/api/[controller]")]
 public class CarApiVisitorController : UmbracoApiController
 {
@@ -521,16 +522,12 @@ public class CarApiVisitorController : UmbracoApiController
         if (salesPage == null) return NotFound("Sales page not found.");
 
         var carBlocks = salesPage.Value<IEnumerable<BlockListItem>>("carCardBlock");
-        var car = carBlocks?
-            .Select(x => x.Content)
-            .FirstOrDefault(x =>
-            {
-                var idStr = x.Value<string>("carID");
-                return !string.IsNullOrWhiteSpace(idStr)
-                    && idStr.Trim() == request.CarId.ToString();
-            });        
+        var car = carBlocks?.Select(x => x.Content)
+            .FirstOrDefault(x => x.Value<int>("carID") == request.CarId);  
             
         if (car == null) return NotFound($"Car with ID {request.CarId} not found.");
+        
+        var media = car.Value<MediaWithCrops>("carPic");
 
         var result = new
         {
@@ -547,7 +544,7 @@ public class CarApiVisitorController : UmbracoApiController
             transmission = car.Value<string>("transmissionType"),
             offer = car.Value<string>("typeOfDiscount"),
             typeOfCar = car.Value<string>("typeOfCar"),
-            imageUrl = car.Value<IPublishedContent>("carPic")?.Url()
+            imageUrl = media?.GetCropUrl() ?? media?.MediaUrl() ?? ""
         };
 
         return Ok(result);
@@ -619,8 +616,39 @@ public class CarApiVisitorController : UmbracoApiController
         var color = car.Value<string>("color");
         var cc = car.Value<string>("cc");
         var hp = car.Value<string>("hp");
-        var imageUrl = car.Value<IPublishedContent>("carPic")?.Url(); // π.χ. /media/xxx/car.jpg
+        var imageUrl = car.Value<MediaWithCrops>("carPic")?.Url();
 
+        // ---- LOGGING ----
+        Console.WriteLine("=== VISITOR DEBUG START ===");
+
+        // 1. Όλα τα properties του block
+        foreach (var p in car.Properties)
+        {
+            Console.WriteLine($"Property: {p.Alias} => {p.GetValue()}");
+        }
+
+        // 2. Raw τιμή του carPic
+        var rawPic = car.Value("carPic");
+        Console.WriteLine("RAW carPic value = " + rawPic);
+
+        // 3. Type του raw carPic
+        Console.WriteLine("RAW carPic TYPE = " + rawPic?.GetType().FullName);
+
+        // 4. MediaWithCrops attempt
+        var mediaCrops = car.Value<MediaWithCrops>("carPic");
+        Console.WriteLine("MediaWithCrops found? " + (mediaCrops != null ? "YES" : "NO"));
+        Console.WriteLine("MediaWithCrops Url: " + (mediaCrops?.Url() ?? "null"));
+
+        // 5. IPublishedContent attempt
+        var mediaIPC = car.Value<IPublishedContent>("carPic");
+        Console.WriteLine("IPublishedContent found? " + (mediaIPC != null ? "YES" : "NO"));
+        Console.WriteLine("IPublishedContent Url: " + (mediaIPC?.Url() ?? "null"));
+
+        // 6. Strong typed attempts on crop URLs
+        Console.WriteLine("GetCropUrl(): " + (mediaCrops?.GetCropUrl() ?? "null"));
+        Console.WriteLine("MediaUrl():   " + (mediaCrops?.MediaUrl() ?? "null"));
+
+        Console.WriteLine("=== VISITOR DEBUG END ===");
 
         // ---------- Base64 embed (inline) ----------
         string imgTag = string.Empty;
