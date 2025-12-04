@@ -68,18 +68,18 @@ let makerName,
 function normalizeColorStrict(v) {
   return (v || "")
     .toLowerCase()
-    .normalize("NFD")                     // αφαιρεί τόνους
+    .normalize("NFD") // αφαιρεί τόνους
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/ς/g, "σ")                   // τελικό σ -> σ
-    .replace(/[\u2010-\u2015]/g, "-")     // όλα τα είδη dash -> "-"
-    .replace(/\s*-\s*/g, "-")             // ενιαίες παύλες χωρίς κενά γύρω
-    .replace(/\s+/g, "-")                 // ⛔️ ό,τι κενό -> παύλα (έτσι “Κόκκινο Μεταλιζέ” == “Κόκκινο-Μεταλιζέ”)
+    .replace(/ς/g, "σ") // τελικό σ -> σ
+    .replace(/[\u2010-\u2015]/g, "-") // όλα τα είδη dash -> "-"
+    .replace(/\s*-\s*/g, "-") // ενιαίες παύλες χωρίς κενά γύρω
+    .replace(/\s+/g, "-") // ⛔️ ό,τι κενό -> παύλα (έτσι “Κόκκινο Μεταλιζέ” == “Κόκκινο-Μεταλιζέ”)
     .trim();
 }
 
 document.addEventListener("change", (e) => {
   if (e.target && e.target.id === "priceOrderSelect") {
-    const val = e.target.value;             
+    const val = e.target.value;
     console.log("🟢 delegated value =", val);
 
     window.currentPriceOrder = val;
@@ -201,35 +201,35 @@ function filterCards(filters) {
               .trim()
         ),
 
-  filters.color.length === 0 ||
-  filters.color.some((c) => {
-    const left = (c || "").trim().toLowerCase(); // φίλτρο όπως είναι
-    const right = (colorName || "")
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/ς/g, "σ")
-      .replace(/-/g, "")       
-      .replace(/\s+/g, "");    
+      filters.color.length === 0 ||
+        filters.color.some((c) => {
+          const left = (c || "").trim().toLowerCase(); // φίλτρο όπως είναι
+          const right = (colorName || "")
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/ς/g, "σ")
+            .replace(/-/g, "")
+            .replace(/\s+/g, "");
 
-    const leftNorm = left
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/ς/g, "σ")
-      .replace(/-/g, "")
-      .replace(/\s+/g, "");
+          const leftNorm = left
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/ς/g, "σ")
+            .replace(/-/g, "")
+            .replace(/\s+/g, "");
 
-    console.log("🎨 compare(color):", {
-      filterColorOriginal: c,
-      cardColorOriginal: colorName,
-      leftNorm,
-      right,
-      eq: leftNorm === right,
-    });
+          console.log("🎨 compare(color):", {
+            filterColorOriginal: c,
+            cardColorOriginal: colorName,
+            leftNorm,
+            right,
+            eq: leftNorm === right,
+          });
 
-    return leftNorm === right;
-  }),
+          return leftNorm === right;
+        }),
 
       filters.carType.length === 0 ||
         filters.carType.some((t) => {
@@ -257,7 +257,6 @@ function filterCards(filters) {
 
   // ...
   if (filteredCards.length === 0) {
-     
     // καθάρισε/κρύψε κάρτες
     displayCars
       .querySelectorAll(".cardCar")
@@ -275,8 +274,10 @@ function filterCards(filters) {
     if (paginationContainer) paginationContainer.style.display = "";
   }
 
-  if (window.currentPriceOrder === "asc" || window.currentPriceOrder === "desc") {
-
+  if (
+    window.currentPriceOrder === "asc" ||
+    window.currentPriceOrder === "desc"
+  ) {
     console.log("🔵 Sorting active:", window.currentPriceOrder);
 
     filteredCards.sort((a, b) => {
@@ -293,9 +294,9 @@ function filterCards(filters) {
     const container = document.getElementById("displayCars");
     container.innerHTML = "";
 
-    window.sortedCards.forEach(card => {
-        card.style.display = "block";
-        container.appendChild(card);
+    window.sortedCards.forEach((card) => {
+      card.style.display = "block";
+      container.appendChild(card);
     });
 
     currentPage = 1;
@@ -320,8 +321,6 @@ function filterCards(filters) {
 
   updateAvailableOffers(filters, filteredCards);
 }
-
-
 
 //-------------------------------------------------//
 //------------------Update Filters-----------------//
@@ -489,10 +488,10 @@ function readNumVisible(fallback, ...ids) {
 
   // καθάρισμα: κρατάμε δεκαδικά, βγάζουμε χιλιάδες
   const cleaned = raw
-    .replace(/\u00A0|\u202F/g, "")  // σπάνια invisible spaces
+    .replace(/\u00A0|\u202F/g, "") // σπάνια invisible spaces
     .replace(/[^\d]/g, "")
-    .replace(/,/g, ".")            // κόμμα → τελεία
-    .replace(/[^\d.]/g, "");       // αφαιρεί οτιδήποτε άλλο
+    .replace(/,/g, ".") // κόμμα → τελεία
+    .replace(/[^\d.]/g, ""); // αφαιρεί οτιδήποτε άλλο
 
   const num = parseFloat(cleaned);
   return isNaN(num) ? fallback : num;
@@ -500,11 +499,15 @@ function readNumVisible(fallback, ...ids) {
 
 function collectFilters() {
   let minPrice = readNumVisible(0, "minPriceInputDesk", "minPriceInputMobile");
-  let maxPrice = readNumVisible(Infinity, "maxPriceInputDesk", "maxPriceInputMobile");
+  let maxPrice = readNumVisible(
+    Infinity,
+    "maxPriceInputDesk",
+    "maxPriceInputMobile"
+  );
 
   // 🔥 MONO αυτό προσθέτουμε (και μόνο για maxPrice)
   // if (maxPrice !== Infinity && maxPrice !== null) {
-  //   maxPrice = maxPrice + 1; 
+  //   maxPrice = maxPrice + 1;
   // }
 
   return {
@@ -567,9 +570,9 @@ function parsePrice(value) {
   const parts = s.split(".");
 
   if (parts.length > 2) {
-      // Π.χ. "30.500.02" → κρατάμε το τελευταίο ως δεκαδικό
-      const decimals = parts.pop(); 
-      s = parts.join("") + "." + decimals;
+    // Π.χ. "30.500.02" → κρατάμε το τελευταίο ως δεκαδικό
+    const decimals = parts.pop();
+    s = parts.join("") + "." + decimals;
   }
 
   // Αν υπάρχει κόμμα, είναι δεκαδικό
@@ -618,11 +621,13 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("LoggedIn:", data.loggedIn);
 
       document.querySelectorAll(".cardCarLink").forEach((link) => {
-        if (data.loggedIn) {
-          link.setAttribute("href", "/carDetailsMember/");
-        } else {
-          link.setAttribute("href", "/carDetailsVisitor/");
-        }
+        const currentHref = link.getAttribute("href"); // π.χ. /carDetailsVisitor?id=37
+
+        const idPart = currentHref.split("?")[1] || ""; // παίρνουμε id=37
+
+        const base = data.loggedIn ? "/carDetailsMember" : "/carDetailsVisitor";
+
+        link.setAttribute("href", `${base}?${idPart}`);
       });
     })
     .catch((err) => console.error("Auth check error:", err));
@@ -826,14 +831,13 @@ function clearAllFilters() {
 
     // 5) Επαναφορά καρτών & layout
     if (displayCars && originalCardElements) {
-
       // 1) Καθάρισε το container
       displayCars.innerHTML = "";
 
       // 2) Βάλε ΠΙΣΩ τις αρχικές κάρτες
-      originalCardElements.forEach(card => {
-          card.style.display = "";   // αφήνουμε το CSS να ορίσει layout
-          displayCars.appendChild(card);
+      originalCardElements.forEach((card) => {
+        card.style.display = ""; // αφήνουμε το CSS να ορίσει layout
+        displayCars.appendChild(card);
       });
 
       // 3) Reset layout του displayCars
@@ -844,11 +848,11 @@ function clearAllFilters() {
       displayCars.classList.remove("is-empty");
 
       // 4) RESET του pagination (wrapper + controls)
-      const paginationWrapper   = document.querySelector(".pagination-wrapper");
-      const paginationControls  = document.getElementById("paginationControls");
+      const paginationWrapper = document.querySelector(".pagination-wrapper");
+      const paginationControls = document.getElementById("paginationControls");
 
-      if (paginationWrapper)  paginationWrapper.style.display  = "";   // π.χ. block
-      if (paginationControls) paginationControls.style.display = "";   // αφήνουμε τις κλάσεις "pagination justify-content-center flex-wrap" να δουλέψουν
+      if (paginationWrapper) paginationWrapper.style.display = ""; // π.χ. block
+      if (paginationControls) paginationControls.style.display = ""; // αφήνουμε τις κλάσεις "pagination justify-content-center flex-wrap" να δουλέψουν
 
       // 5) Ξαναχτίσε το pagination με ΟΛΕΣ τις κάρτες
       const cardsArray = Array.from(originalCardElements);
@@ -1090,17 +1094,17 @@ function setCookie(name, value, minutes) {
   )}; Expires=${d.toUTCString()}; Path=/; SameSite=Lax; Secure`;
 }
 
-function storeCarId(e, carId) {
-  e.preventDefault();
-  const id = String(carId).trim();
+// function storeCarId(e, carId) {
+//   e.preventDefault();
+//   const id = String(carId).trim();
 
-  sessionStorage.setItem("selectedCarId", id); // 1) session
-  setCookie("selectedCarId", id, 30); // 2) cookie fallback
+//   sessionStorage.setItem("selectedCarId", id); // 1) session
+//   setCookie("selectedCarId", id, 30); // 2) cookie fallback
 
-  // (optional) fallback state
-  history.replaceState({ carId: id }, "", "/carDetails/");
+//   // (optional) fallback state
+//   history.replaceState({ carId: id }, "", "/carDetails/");
 
-  // ίδιο origin για σιγουριά
-  window.location.href = location.origin + "/carDetails/";
-  return false;
-}
+//   // ίδιο origin για σιγουριά
+//   window.location.href = location.origin + "/carDetails/";
+//   return false;
+// }

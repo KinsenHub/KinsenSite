@@ -34,6 +34,7 @@
   align-items: center;
   gap: 16px;
 }
+
 .cart-card .car-img {
   width: 110px;
   height: 72px;
@@ -94,15 +95,53 @@
   font-size: 18px;
 }
 
-/* Responsive */
-@media (max-width: 700px) {
+@media (max-width: 575px) {
+  .custom-carousel .carousel-item img {
+    width: 80% !important;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    max-height: 650px;
+    image-rendering: -webkit-optimize-contrast;
+  }
+
+  /* Τα κουτάκια σε 2 στήλες */
+  section.car-specs-section .specs-grid {
+    display: grid !important;
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    gap: 10px;
+    width: 80%;
+    max-width: 80%;
+    box-sizing: border-box !important;
+  }
+
+  .upologismos_label {
+    font-size: 1rem !important;
+  }
+
+  .addToCartBtn {
+    width: 100%;
+    background-color: #007c91 !important;
+    color: white;
+    padding: 1rem;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 1rem;
+    font-weight: 600;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
   section.car-specs-section {
     width: 100% !important;
     max-width: 100% !important;
     margin: 20px auto 40px auto !important;
     padding: 5px 10px 20px 10px !important;
     box-sizing: border-box !important;
-    overflow-x: hidden !important; /* ασφάλεια */
+    overflow-x: hidden !important;
     display: block !important;
   }
 
@@ -122,6 +161,10 @@
     width: 100%;
     max-width: 100%;
     box-sizing: border-box !important;
+  }
+
+  .upologismos_label {
+    font-size: 1rem !important;
   }
 
   .specs-grid .spec-box {
@@ -158,7 +201,7 @@
   }
 }
 
-@media (min-width: 701px) {
+@media (min-width: 992px) {
   /* section.car-specs-section {
     width: 100% !important;
     max-width: 95% !important;

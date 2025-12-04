@@ -1,3 +1,4 @@
+﻿﻿
 ﻿﻿@using Umbraco.Cms.Core.Models.Blocks;
 @using Umbraco.Cms.Core.Models;
 @using Umbraco.Cms.Web.Common
@@ -799,75 +800,77 @@
 					</div>
 				</div>
 
-				@* <div class="card-body"> *@
 					
-					@if (carCardBlock != null)
+				@if (carCardBlock != null)
+				{
+					var validCards = carCardBlock
+					.Where(b =>
 					{
-						var validCards = carCardBlock
-						.Where(b =>
-						{
-							var c = b.Content;
-							string T(string a) => (c.Value<string>(a) ?? "").Trim();
+						var c = b.Content;
+						string T(string a) => (c.Value<string>(a) ?? "").Trim();
 
-							var model = T("model");
+						var model = T("model");
 
-							var hasModel = !string.IsNullOrWhiteSpace(model);
-							return hasModel;
-						})
-						.ToList();
+						var hasModel = !string.IsNullOrWhiteSpace(model);
+						return hasModel;
+					})
+					.ToList();
 
-						@foreach (var card in validCards)
-						{
-							var car = card.Content;
-							var carID = car.Value<string>("carID");
-							var carPic = car.Value<MediaWithCrops>("carPic");
-							var maker = car.Value<string>("maker");
-							var modelo = car.Value<string>("model");
-							var yearRelease = car.Value<string>("yearRelease");
-							var price = car.Value<string>("price");
-							var km = car.Value<string>("km");
-							var cc = car.Value<string>("cc");
-							var hp = car.Value<string>("hp");
-							var typeOfDiscount = car.Value<string>("typeOfDiscount");
-							var typeOfFuel = car.Value<string>("fuel");
-							var transmission = car.Value<string>("transmissionType");
-							var color = car.Value<string>("color");
-							var typeOfCar = car.Value<string>("typeOfCar");
+					@foreach (var card in validCards)
+					{
+						var car = card.Content;
+						var carID = car.Value<string>("carID");
+						var carPic = car.Value<MediaWithCrops>("carPic");
+						var maker = car.Value<string>("maker");
+						var modelo = car.Value<string>("model");
+						var yearRelease = car.Value<string>("yearRelease");
+						var price = car.Value<string>("price");
+						var km = car.Value<string>("km");
+						var cc = car.Value<string>("cc");
+						var hp = car.Value<string>("hp");
+						var typeOfDiscount = car.Value<string>("typeOfDiscount");
+						var typeOfFuel = car.Value<string>("fuel");
+						var transmission = car.Value<string>("transmissionType");
+						var color = car.Value<string>("color");
+						var typeOfCar = car.Value<string>("typeOfCar");
+
+						var targetUrl = isLoggedIn
+							? $"/carDetailsMember?id={carID}"
+							: $"/carDetailsVisitor?id={carID}";
+						
+						<div class="cardCar" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
+							<a href="@targetUrl"
+								class="cardCarLink" 
+								data-car-id="@carID" 
+								style="text-decoration: none; color: inherit;">
 							
-							<div class="cardCar" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
-								<a href="/carDetails/"
-									class="cardCarLink" 
-									data-car-id="@carID" 
-									onclick="storeCarId(event, '@carID')"
-									style="text-decoration: none; color: inherit;">
+								@if (!string.IsNullOrWhiteSpace(typeOfDiscount))
+								{
+									<span class="discount-badge">@typeOfDiscount</span>
+								}
 								
-									@if (!string.IsNullOrWhiteSpace(typeOfDiscount))
-									{
-										<span class="discount-badge">@typeOfDiscount</span>
-									}
-
-									<img src="@carPic?.Url()" class="card-img-top car-image" />
-									<div class="card-body d-flex flex-column justify-content-between text-center p-3">
-										<div>
-											<h4 class="maker-title fw-semibold mb-2">@maker <span class="card-title">@modelo</span></h4>
-											<p class="car-year">@yearRelease</p>
-											<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@price €</p>
-											<p class="text-muted mb-0">
-												<i class="fa-solid fa-road"></i><span class="klm">&nbsp; @km </span>km &nbsp;&nbsp;
-												<i class="fa fa-wrench"></i><span class="cc">&nbsp; @cc</span>cc &nbsp;&nbsp;
-												<i class="fa-solid fa-gas-pump"></i><span class="fuel">&nbsp; @typeOfFuel</span>
-											</p>
-											<p class="transmission" style="display:none">@transmission</p>
-											<p class="typeOfColor" style="display:none">@color</p>
-											<p class="hp" style="display:none">@hp</p>
-											<p class="typeOfCar" style="display:none">@typeOfCar</p>
-										</div>
+								<img src="@carPic?.Url()" class="card-img-top car-image" />
+								<div class="card-body d-flex flex-column justify-content-between text-center p-3">
+									<div>
+										<h4 class="maker-title fw-semibold mb-2">@maker <span class="card-title">@modelo</span></h4>
+										<p class="car-year">@yearRelease</p>
+										<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@price €</p>
+										<p class="text-muted mb-0">
+											<i class="fa-solid fa-road"></i><span class="klm">&nbsp; @km </span>km &nbsp;&nbsp;
+											<i class="fa fa-wrench"></i><span class="cc">&nbsp; @cc</span>cc &nbsp;&nbsp;
+											<i class="fa-solid fa-gas-pump"></i><span class="fuel">&nbsp; @typeOfFuel</span>
+										</p>
+										<p class="transmission" style="display:none">@transmission</p>
+										<p class="typeOfColor" style="display:none">@color</p>
+										<p class="hp" style="display:none">@hp</p>
+										<p class="typeOfCar" style="display:none">@typeOfCar</p>
 									</div>
-								</a>
-							</div>
-						}
+								</div>
+							</a>
+						</div>
 					}
-				@* </div> *@
+				}
+				
 			</div>
 			<div class="pagination-wrapper">
 				<nav class="mt-4 w-100">

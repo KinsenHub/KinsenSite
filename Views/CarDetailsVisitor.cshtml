@@ -1,4 +1,4 @@
-﻿@using Umbraco.Cms.Core.Models.Blocks;
+﻿﻿@using Umbraco.Cms.Core.Models.Blocks;
 @using Umbraco.Cms.Core.Models; 
 @using Umbraco.Cms.Web.Common.PublishedModels
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
@@ -19,7 +19,17 @@
 
 	<script>
 	(() => {
-		// helper: διάβασε cookie
+
+		const url = new URL(window.location.href);
+		const queryId = url.searchParams.get("id");
+
+		if (queryId) {
+			try { sessionStorage.setItem("selectedCarId", queryId); } catch {}
+			// Καθάρισε το URL χωρίς reload
+			url.searchParams.delete("id");
+			window.history.replaceState({ carId: queryId }, "", url.toString());
+		}
+		
 		function getCookie(name) {
 			const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g,'\\$&') + '=([^;]*)'));
 			return m ? decodeURIComponent(m[1]) : null;
@@ -28,6 +38,7 @@
 		const fromStorage = sessionStorage.getItem('selectedCarId');
 		const fromState   = (history.state && history.state.carId) ? String(history.state.carId) : null;
 		const fromCookie  = getCookie('selectedCarId');
+
 		let   fromName    = null;
 		if (typeof window.name === 'string' && window.name.indexOf('car:') === 0) {
    			fromName = window.name.slice(4); // πάρε ΜΟΝΟ το ID
@@ -37,17 +48,17 @@
 					|| (fromCookie && fromCookie.trim())
 					|| (fromName && fromName.trim());
 
-		console.log('[MEMBER] carID (resolved):', carID);
+		console.log('[Visitor] carID (resolved):', carID);
 
 		if (!carID) {
-			console.warn('[MEMBER] carID is missing or empty');
+			console.warn('[Visitor] carID is missing or empty');
 			// προαιρετικά: window.location.href = '/cars';
 			return;
 		}
 
 		// Αν ο controller σου θέλει int, κράτα αυτόν τον έλεγχο:
 		if (!/^\d+$/.test(carID)) {
-			console.error('[MEMBER] carID is not numeric, controller expects int:', carID);
+			console.error('[Visitor] carID is not numeric, controller expects int:', carID);
 			return;
 		}
 
@@ -62,8 +73,6 @@
 			window.name = 'car:' + carID;
 		}
 		history.replaceState({ carId: carID }, '', location.pathname);
-
-		@* const carID = sessionStorage.getItem("selectedCarId"); *@
 
 		console.log("carID from Razor:", carID); 
 
@@ -285,4 +294,3 @@
 	});
 </script>
     
-

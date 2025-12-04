@@ -206,7 +206,11 @@ body {
 
 /*----------Καρουζέλ-----------*/
 .carousel-inner {
-  padding: 10px 0;
+  padding: 40px 0;
+}
+
+#carouselExampleDark {
+  margin-bottom: 80px;
 }
 
 .car-card {

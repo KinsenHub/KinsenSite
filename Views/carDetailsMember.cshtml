@@ -19,6 +19,17 @@
 
 	<script>
 		(() => {
+
+		const url = new URL(window.location.href);
+		const queryId = url.searchParams.get("id");
+
+		if (queryId) {
+			try { sessionStorage.setItem("selectedCarId", queryId); } catch {}
+			// Καθάρισε το URL χωρίς reload
+			url.searchParams.delete("id");
+			window.history.replaceState({ carId: queryId }, "", url.toString());
+		}
+
 		// helper: διάβασε cookie
 		function getCookie(name) {
 			const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]{}()*+?.,\\^$|#\\s]/g,'\\$&') + '=([^;]*)'));
@@ -63,13 +74,15 @@
 		}
 		history.replaceState({ carId: carID }, '', location.pathname);
 
+		console.log("carID from Razor:", carID); 
+
 		// ------- FETCH όπως το είχες (κρατάω ίδιο endpoint) -------
-		const payload = { id: Number(carID) }; 
+		@* const payload = { id: Number(carID) };  *@
 		fetch("/umbraco/api/CarApiMember/getcarbyid", {
 			method: "POST",
 			headers: {"Content-Type": "application/json"},
 			credentials: "same-origin",
-  			body: JSON.stringify(payload)  
+  			body: JSON.stringify({ id: parseInt(carID, 10) }) 
 		})
 			.then(async (resp) => {
 				const text = await resp.text();
