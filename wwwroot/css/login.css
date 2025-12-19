@@ -1,11 +1,7 @@
-/* ===== Login Page CSS (fixed for mobile gap) ===== */
-
-/* Fallback αν δεν έχει ήδη οριστεί από το navbar */
 :root {
   --nx-h: 56px;
 }
 
-/* Βασικά */
 html,
 body {
   margin: 0;
@@ -16,28 +12,23 @@ body {
 /* Wrapper: ύψος οθόνης ΜΕΙΟΝ το fixed navbar */
 .login-wrapper {
   display: flex;
-  align-items: flex-start; /* να ξεκινά ακριβώς κάτω από το navbar */
+  align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
-  padding: 8px 16px 24px; /* μικρό, καθαρό padding */
-  min-height: calc(100vh - var(--nx-h));
-}
-@supports (height: 100dvh) {
-  .login-wrapper {
-    min-height: calc(100dvh - var(--nx-h));
-  }
+  margin: 30px auto;
+  padding: 8px 66px 14px;
 }
 
 /* Κουτί login */
 .login-box {
-  width: 100%;
-  max-width: 700px;
-  padding: 30px 48px; /* εσωτερική ανάσα */
+  width: 90%;
+  max-width: 800px;
+  padding: 40px 48px;
+  margin-top: 0;
   border-radius: 15px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
   background: #fff;
   text-align: center;
-  margin-top: 0; /* <-- ήταν 100px: έφτιαχνε το κενό */
   box-sizing: border-box;
 }
 
@@ -47,6 +38,7 @@ body {
   height: auto;
   margin-bottom: 20px;
 }
+
 .login-title {
   font-family: "Open Sans", sans-serif;
   color: #001858;
@@ -93,16 +85,39 @@ body {
   background-color: #007c91;
 }
 
+.forgot-link {
+  position: relative;
+  display: inline-block;
+  color: #0b5aa7;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 0%;
+  height: 2px;
+  background: currentColor;
+  transform: translateX(-50%);
+  transition: width 0.22s ease;
+  opacity: 0.9;
+}
+
+.forgot-link:hover::after,
+.forgot-link:focus-visible::after {
+  width: 100%;
+}
+
 /* ===== Mobile tweaks ===== */
 @media (max-width: 575px) {
   .login-wrapper {
-    padding-top: 10px; /* κόψε το “μαξιλαράκι” κάτω απ’ το navbar */
+    padding-top: 10px;
     padding-inline: 12px;
   }
-  .login-box {
-    padding-top: 30px; /* δώσε ανάσα ΜΕΣΑ στο box για το logo */
-    padding-inline: 16px;
-  }
+
   .login-title {
     font-size: 1.8rem;
     line-height: 1.4;
@@ -127,27 +142,16 @@ body {
   .login-wrapper {
     align-items: flex-start;
     min-height: auto;
-    padding: 100px 30px 30px 30px;
+    padding: 50px 30px;
     margin: 0;
     box-sizing: border-box;
-  }
-
-  .login-box {
-    padding: 28px 24px 22px;
-    margin: 8px auto 6px;
-    border-radius: 14px;
   }
 }
 
 @media (min-width: 992px) {
   .login-wrapper {
-    min-height: auto; /* override του calc(100vh - var(--nx-h)) */
-    /* padding-top: 120px; */
-    padding-bottom: 24px; /* μικρό κενό κάτω, όχι «χαλί» */
-  }
-
-  .login-box {
-    margin: 16px auto 12px; /* λίγη ανάσα γύρω από το box */
+    min-height: auto;
+    padding-bottom: 24px;
   }
 }
 
@@ -159,19 +163,18 @@ body {
   }
 
   .login-box {
-    margin: 16px auto 12px;
+    margin-top: 20px;
   }
 }
 
 @media (min-width: 1400px) {
   .login-wrapper {
     margin-top: 30px;
-    /* padding-top: 130px; */
     padding-inline: 12px;
   }
   .login-box {
-    padding: 50px 200px 100px 200px;
-    padding-inline: 20px;
+    margin-top: 40px;
+    margin-bottom: 40px;
   }
   .login-title {
     font-size: 1.8rem;

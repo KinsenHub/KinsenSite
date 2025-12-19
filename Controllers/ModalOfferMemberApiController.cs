@@ -127,7 +127,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
           <tr>
             <td align='center' style='padding:20px;color:#000000;
                                       font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.6;'>
-              <div style='margin-bottom:6px;'>Kinsen - Όμιλος Σαρακάκη</div>
+              <div style='margin-bottom:6px; font-size:15px;'><b>Kinsen</b></div>
               <div style='margin-bottom:6px;'>{companyAddress}</div>
               <div style='margin-bottom:6px;'>📞 {companyPhone}</div>
               <div style='margin-bottom:6px;'>✉️ <a href='mailto:{companyEmail}' style='color:#000000;text-decoration:none;'>{companyEmail}</a></div>

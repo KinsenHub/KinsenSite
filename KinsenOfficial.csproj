@@ -36,4 +36,8 @@
     <Content Include="App_Plugins\**\*.*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="Views\CarPageDetails.cshtml" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,66 @@
+.login-wrapper {
+  padding: 0;
+  margin: 30px auto;
+}
+
+.status-msg {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  text-align: center;
+
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+
+  transition: opacity 0.4s ease, max-height 0.4s ease;
+}
+
+.status-msg.show {
+  opacity: 1;
+  max-height: 40px;
+}
+
+.status-msg.success {
+  color: #198754; /* πράσινο */
+}
+
+.status-msg.error {
+  color: #dc3545; /* κόκκινο */
+}
+
+@media (max-width: 575px) {
+  .forgetPass-title {
+    font-size: 1.2rem;
+    line-height: 1.2;
+    font-weight: 300;
+    color: #001858;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .forgetPass-title {
+    font-size: 1.4rem !important;
+    line-height: 1.5;
+    font-weight: 300;
+    color: #001858;
+  }
+}
+
+@media (min-width: 992px) {
+  .forgetPass-title {
+    font-size: 1.6rem !important;
+    line-height: 1.5;
+    font-weight: 300;
+    color: #001858;
+  }
+}
+
+@media (min-width: 1200px) {
+  .forgetPass-title {
+    font-size: 1.8rem !important;
+    line-height: 1.5;
+    font-weight: 300;
+    color: #001858;
+    margin: 40px auto;
+  }
+}

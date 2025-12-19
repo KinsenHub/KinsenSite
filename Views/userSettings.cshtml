@@ -1,0 +1,215 @@
+﻿@using Umbraco.Cms.Core.Models
+@using Umbraco.Cms.Core.Security
+@using Umbraco.Cms.Core.Services
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject IMemberService MemberService
+@inject IMemberManager MemberManager
+
+@using CoreMember = Umbraco.Cms.Core.Models.IMember
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var backImg = Model.Value<MediaWithCrops>("backImg");
+
+    // Κατάσταση χρήστη
+    var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
+
+    CoreMember currentMember = null;
+
+    if (isLoggedIn)
+    {
+        var memberTask = MemberManager.GetCurrentMemberAsync();
+        memberTask.Wait();
+        var loggedIn = memberTask.Result;
+        @* <p>@loggedIn</p> *@
+        
+        if (loggedIn != null)
+        {
+            currentMember = MemberService.GetByKey(loggedIn.Key);
+            @* <p>@currentMember</p> *@
+        }
+    }
+
+    string firstName = "";
+    string lastName  = "";
+    string phone     = "";
+    string email     = "";
+    string afm       = "";
+    string company   = "";
+
+    if (currentMember != null)
+    {
+        firstName = currentMember.GetValue("umbracoMemberLogin")?.ToString() ?? "";
+        lastName  = currentMember.GetValue("LastName")?.ToString() ?? "";
+        phone     = currentMember.GetValue("Phone")?.ToString() ?? "";
+        email     = currentMember.Email ?? "";
+        afm       = currentMember.GetValue("Afm")?.ToString() ?? "";
+        company   = currentMember.GetValue("CompanyName")?.ToString() ?? "";
+    }
+}
+
+@if (backImg != null)
+{
+    <div class="hero-blur-wrapper">
+        <img src="@backImg.Url()" alt="Hero image" class="hero-blur-img" />
+
+        <div class="form-overlay">
+            <div class="form-container">
+
+                <h4>Στοιχεία Λογαριασμού</h4>
+                <small>Ελέγξτε και ενημερώστε τα προσωπικά σας στοιχεία:</small>
+
+                <form id="profileForm" class="file-upload mt-3" method="post" action="/umbraco/api/ProfileCustomer/SaveProfile">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Όνομα *</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="firstName"
+                                value="@firstName"
+                                required
+                                minlength="3"
+                                oninput="this.value = this.value.replace(/[^A-Za-zΑ-Ωα-ωΆ-Ώά-ώ.\_\s]/g, '');"
+                                pattern="[A-Za-zΑ-Ωα-ωΆ-Ώά-ώ.\-\s]+"
+                                title="Χρησιμοποίησε τουλάχιστον 3 γράμματα. Επιτρέπονται μόνο γράμματα, τελεία (.) και παύλα (-)."
+                            />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Επώνυμο *</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="lastName"
+                                value="@lastName"
+                                required
+                                minlength="3"
+                                oninput="this.value = this.value.replace(/[^A-Za-zΑ-Ωα-ωΆ-Ώά-ώ.\_\s]/g, '');"
+                                pattern="[A-Za-zΑ-Ωα-ωΆ-Ώά-ώ.\-\s]+"
+                            />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" value="@email" class="form-control" required/>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Κινητό *</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="phone"
+                                inputmode="numeric"
+                                minlength="10"
+                                maxlength="10"
+                                pattern="\d{10}"
+                                value="@phone"
+                                required
+                                oninput="this.value = this.value.replace(/[^0-9]/g,'').slice(0,10);"
+                            />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Εταιρικό ΑΦΜ *</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="afm"
+                                placeholder=""
+                                aria-label="afm"
+                                inputmode="numeric"
+                                minlength="9"
+                                maxlength="9"
+                                pattern="\d{9}"
+                                value="@afm"
+                                required
+                                oninput="this.value = this.value.replace(/[^0-9]/g,'').slice(0,9);"
+                            />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Επωνυμία Εταιρείας *</label>
+                            <input 
+                                type="text" 
+                                name="company" 
+                                value="@company" 
+                                class="form-control" 
+                                required
+                                minlength="3"
+                                oninput="this.value = this.value.replace(/[^A-Za-zΑ-Ωα-ωΆ-Ώά-ώ.\_\s]/g, '');"
+                                pattern="[A-Za-zΑ-Ωα-ωΆ-Ώά-ώ.\-\s]+"
+                                title="Χρησιμοποίησε τουλάχιστον 3 γράμματα. Επιτρέπονται μόνο γράμματα, τελεία (.) και παύλα (-)."
+                            />
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex gap-8 justify-content-center mt-4">
+                        <button type="button" class="btn btn-lg saveBtn" style="background:#023859; color:white;" onclick="saveProfile()">Αποθήκευση</button>
+                    </div>
+                    <div class="form-message d-flex gap-3 justify-content-center mt-4" id="formMsg" aria-live="polite"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+let msgTimer = null;
+
+function showFormMsg(text, type) {
+  const el = document.getElementById("formMsg");
+  if (!el) return;
+
+  // καθάρισε παλιό timer
+  if (msgTimer) clearTimeout(msgTimer);
+
+  el.classList.remove("success", "error");
+  el.classList.add(type);
+  el.textContent = text;
+  el.style.display = "block";
+
+  msgTimer = setTimeout(() => {
+    el.style.display = "none";
+    el.textContent = "";
+    el.classList.remove("success", "error");
+  }, 3000);
+}
+
+async function saveProfile() {
+  const form = document.getElementById("profileForm");
+  const btn = document.getElementById("saveBtn");
+  const formData = new FormData(form);
+
+  try {
+    if (btn) btn.disabled = true;
+
+    const res = await fetch("/umbraco/api/ProfileCustomer/SaveProfile", {
+      method: "POST",
+      credentials: "include",
+      body: formData
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (res.ok && data?.success) {
+      showFormMsg(data.message || "Οι αλλαγές αποθηκεύτηκαν με επιτυχία!", "success");
+    } else {
+      showFormMsg(data?.message || "Κάτι πήγε λάθος. Δοκιμάστε ξανά.", "error");
+    }
+
+  } catch (e) {
+    console.error(e);
+    showFormMsg("Σφάλμα σύνδεσης!", "error");
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+</script>
+
+
+

@@ -1082,10 +1082,6 @@ function resetDisplayCarsLayout() {
   document.documentElement.style.setProperty("overflow-y", "auto", "important");
 }
 
-// function storeCarId(event, carId) {
-//   sessionStorage.setItem("selectedCarId", carId);
-// }
-
 function setCookie(name, value, minutes) {
   const d = new Date();
   d.setTime(d.getTime() + minutes * 60 * 1000);
@@ -1093,18 +1089,3 @@ function setCookie(name, value, minutes) {
     value
   )}; Expires=${d.toUTCString()}; Path=/; SameSite=Lax; Secure`;
 }
-
-// function storeCarId(e, carId) {
-//   e.preventDefault();
-//   const id = String(carId).trim();
-
-//   sessionStorage.setItem("selectedCarId", id); // 1) session
-//   setCookie("selectedCarId", id, 30); // 2) cookie fallback
-
-//   // (optional) fallback state
-//   history.replaceState({ carId: id }, "", "/carDetails/");
-
-//   // ίδιο origin για σιγουριά
-//   window.location.href = location.origin + "/carDetails/";
-//   return false;
-// }

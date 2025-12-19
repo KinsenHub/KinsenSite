@@ -5,82 +5,29 @@
 	Layout = null;
 }
 
-@* 
-<footer class="custom-footer">
-  <div class="footer-container">
-    <div class="footer-left">
-      <h2><span class="logo-highlight"> <strong>KINSEN HELLAS</strong></h2>
-      <p style="color:#002e4d;">
-       Επενδύσεις με πυξίδα τη βιωσιμότητα, την πρόοδο και την υπεύθυνη επιχειρηματικότητα.
-      </p>
-      <div class="footer-socials">
-        <a href="#"><i class="fab fa-facebook-f"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-      </div>
-    </div>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
 
-    <div class="footer-columns">
-      <div class="footer-col">
-        <h4>Account</h4>
-        <ul>
-          <li><a href="#">Profile</a></li>
-          <li><a href="#">Settings</a></li>
-          <li><a href="#">Billing</a></li>
-          <li><a href="#">Notifications</a></li>
-        </ul>
-      </div>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap" rel="stylesheet">
 
-      <div class="footer-col">
-        <h4>About</h4>
-        <ul>
-          <li><a href="#">Services</a></li>
-          <li><a href="#">Pricing</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><a href="#">Careers</a></li>
-        </ul>
-      </div>
+    <link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600&display=swap" rel="stylesheet">
 
-      <div class="footer-col">
-        <h4>Company</h4>
-        <ul>
-          <li><a href="#">Community</a></li>
-          <li><a href="#">Help center</a></li>
-          <li><a href="#">Support</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
+    @* <link rel="stylesheet" href="~/css/style.css"> *@
 
-  <div class="footer-bottom">
-    <span>© 2025 All Right Reserved by Kinsen</span>
-    <div class="footer-links">
-      <a href="#">Terms</a>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Cookies</a>
-    </div>
-  </div>
-</footer> 
-*@
+    <!-- Bootstrap CSS -->
+    @* <link rel="stylesheet" href="~/css/bootstrap.min.css"> *@
 
-<footer class="text-center text-lg-start bg-body-tertiary text-muted" style="background-color:#fff !important;">
+@* <footer class="text-center text-lg-start bg-body-tertiary text-muted" style="background-color:#fff !important;">
   <!-- Section: Social media -->
   <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom" style="background-color:#39c0c3 !important;">
-    <!-- Left -->
-    <div class="me-5 d-none d-lg-block" >
+    <div class="me-5 d-none d-lg-block">
       <span style="color:white; font-weight:600;">Βρείτε μας στα Social:</span>
     </div>
-    <!-- Left -->
 
-    <!-- Right -->
     <div>
       <a href="https://www.facebook.com/KinsenGR/?locale=el_GR" class="me-4 text-reset">
         <i class="fab fa-facebook-f" style="color:white;"></i>
       </a>
-      @* <a href="" class="me-4 text-reset">
-        <i class="fab fa-twitter" style="color:white;"></i>
-      </a> *@
       <a href="https://kinsen.gr/" class="me-4 text-reset">
         <i class="fab fa-google" style="color:white;"></i>
       </a>
@@ -91,24 +38,20 @@
         <i class="fab fa-linkedin" style="color:white;"></i>
       </a>
     </div>
-    <!-- Right -->
   </section>
-  <!-- Section: Social media -->
 
   <!-- Section: Links  -->
-  <section class="">
-    <div class="container text-center text-md-start mt-5">
-      <!-- Grid row -->
-      <div class="row mt-3">
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-          <!-- Content -->
+  <section class="footer-links">
+    <!-- ΙΔΙΟ container με τις 3 κάρτες: container px-4 px-lg-5 -->
+    <div class="container px-4 px-lg-5 mt-5">
+      <div class="row gx-5">
+        <!-- Στήλη 1 (όπως 1η κάρτα) -->
+        <div class="col-md-4 mb-4">
           <h6 class="text-uppercase fw-bold mb-4">
-          <img src="~/media/brandlogo.png" width="150" height="50" style="object-fit:contain;"/>
-          @* <span style="color: #023859;">Όμιλος Σαρακάκη</span> *@
+            <img src="~/media/brandlogo.png" width="150" height="50" style="object-fit:contain;" />
           </h6>
-          <p style="line-height: 2.2rem; text-align: left;">
-            Ο Όμιλος Σαρακάκη διαθέτει σύγχρονο στόλο οχημάτων για leasing, με πλήρη τεχνική υποστήριξη και διαφανές κόστος. 
+          <p class="footer-about-text">
+            Η Kinsen διαθέτει σύγχρονο στόλο οχημάτων για leasing, με πλήρη τεχνική υποστήριξη και διαφανές κόστος. 
             Μετά τη λήξη της μίσθωσης, τα αυτοκίνητα διατίθενται προς πώληση με πιστοποιημένο ιστορικό συντήρησης—ώστε να 
             αποκτάτε αξιόπιστα οχήματα με πραγματική αξία. <br />
             <a href="/πωλήσεις-μεταχειρισμένων"
@@ -118,47 +61,45 @@
             </a>
           </p>
         </div>
-        <!-- Grid column -->
 
-        <!-- Grid column -->
-        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4">
+        <!-- Στήλη 2 (Επιχειρήσεις + Leasing) -->
+        <div class="col-md-4 mb-4 text-md-center">
+          <h6 class="text-uppercase fw-bold mb-5" style="color: #023859;">
             Επιχειρήσεις
           </h6>
-          <a href="https://kinsen.gr">
-            <img src="~/media/brandlogo.png" width="100" height="80" style="object-fit:contain;" alt="Kinsen Logo">
-          </a> <br />
-          <a href="https://europcarlease.gr/">
-            <img src="~/media/europcar.png" width="100" height="80" style="object-fit:contain;"/>
-          </a> <br />
-          <a href="https://www.goldcar.com/el-gr/">
-            <img src="~/media/goldcar.png" width="100" height="80" style="object-fit:contain;"/>
-          </a>
-        </div>
-        <!-- Grid column -->
+          <div class="mb-3">
+            <a href="https://kinsen.gr">
+              <img src="~/media/brandlogo.png" width="100" height="80" style="object-fit:contain;" alt="Kinsen Logo">
+            </a>
+          </div>
+          <div class="mb-3">
+            <a href="https://europcarlease.gr/">
+              <img src="~/media/europcar.png" width="100" height="80" style="object-fit:contain;" />
+            </a>
+          </div>
+          <div class="mb-4">
+            <a href="https://www.goldcar.com/el-gr/">
+              <img src="~/media/goldcar.png" width="100" height="80" style="object-fit:contain;" />
+            </a>
+          </div>
 
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4">
-          Leasing
+          <h6 class="text-uppercase fw-bold mb-3">
+            Leasing
           </h6>
-          <a href="https://saracakisleasing.gr/">
-            <img src="~/media/sarakakisleasing1.png" width="150" height="140" style="object-fit:contain;"/>
-          </a> <br />
-          <a href="https://europcarflex.gr/">
-            <img src="~/media/flex.png" width="100" height="70" style="object-fit:contain; margin-right:20px;"/>
-          </a><br />
-          <li class="mb-3 invisible">
-              <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" height="70" alt="">
-            </li>
+          <div class="mb-3">
+            <a href="https://saracakisleasing.gr/">
+              <img src="~/media/sarakakisleasing1.png" width="150" height="140" style="object-fit:contain;" />
+            </a>
+          </div>
+          <div>
+            <a href="https://europcarflex.gr/">
+              <img src="~/media/flex.png" width="100" height="70" style="object-fit:contain;" />
+            </a>
+          </div>
         </div>
-        <!-- Grid column -->
 
-        <!-- Grid column -->
-        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-5">
-          <!-- Links -->
+        <!-- Στήλη 3 (Επικοινωνία, όπως 3η κάρτα) -->
+        <div class="col-md-4 mb-4">
           <h6 class="text-uppercase fw-bold mb-5" style="color: #023859;">Επικοινωνία</h6>
           <p><i class="fas fa-home me-3" style="color: #023859;"></i> Λεωφόρος Αθηνών 71 Τ.Κ. 104 47, Αθήνα </p>
           <p>
@@ -167,17 +108,114 @@
           </p>
           <p><i class="fas fa-phone me-3" style="color: #023859;"></i>21 0349 7860</p>
         </div>
-        <!-- Grid column -->
       </div>
-      <!-- Grid row -->
     </div>
   </section>
-  <!-- Section: Links  -->
 
-  <!-- Copyright -->
   <div class="text-center p-4">
     © 2025 Copyright:
     <a class="text-reset fw-bold" style="color: #023859;">KINSEN HELLAS</a>
   </div>
-  <!-- Copyright -->
+</footer> *@
+
+<footer class="footer-59391">
+  <div class="footer-59391-container">
+    <!-- 1η σειρά: logo + social -->
+    <div class="row mb-5">
+      <div class="col-md-4">
+        <div class="site-logo">
+          @* <img src="~/media/brandlogo.png" width="200" height="50" style="object-fit:contain;" /> *@
+        </div>
+      </div>
+      <div class="col-md-8 text-md-right">
+        <ul class="list-unstyled social-icons">
+          <li>
+            <a href="https://www.facebook.com/KinsenGR/?locale=el_GR" class="me-4 text-reset">
+              <i class="fab fa-facebook-f" style="color: #023859;"></i>
+            </a>
+          </li>
+          <li>
+            <a href="https://kinsen.gr/" class="me-4 text-reset">
+              <i class="fab fa-google" style="color: #023859;"></i>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.instagram.com/kinsen_hellas/" class="me-4 text-reset">
+              <i class="fab fa-instagram" style="color: #023859;"></i>
+            </a>
+          </li>
+          <li>
+            <a href="https://gr.linkedin.com/company/kinsen" class="me-4 text-reset">
+              <i class="fab fa-linkedin" style="color: #023859;"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2η σειρά: μόνο Επικοινωνία -->
+    @* <div class="row mb-4">
+      <div class="col-md-6 offset-md-6 text-md-right">
+        <h6 class="text-uppercase fw-bold mb-4" style="color: #023859;">Επικοινωνία</h6>
+        <p><i class="fas fa-home me-3" style="color: #023859;"></i> Λεωφόρος Αθηνών 71 Τ.Κ. 104 47, Αθήνα </p>
+        <p>
+          <i class="fas fa-envelope me-3" style="color: #023859;"></i>
+          info@kinsen.gr
+        </p>
+        <p><i class="fas fa-phone me-3" style="color: #023859;"></i>21 0349 7860</p>
+      </div>
+    </div> *@
+
+    <!-- 3η σειρά: LOGOS ΚΑΤΩ ΚΑΤΩ, σε μία γραμμή, πάνω από copyright -->
+    <div class="row logos-row">
+      <div class="row-12">
+        <ul class="nav-links list-unstyled brand-logos">
+          <li>
+            <a href="https://kinsen.gr">
+              <img src="~/media/brandlogo.png" width="100" height="80" style="object-fit:contain;" alt="Kinsen Logo">
+            </a>
+          </li>
+          <li>
+            <a href="https://europcarlease.gr/">
+              <img src="~/media/europcar.png" width="100" height="80" style="object-fit:contain;" />
+            </a>
+          </li>
+          <li>
+            <a href="https://www.goldcar.com/el-gr/">
+              <img src="~/media/goldcar.png" width="100" height="80" style="object-fit:contain;" />
+            </a>
+          </li>
+          <li>
+            <a href="https://saracakisleasing.gr/">
+              <img src="~/media/sarakakisleasing1.png" width="150" height="140" style="object-fit:contain;" />
+            </a>
+          </li>
+          <li>
+            <a href="https://europcarflex.gr/">
+              <img src="~/media/flex.png" width="100" height="70" style="object-fit:contain;" />
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 4η σειρά: COPYRIGHT ΚΑΤΩ ΑΠΟ ΤΑ LOGOS -->
+    <div class="row">
+      <div class="col">
+        <div class="copyright">
+          <p><small>Copyright <span id="year"></span>. All Rights Reserved.</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
 </footer>
+
+@* <script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script> *@
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+
+

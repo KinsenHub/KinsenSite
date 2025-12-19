@@ -1,0 +1,24 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="login-wrapper">
+	<div class="login-box">
+		@* <img src="~/media/kinsenLogo.png" alt="Kinsen Logo" class="login-logo" /> *@
+		<p class="forgetPass-title">Συμπληρώστε το email σας <br> για να ανακτήσουμε τον κωδικό σας:</p>
+
+		<div class="loginForm">
+
+			<div class="mb-3">
+				<label for="email" class="form-label">Email</label>
+				<input type="email" id="email" autocomplete="username" class="form-control" required />
+			</div>
+			<button type="button" class="btn btn-primary" id="sendButton" onclick="sendCode()">Αποστολή κωδικού</button>
+			<p id="statusMsg" class="status-msg"></p>
+		</div>
+	</div>
+</div>
+
+<script src="~/js/getCode.js" defer></script>

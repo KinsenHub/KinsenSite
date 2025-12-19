@@ -55,10 +55,10 @@
     <!-- Menu -->
     <div id="nxMenu" class="nx-menu">
       <a href="/" class="nx-brand" aria-label="Αρχική">
-        <img src="~/media/brandlogo.png" alt="Kinsen Hellas Logo" class="navbar-logoInner" style="display:none;"/>
+        <img src="~/media/kinsen_vertical.png" alt="Kinsen Hellas Logo" class="navbar-logoInner" style="display:none;"/>
       </a>
       <ul class="nx-left">
-        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq"))
+        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq" && x.Name() != "userSettings" && x.Name() != "getcode" && x.Name() != "forgotPassword"))
         {
           var menuTitle = item.Value("menuTitle") as string ?? item.Name();
           <li class="nx-li">
@@ -107,12 +107,13 @@
                 aria-haspopup="true"
                 aria-expanded="false"
                 aria-controls="accountMenu">
-                <i class="fa-solid fa-user"></i>&nbsp;@displayName
+                <i class="fa-solid fa-user"></i>&nbsp;&nbsp;@displayName
                 <span class="kx-caret" aria-hidden="true"></span>
               </button>
 
               <ul id="accountMenu" class="kx-menu" role="menu" aria-labelledby="accountBtn">
-                <li role="none"><a role="menuitem" class="kx-menu-item kx-danger" href="#" id="logoutBtn">Αποσύνδεση</a></li>
+                <li role="none"><a role="menuitem" class="kx-menu-item kx-primary" href="/usersettings/" id="settingsBtn"><i class="fa-solid fa-user"></i>&nbsp;Ρυθμίσεις Προφίλ</a></li>
+                <li role="none"><a role="menuitem" class="kx-menu-item kx-danger" href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i>&nbsp;Αποσύνδεση</a></li>
               </ul>
             </div>
           </li>

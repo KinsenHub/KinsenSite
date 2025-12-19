@@ -1,0 +1,313 @@
+.hero-blur-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 95%; /* <– αφήνουμε κενό δεξιά-αριστερά για να φανούν οι γωνίες */
+  margin: 2rem auto 2rem; /* κέντρο στη σελίδα */
+  height: 70vh;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.hero-blur-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* filter: blur(4px); */
+  transform: scale(1.05);
+  border-radius: 12px;
+}
+
+.form-overlay {
+  position: absolute;
+  top: 50%;
+  margin: 0 auto;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  max-width: 900px;
+}
+
+.form-container {
+  background: rgba(255, 255, 255, 0.503);
+  backdrop-filter: blur(6px);
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.form-container h4 {
+  margin: 0;
+  margin-bottom: 4px;
+}
+
+.form-container small {
+  margin-bottom: 16px;
+  display: block;
+  color: #000000db;
+}
+
+.bg-secondary-soft {
+  background-color: rgba(208, 212, 217, 0.21) !important;
+}
+.rounded {
+  border-radius: 5px !important;
+}
+.py-5 {
+  padding-top: 3rem !important;
+  padding-bottom: 3rem !important;
+}
+.px-4 {
+  padding-right: 1.5rem !important;
+  padding-left: 1.5rem !important;
+}
+.file-upload .square {
+  height: 250px;
+  width: 250px;
+  margin: auto;
+  vertical-align: middle;
+  border: 1px solid #e5dfe4;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.text-secondary {
+  --bs-text-opacity: 1;
+  color: rgba(208, 212, 217, 0.5) !important;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #29292e;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #e5dfe4;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 5px;
+  -webkit-transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    -webkit-box-shadow 0.15s ease-in-out;
+}
+
+.forestImg {
+  background-attachment: fixed;
+  background-size: 100% 100%;
+}
+
+.saveBtn {
+  transition: transform 0.18s ease, background-color 0.18s ease,
+    box-shadow 0.18s ease, filter 0.18s ease;
+  will-change: transform;
+}
+
+.saveBtn:hover {
+  /* background-color: #39c1c3b0 !important; */
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+  filter: brightness(1.05);
+}
+
+.saveBtn:active {
+  transform: translateY(-1px) scale(0.99); /* “πάτημα” */
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.form-message {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.form-message.success {
+  background: #d1e7dd;
+  color: #0f5132;
+  font-weight: 400;
+}
+
+.form-message.error {
+  background: #f8d7da;
+  color: #842029;
+  font-weight: 400;
+}
+
+@media (max-width: 575px) {
+  .hero-blur-wrapper {
+    height: auto;
+    min-height: unset;
+    padding: 1rem 0;
+    margin: 1rem auto;
+  }
+
+  .form-overlay {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    padding: 3rem;
+    margin: 0 auto;
+  }
+
+  /* 4️⃣ Η φόρμα παίρνει ΟΣΟ ΥΨΟΣ ΧΡΕΙΑΖΕΤΑΙ */
+  .form-container {
+    padding: 50px;
+    border-radius: 12px;
+  }
+
+  /* 5️⃣ Καλύτερη αναπνοή inputs */
+  .form-control {
+    font-size: 1rem;
+    padding: 0.6rem 0.9rem;
+  }
+
+  /* 6️⃣ Κουμπί full width */
+  .saveBtn {
+    width: 100%;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .hero-blur-wrapper {
+    height: auto;
+    min-height: unset;
+    padding: 3rem 0;
+    margin: 1rem auto;
+  }
+
+  .form-overlay {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    padding: 2rem 3rem;
+    margin: 0 auto;
+  }
+
+  .form-container {
+    padding: 50px;
+    border-radius: 12px;
+  }
+
+  .form-message {
+    padding: 10px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: center;
+    margin: 12px 60px;
+  }
+}
+
+@media (min-width: 992px) {
+  .hero-blur-wrapper {
+    height: auto;
+    min-height: unset;
+    padding: 3rem 0;
+    margin: 1rem auto;
+  }
+
+  .form-overlay {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    padding: 5rem;
+    margin: 0 auto;
+  }
+
+  .form-container {
+    padding: 40px;
+    border-radius: 12px;
+  }
+
+  .form-message {
+    padding: 10px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: center;
+    margin: 12px 130px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero-blur-wrapper {
+    height: auto;
+    min-height: unset;
+    padding: 6rem 0;
+    margin: 1rem auto;
+  }
+
+  .form-overlay {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    padding: 5rem 0;
+    margin: 0 auto;
+  }
+
+  .form-container {
+    padding: 40px;
+    border-radius: 12px;
+  }
+
+  .form-message {
+    padding: 10px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: center;
+    margin: 12px 200px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .hero-blur-wrapper {
+    height: auto;
+    min-height: unset;
+    padding: 6rem 0;
+    margin: 1rem auto;
+  }
+
+  .form-overlay {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    padding: 5rem 0;
+    margin: 0 auto;
+  }
+
+  .form-container {
+    padding: 40px;
+    border-radius: 12px;
+  }
+
+  .form-message {
+    padding: 10px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: center;
+    margin: 12px 180px;
+  }
+}

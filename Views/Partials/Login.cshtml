@@ -28,25 +28,28 @@
                 @* <img src="~/media/kinsenLogo.png" alt="Kinsen Logo" class="login-logo" /> *@
                 <h2 class="login-title">Είσοδος Συνεργάτη</h2>
 
-            <div class="loginForm">
+                <div class="loginForm">
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" class="form-control" required />
+                        <input type="email" id="email" autocomplete="username" class="form-control" required />
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Κωδικός</label>
-                        <input type="password" id="password" class="form-control" required />
+                        <input type="password" id="password" name="password" autocomplete="current-password" class="form-control" required />
                     </div>
 
-                    <div class="mb-3 form-check">
+                    <div class="mb-3 form-check" style="display:none;">
                         <input type="checkbox" id="rememberMe" class="form-check-input">
-                        <label class="form-check-label" for="exampleCheck1">&nbsp; Να με θυμάσαι</label>
+                        <label class="form-check-label" for="rememberMe">&nbsp; Να με θυμάσαι</label>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Σύνδεση</button>
                     <p id="loginMessage" class="mt-2"></p>
+                </div>
+                 <div class="mt-3 text-center">
+                    <a href="/getcode" class="forgot-link" style="color:#007c91;">Ξέχασα τον κωδικό μου</a>
                 </div>
             </div>
         </div>
@@ -80,14 +83,15 @@
                     const response = await fetch("@Url.Content("~/umbraco/api/member/login")", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email, password })
+                        body: JSON.stringify({ email, password, rememberMe })
                     });
 
                     const data = await response.json();
 
                     if (data.success) {
-                        loginMessage.style.color = "green";
-                        loginMessage.textContent = "Συνδεθήκατε επιτυχώς!";
+                        @* loginMessage.style.color = "green";
+                        loginMessage.textContent = "Συνδεθήκατε επιτυχώς!"; *@
+                        showLoginMessage("Συνδεθήκατε επιτυχώς!", "green", 3000);
                         localStorage.setItem("loggedInEmail", email);
                         localStorage.setItem("loggedInGroup", data.group);
                         setTimeout(() => {
@@ -95,13 +99,15 @@
                         }, 1000);
                         localStorage.clear();
                     } else {
-                        loginMessage.style.color = "red";
-                        loginMessage.textContent = data.message || "Λάθος στοιχεία.";
+                        @* loginMessage.style.color = "red";
+                        loginMessage.textContent = data.message || "Λάθος στοιχεία."; *@
+                        showLoginMessage(data.message || "Λάθος στοιχεία.", "red", 3000);
                     }
 
                 } catch (error) {
-                    loginMessage.style.color = "red";
-                    loginMessage.textContent = "Σφάλμα κατά τη σύνδεση.";
+                    @* loginMessage.style.color = "red";
+                    loginMessage.textContent = "Σφάλμα κατά τη σύνδεση."; *@
+                    showLoginMessage("Σφάλμα κατά τη σύνδεση.", "red", 3000);
                     console.error("Login Error", error);
                 }
             });
@@ -110,4 +116,20 @@
             console.log("Δεν πραγματοποιήθηκε το Login");
         }
     });
+
+    function showLoginMessage(text, color = "red", timeout = 3000) {
+        const loginMessage = document.getElementById("loginMessage");
+
+        if (!loginMessage) return;
+
+        loginMessage.style.color = color;
+        loginMessage.textContent = text;
+        loginMessage.style.display = "block";
+
+        // ⏱️ εξαφάνιση μετά από 3"
+        setTimeout(() => {
+            loginMessage.textContent = "";
+            loginMessage.style.display = "none";
+        }, timeout);
+    }
 </script>

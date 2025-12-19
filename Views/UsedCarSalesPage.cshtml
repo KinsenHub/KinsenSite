@@ -1,4 +1,3 @@
-﻿﻿
 ﻿﻿@using Umbraco.Cms.Core.Models.Blocks;
 @using Umbraco.Cms.Core.Models;
 @using Umbraco.Cms.Web.Common
@@ -195,7 +194,7 @@
     // Κατάσταση χρήστη
     var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
 
-	// Έλεγχος εαν ανήκει στο GroupAdmins που αφορ΄ά το κουμπί Import/Export !!
+	// Έλεγχος εαν ανήκει στο GroupAdmins που αφορά το κουμπί Import/Export !!
 	var isAdminMember = false;
 
     if (User?.Identity?.IsAuthenticated ?? false)
@@ -894,7 +893,7 @@
 })();
 </script>
 
-@* Αφορ΄ά το Export: *@
+@* Αφορά το Export: *@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const exportBtn = document.getElementById("btnExportCars");

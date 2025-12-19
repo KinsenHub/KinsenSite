@@ -145,7 +145,7 @@ nav.navbar {
 
 .kx-menu {
   position: absolute;
-  top: calc(100% + 14px);
+  top: calc(100% + 12px);
   right: 0;
   background: #fff;
   border-radius: 20px;
@@ -171,6 +171,17 @@ nav.navbar {
   justify-content: center;
   padding: 10px 20px !important;
   gap: 0 !important;
+}
+
+/* Αφορά το DropDown menu */
+#accountMenu .kx-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  width: 100%;
+  gap: 8px;
+  font-size: 15px;
 }
 
 .kx-menu-item:hover {
@@ -319,6 +330,14 @@ nav.navbar {
     opacity: 1;
     transform: translateX(0%) scaleX(1) !important;
   }
+
+  .nx-menu {
+    font-size: 15px;
+  }
+
+  li.nx-li {
+    margin-bottom: 13px;
+  }
 }
 
 @media (min-width: 577px) and (max-width: 991px) {
@@ -362,9 +381,27 @@ nav.navbar {
     opacity: 1;
     transform: translateX(0%) scaleX(1) !important;
   }
+
+  .nx-menu {
+    font-size: 16px;
+  }
+
+  li.nx-li {
+    margin-bottom: 10px;
+  }
 }
 
-@media (max-width: 1200px) {
+@media (min-width: 992px) {
+  .nx-menu {
+    font-size: 18px;
+  }
+
+  li.nx-li {
+    margin-bottom: 13px;
+  }
+}
+
+@media (max-width: 1400px) {
   .navbar-logo {
     height: 36px;
     width: auto;
@@ -384,10 +421,10 @@ nav.navbar {
 
   .navbar-logoInner {
     display: block !important;
-    height: 30px !important;
-    width: auto;
+    height: 10rem;
+    width: 10rem;
     object-fit: contain;
-    margin: 1rem auto;
+    /* margin: 1rem auto; */
   }
 
   /* Home μόνο: διάφανο πάνω στο hero */
@@ -531,7 +568,7 @@ nav.navbar {
 }
 
 /* ============ >=1400px: desktop, STICKY ============ */
-@media (min-width: 1201px) {
+@media (min-width: 1401px) {
   .navbar-logo {
     height: 40px !important;
     width: auto !important;

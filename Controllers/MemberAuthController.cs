@@ -47,7 +47,7 @@ namespace KinsenOfficial.Controllers
 
             // Αν όλα είναι ΟΚ, κάνει sign in το χρήστη
             // false: αμα κλεισει ο browser, αποσυνδέει τον χρήστη
-            await _memberSignInManager.SignInAsync(member, false);
+            await _memberSignInManager.SignInAsync(member, request.RememberMe);
 
             // Παίρνει τον τρέχον χρήστη και επιστρέφει το group/ρόλο του
             var currentMember = await _memberManager.GetCurrentMemberAsync();
@@ -82,6 +82,7 @@ namespace KinsenOfficial.Controllers
         {
             public string Email { get; set; }
             public string Password { get; set; }
+            public bool RememberMe { get; set; }
         }
     }
 }
