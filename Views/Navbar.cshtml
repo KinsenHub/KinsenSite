@@ -61,11 +61,12 @@
         @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq" && x.Name() != "userSettings" && x.Name() != "getcode" && x.Name() != "forgotPassword"))
         {
           var menuTitle = item.Value("menuTitle") as string ?? item.Name();
+          var iconClass = item.Value<string>("menuIcon");
           <li class="nx-li">
               <a class="nx-link"
                 href="@item.Url()"
                 data-node="@item.Id">
-                  @menuTitle
+                <i class="@iconClass nav-icon"></i>  @menuTitle
               </a>
           </li>
         }
@@ -75,7 +76,7 @@
           <div class="kx-dropdown">
             <button id="companyDropdown" type="button" class="kx-link"
                     aria-haspopup="true" aria-expanded="false" aria-controls="companyMenu">
-              Η Εταιρεία μας <span class="kx-caret" aria-hidden="true"></span>
+              <i class="fa-solid fa-building"></i> Η Εταιρεία μας <span class="kx-caret" aria-hidden="true"></span>
             </button>
             <ul id="companyMenu" class="kx-menu" role="menu" aria-labelledby="companyDropdown">
               <li role="none"><a role="menuitem" class="kx-menu-item" href="/faq">FAQ</a></li>
@@ -83,8 +84,8 @@
           </div>
         </li>
       
-
-      @* <ul class="nx-right"> *@
+      
+      @* <div class="nx-right"> *@
         @if (isLoggedIn && isCustomer)
         {
 
@@ -93,7 +94,7 @@
                         class="btn btn-outline-secondary position-relative"
                         type="button"
                         title="Καλάθι προσφοράς">
-                    <i class="fa-solid fa-cart-shopping"></i>
+                    <i class="fa-solid fa-cart-shopping" style="color:#023859;"></i>
                     <span id="offerCartCount"
                           class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
                 </button>
@@ -126,9 +127,10 @@
             </a>
           </li>
         }
-      @* </ul> *@
-      </ul>
+      @* </div> *@
+      
     </div>
+    </ul>
   </div>
 
   <!-- overlay όταν ανοίγει το burger -->

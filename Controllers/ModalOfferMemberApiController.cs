@@ -38,21 +38,69 @@ public class ModalOfferMemberApiController : UmbracoApiController
     }
 
     // Helper για Base64 εικόνα
-    private async Task<string> ToBase64ImgTag(string url, string alt, int maxWidth = 300)
+    private async Task<string> BuildCarImageTag(string imageUrl, string alt, int maxWidth = 300)
     {
-        try
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            return "";
+
+        // ABSOLUTE URL
+        var carUrl = Uri.IsWellFormedUriString(imageUrl, UriKind.Absolute)
+            ? imageUrl
+            : $"{Request.Scheme}://{Request.Host}{imageUrl}";
+
+        bool isLocal = string.Equals(Request.Host.Host, "localhost", StringComparison.OrdinalIgnoreCase);
+
+        if (isLocal)
         {
-            using var http = new HttpClient();
-            var bytes = await http.GetByteArrayAsync(url);
-            var base64 = Convert.ToBase64String(bytes);
-            return $"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"{alt}\" " +
-                  $"style=\"display:block;width:100%;max-width:{maxWidth}px;height:auto;margin:0 auto;border:0;outline:none;\" />";
+            string relative = carUrl;
+            if (Uri.TryCreate(carUrl, UriKind.Absolute, out var abs))
+                relative = abs.LocalPath;
+
+            string localPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                relative.TrimStart('/').Replace('/', Path.DirectorySeparatorChar)
+            );
+
+            byte[]? bytes = null;
+
+            try
+            {
+                if (System.IO.File.Exists(localPath))
+                {
+                    bytes = await System.IO.File.ReadAllBytesAsync(localPath);
+                }
+                else
+                {
+                    using var http = new HttpClient();
+                    bytes = await http.GetByteArrayAsync(carUrl);
+                }
+            }
+            catch { }
+
+            if (bytes != null && bytes.Length > 0)
+            {
+                string ext = Path.GetExtension(relative).ToLowerInvariant();
+                string mime = ext switch
+                {
+                    ".png" => "image/png",
+                    ".gif" => "image/gif",
+                    ".webp" => "image/webp",
+                    ".jpg" or ".jpeg" => "image/jpeg",
+                    _ => "image/jpeg"
+                };
+
+                var b64 = Convert.ToBase64String(bytes);
+                return
+                    $"<img src='data:{mime};base64,{b64}' alt='{alt}' " +
+                    $"style='display:block;width:100%;max-width:{maxWidth}px;height:auto;border:0;outline:none;text-decoration:none;' />";
+            }
         }
-        catch
-        {
-            // fallback αν αποτύχει
-            return $"<img src=\"{url}\" alt=\"{alt}\" style=\"display:block;width:100%;max-width:{maxWidth}px;height:auto;margin:0 auto;border:0;outline:none;\" />";
-        }
+
+        // PRODUCTION ή fallback
+        return
+            $"<img src='{carUrl}' alt='{alt}' " +
+            $"style='display:block;width:100%;max-width:{maxWidth}px;height:auto;border:0;outline:none;text-decoration:none;' />";
     }
 
     [HttpPost("send")]
@@ -63,7 +111,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
 
         // === LOGO Kinsen ===
         const string logoUrl = "https://production-job-board-public.s3.amazonaws.com/logos/43021810-0cfb-466e-b00c-46c05fd4b394";
-        var logoTag = await ToBase64ImgTag(logoUrl, "Kinsen", 250);
+        var logoTag = await BuildCarImageTag(logoUrl, "Kinsen", 250);
 
         // === Κάρτες αυτοκινήτων ===
         var carCardsHtml = string.Join("", await Task.WhenAll(request.Cars.Select(async c => $@"
@@ -72,8 +120,8 @@ public class ModalOfferMemberApiController : UmbracoApiController
                         border-radius:10px;overflow:hidden;background:#ffffff;'>
             <tr>
               <!-- Εικόνα αριστερά -->
-              <td width='240' align='center' style='padding:10px;background:#f9f9f9;height:180px;'>
-                {await ToBase64ImgTag(c.Img, $"{c.Maker} {c.Model}", 220)}
+              <td width='240' align='center' style='height:180px;'>
+                {await BuildCarImageTag(c.Img, $"{c.Maker} {c.Model}", 220)}
               </td>
 
               <!-- Στοιχεία δεξιά -->
@@ -82,7 +130,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
                 <div style='font-size:13px;color:#555;margin-bottom:8px;'>
                   • {(c.Year.HasValue ? c.Year.Value.ToString() : "-")} <br> • {(c.Km.HasValue ? c.Km.Value + " km" : "-")} <br> • {c.Fuel}
                 </div>
-                <div style='font-size:16px;font-weight:600;color:#007c91;margin-bottom:8px;'>{c.PriceText} €</div>
+                <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{c.PriceText} €</div>
               </td>
             </tr>
           </table>
@@ -127,7 +175,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
           <tr>
             <td align='center' style='padding:20px;color:#000000;
                                       font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.6;'>
-              <div style='margin-bottom:6px; font-size:15px;'><b>Kinsen</b></div>
+              <div style='margin-bottom:6px; font-size:15px; color:#023859;'><b>Kinsen</b></div>
               <div style='margin-bottom:6px;'>{companyAddress}</div>
               <div style='margin-bottom:6px;'>📞 {companyPhone}</div>
               <div style='margin-bottom:6px;'>✉️ <a href='mailto:{companyEmail}' style='color:#000000;text-decoration:none;'>{companyEmail}</a></div>
@@ -154,7 +202,20 @@ public class ModalOfferMemberApiController : UmbracoApiController
             // ==**************= Email προς Kinsen =*********************==
             var subject = $"Αίτημα Προσφοράς: {request.FirstName} {request.LastName}";
             var body = $@"
-              <h2>Νέο αίτημα προσφοράς</h2>
+              <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'>
+                <tr>
+                  <td align='left'>
+                    <table role='presentation' border='0' cellspacing='0' cellpadding='0'>
+                      <tr>
+                        <td align='left' style='padding:10px;'>
+                          {logoTag}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <h2 style='color:#39c0c3;'>Νέο αίτημα προσφοράς</h2>
               <p><strong>Πελάτης:</strong> {request.FirstName} {request.LastName}</p>
               <p><strong>Email:</strong> {request.Email}</p>
               <p><strong>Τηλέφωνο:</strong> {request.Phone}</p>

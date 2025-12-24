@@ -17,12 +17,6 @@
   max-height: 650px;
   image-rendering: -webkit-optimize-contrast;
 }
-/* .cart-item .car-img {
-  width: 200px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 12px;
-} */
 
 /* Κάρτα */
 .cart-card {
@@ -95,6 +89,28 @@
   font-size: 18px;
 }
 
+.cartMsg {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.cartMsg.warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  font-size: 17px;
+}
+
+.cartMsg.success {
+  background: #e6f4ea;
+  color: #1e4620;
+  border: 1px solid #cce8d5;
+  font-size: 17px;
+}
+
 @media (max-width: 575px) {
   .custom-carousel .carousel-item img {
     width: 80% !important;
@@ -125,7 +141,7 @@
     background-color: #007c91 !important;
     color: white;
     padding: 1rem;
-    font-size: 0.8rem;
+    font-size: 1.1rem !important;
     border: none;
     border-radius: 1rem;
     font-weight: 600;
@@ -202,16 +218,6 @@
 }
 
 @media (min-width: 992px) {
-  /* section.car-specs-section {
-    width: 100% !important;
-    max-width: 95% !important;
-    margin: 20px auto 40px auto !important;
-    padding: 5px 0 20px 10px !important;
-    box-sizing: border-box !important;
-    overflow-x: hidden !important; 
-    display: block !important;
-  } */
-
   /* Τίτλος */
   section.car-specs-section > p {
     margin: 10px 0 20px 0;

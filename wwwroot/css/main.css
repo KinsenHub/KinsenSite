@@ -9,7 +9,6 @@ body {
 .layout-wrapper {
   display: flex;
   flex-direction: column;
-  /* min-height: 100vh; */
 }
 
 .main-content {
@@ -17,7 +16,6 @@ body {
 }
 
 .hero-wrapper {
-  /* position: relative; */
   width: 100%;
   height: 80vh;
   overflow: hidden;
@@ -116,6 +114,29 @@ body {
   flex-wrap: wrap;
 }
 
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #001858;
+}
+
+.stat-label {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.stats-paragr {
+  max-width: 70%;
+  margin: 50px auto; /* auto για να μπει στο κέντρο */
+  color: #001858;
+  font-family: "Open Sans", sans-serif;
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 1.8;
+  text-align: center;
+}
+
 .stat-box {
   text-align: center;
 }
@@ -125,11 +146,10 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 3rem;
+  gap: 1rem;
   margin: 0 auto;
   margin-bottom: 100px;
   max-width: 1400px;
-  padding: 1 1rem;
 }
 
 .featureTitle {
@@ -153,7 +173,6 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  /* box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1); */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   padding: 1.5rem;
 }
@@ -180,16 +199,17 @@ body {
   transition: transform 0.3s ease;
 }
 
-.feature-description p {
-  margin: 0;
-  font-weight: 500;
+.feature-description {
   color: #023859;
   text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  /* box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); */
 }
 
 .feature-card-link {
@@ -198,93 +218,185 @@ body {
 }
 
 .feature-card-link:hover .feature-card {
-  box-shadow: 0 0 15px rgba(0, 100, 200, 0.2);
-  transform: scale(1.03);
+  /* box-shadow: 0 0 15px rgba(0, 100, 200, 0.2); */
+  transform: scale(1.08);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 /*----------Καρουζέλ-----------*/
-.carousel-inner {
-  padding: 40px 0;
-  background: transparent !important;
+.prosfores {
+  text-align: center;
+  color: #39c0c3;
+  font-weight: 400;
+  margin: 30px;
+  font-size: 1.4rem;
+  text-shadow: 0 0 12px rgba(46, 196, 199, 0.25) !important;
 }
 
-#carouselExampleDark {
-  margin: 10px 30px;
-}
-
-.custom-carousel {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.car-card {
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 10px 0 !important;
-  margin: 20px auto !important;
-  max-width: 600px;
-  min-height: auto !important;
-  border-radius: 0 !important;
-}
-
-.car-card img {
+/* OUTER VIEWPORT */
+.tesla-carousel {
   width: 100%;
-  max-height: 350px;
-  object-fit: contain;
-  margin-bottom: 18px;
+  overflow: hidden;
+  padding: 40px 0;
 }
 
-.car-card h3 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin: 12px 0 6px;
-  color: #001858;
+/* HORIZONTAL TRACK */
+.tesla-track {
+  display: flex;
+  gap: 28px;
+  /* padding-left: 60px; */
+  transition: transform 0.6s ease;
 }
 
-.car-card p {
-  font-size: 1.2rem;
-  margin: 4px 0;
-  color: #333;
+/* CARD */
+.tesla-card {
+  flex: 0 0 620px;
+  height: 380px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
 }
 
-.car-card .price {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 14px;
-  color: #023859;
+/* IMAGE */
+.tesla-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.car-card .price {
-  font-weight: bold;
-  color: #023859;
-  font-size: 1.3rem;
-  margin: 10px 0 30px 0 !important;
+/* LINK */
+.tesla-link {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.btn-offer {
-  margin-top: 80px;
-  padding: 8px 16px;
-  border: none;
-  background: #023859;
+/* OVERLAY */
+.tesla-overlay {
+  position: absolute;
+  inset: 0;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.35),
+    transparent
+  );
+  color: #fff;
+}
+
+/* TAG */
+.discount-badgeMain {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #39c0c3;
+  padding: 6px 12px;
   border-radius: 6px;
+  font-size: 15px;
+}
+
+/* TITLE */
+.tesla-overlay h2 {
+  font-size: 32px;
+  margin: 0;
+}
+
+/* PRICE */
+.tesla-overlay p {
+  margin: 8px 0 20px;
+  font-size: 16px;
+}
+
+/* BUTTON */
+.tesla-btn {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-weight: 600;
+  width: fit-content;
   cursor: pointer;
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
+}
+
+.tesla-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.tesla-track {
+  position: relative;
+  z-index: 1;
+}
+
+.tesla-carousel-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.tesla-carousel {
+  position: relative;
+  padding-bottom: 70px;
+}
+
+.tesla-track {
+  display: flex;
+  gap: 24px;
+  transition: transform 0.45s ease;
+  will-change: transform;
+}
+
+.tesla-arrow {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  top: auto;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 48px;
+  border: 0;
+  appearance: none;
+  color: #000;
+  font-size: 32px;
+  line-height: 0;
+  cursor: pointer;
+  z-index: 20;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.tesla-arrow.prev {
+  transform: translateX(calc(-50% - 34px));
+}
+
+.tesla-arrow.next {
+  transform: translateX(calc(-50% + 34px));
 }
 
 /* Photo Trilogy */
-
 .trilogy-container {
-  /* background: #39c1c369; */
   border-radius: 16px;
   padding: 1.25rem;
+  margin-top: 3rem;
 }
 
-.trilogy-text-block h6 {
-  font-size: 2.4rem;
+.trilogy-container .ratio {
+  border-radius: 1.25rem; /* να ταιριάζει με rounded-4 */
+  overflow: hidden; /* για να μην “σπάει” το shadow με corners */
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.text-block-h3 {
+  font-size: 1.2rem;
   font-family: "Open Sans", sans-serif;
   margin-bottom: 0.5rem;
   line-height: 1.4;
@@ -292,84 +404,17 @@ body {
   font-weight: 700;
 }
 
-.trilogy-text-block p {
+.text-block-par {
   font-size: 1.1rem;
   font-family: "Open Sans", sans-serif;
-  /* line-height: 1; */
   margin-top: 0;
   text-align: left;
-  font-weight: 500;
-  /* color: #fff !important; */
-}
-
-/* Accordion */
-.accordion-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 20px 20px;
-}
-
-.custom-accordion {
-  width: 100%;
-  max-width: 1000px;
-}
-
-.custom-accordion .accordion-item {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  overflow: hidden;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  width: 100%;
-}
-
-/* Επικεφαλίδα με βελάκι */
-.custom-accordion .accordion-button {
-  background-color: #ffffff;
+  font-weight: 300;
+  line-height: 2;
   color: #023859;
-  font-weight: 600;
-  padding: 16px;
-  font-size: 1.1rem;
-  position: relative;
-  transition: background-color 0.3s ease;
-}
-
-.custom-accordion .accordion-button:hover {
-  background-color: #eef7fb;
-}
-
-/* Βελάκι */
-.custom-accordion .accordion-button::after {
-  content: "";
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23023859" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M1.646 5.646a.5.5 0 01.708 0L8 11.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z"/></svg>');
-  background-repeat: no-repeat;
-  background-size: 1rem;
-  transform: rotate(0deg);
-  transition: transform 0.3s ease;
-}
-
-/* Περιστροφή όταν είναι ανοιχτό */
-.custom-accordion .accordion-button:not(.collapsed)::after {
-  transform: rotate(180deg);
-}
-
-/* Περιεχόμενο */
-.custom-accordion .accordion-body {
-  padding: 20px;
-  font-size: 1rem;
-  color: #333;
-  background-color: #ffffff;
-  border-top: 1px solid #ddd;
-}
-
-.container-trilogy {
-  background-color: #001858;
-  height: 500px;
 }
 
 /*************************MEDIA QUERIES*********************** */
-
 /* ============ 📱 Mobile (έως 575px) ============ */
 @media (max-width: 575px) {
   h1.hero-title {
@@ -408,83 +453,150 @@ body {
     font-size: 0.8rem;
   }
 
+  .stats-section {
+    padding: 32px 0 0 0; /* λίγο πιο σφιχτό στο mobile */
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 πάνω */
+    gap: 22px 18px;
+    margin-top: 24px;
+    padding: 0 16px; /* κενό δεξιά/αριστερά */
+    justify-items: center;
+  }
+
+  /* το 3ο να πάει κάτω και να πιάσει όλο το πλάτος */
+  .stats-row > *:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
   .stat-number {
-    font-size: 2.3rem;
-    font-weight: bold;
-    color: #001858;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    text-align: center;
   }
 
   .stat-label {
     margin-top: 10px;
-    font-size: 0.9rem;
-    color: #333;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    text-align: center;
   }
 
   .stats-paragr {
-    max-width: 70%;
-    margin: 50px auto; /* auto για να μπει στο κέντρο */
-    color: #001858;
-    font-family: "Open Sans", sans-serif;
-    text-align: center;
-    font-size: 1.7rem;
-    line-height: 1.4;
-    text-align: center;
-  }
-
-  .prosfores {
-    text-align: center;
-    color: #39c0c3;
-    font-weight: 400;
-    margin: 30px;
-    font-size: 1.8rem;
-  }
-
-  .feature-description p {
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin: 0;
-    color: #002e4d;
-  }
-
-  h2.car-title {
     font-size: 1.3rem;
   }
 
-  /* .cardCar {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-  } */
-
-  .price {
-    font-size: 1.2rem;
+  .features-container {
+    gap: 0;
+    margin-bottom: 0 !important;
   }
 
-  .discount-badgeMain {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
+  .feature-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 0.75rem;
+  }
+
+  .feature-description {
     font-size: 1rem;
-    font-weight: 400;
-    padding: 4px 20px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .prosfores {
+    font-size: 1.4rem;
+  }
+
+  .tesla-carousel-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "carousel carousel"
+      "prev next";
+    align-items: center;
+    justify-items: center;
+    row-gap: 14px; /* 👈 απόσταση κάρτας-βελακιών */
+  }
+
+  .tesla-carousel {
+    grid-area: carousel;
+    width: 100%;
+    padding: 0 14px; /* αναπνοή δεξιά/αριστερά */
+  }
+
+  .tesla-arrows {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* 👈 ΠΙΟ ΚΟΝΤΑ */
+    margin-top: 400px !important;
+  }
+
+  /* κουμπί-βελάκι (τετράγωνο) */
+  .tesla-arrow {
+    width: 44px;
+    height: 38px;
+    border-radius: 6px; /* 👈 όχι κύκλος */
+    border: 0;
+    background: #f3f3f3;
+    color: #111;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+    position: absolute;
+    left: 50%;
+    bottom: -50px;
+  }
+
+  /* κάρτα στο κινητό */
+  .tesla-card {
+    flex: 0 0 calc(100% - 28px);
+    border-radius: 16px;
+    overflow: hidden; /* για να κόβει σωστά με το radius */
+    background: #f2f2f2;
+  }
+
+  /* η εικόνα να γεμίζει ΟΛΟ το πλάτος (και το ύψος του box) */
+  .trilogy-container .card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch;
+    gap: 2.5rem;
+    margin: 4rem 1rem 4rem 2rem;
+  }
+
+  /* πιο “μαζεμένα” κείμενα 3-pics */
+  .tesla-overlay {
+    padding: 14px;
+  }
+  .tesla-overlay h2 {
+    font-size: 20px;
+    line-height: 1.15;
+  }
+  .tesla-overlay p {
+    font-size: 14px;
+    margin: 6px 0 12px;
+  }
+  .tesla-btn {
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+
+  .trilogy-container {
+    margin-top: 5rem;
   }
 
   .text-block-h3 {
-    font-size: 1.6rem !important;
-    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 1rem;
   }
 
-  .trilogy-text-block p {
-    font-size: 1.2rem !important;
+  .text-block-par {
+    font-size: 1.1rem;
   }
 }
 
@@ -492,7 +604,6 @@ body {
 @media (min-width: 576px) and (max-width: 991px) {
   h1.hero-title {
     font-size: 3rem;
-    font-weight: 300 !important;
   }
 
   .hero-video {
@@ -523,97 +634,104 @@ body {
   .pill-cta {
     --icon-size: 33px;
     padding: 12px 18px 12px 24px;
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
   .stat-number {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #001858;
+    font-size: 2.6rem;
   }
 
   .stat-label {
-    margin-top: 10px;
     font-size: 1.2rem;
-    color: #333;
   }
 
   .stats-paragr {
-    max-width: 80%;
-    margin: 50px auto; /* auto για να μπει στο κέντρο */
-    color: #001858;
-    font-family: "Open Sans", sans-serif;
-    text-align: center;
-    font-size: 1.8rem;
-    line-height: 1.4;
-    text-align: center;
+    font-size: 1.5rem;
   }
 
   .features-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2.5rem;
-    justify-items: center;
-    align-items: start;
-    max-width: 900px;
+    max-width: 600px;
     margin: 3rem auto;
-    padding: 1rem;
+    gap: 3rem;
+  }
+
+  .feature-description {
+    font-size: 1.1rem;
   }
 
   .prosfores {
-    text-align: center;
-    color: #39c0c3;
-    font-weight: 400;
-    margin: 30px;
-    font-size: 1.9rem;
-  }
-
-  .feature-description p {
-    font-size: 1rem;
-    font-weight: 500;
-    margin: 0;
-    color: #002e4d;
-  }
-
-  h2.car-title {
-    font-size: 1.5rem;
-  }
-
-  /* .cardCar {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-  } */
-
-  .price {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
 
   .discount-badgeMain {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
     font-size: 1.5rem;
-    font-weight: 400;
-    padding: 4px 20px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
-  .text-block-h3 {
-    font-size: 1.8rem !important;
-    font-weight: bold;
+  .tesla-carousel {
+    grid-area: carousel;
+    width: 95%;
+    padding: 0 14px;
   }
 
-  .trilogy-text-block p {
-    font-size: 1.2rem !important;
+  .tesla-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: -80px;
+  }
+
+  .trilogy-container {
+    margin-top: 4rem;
+    margin-bottom: 5rem;
+  }
+
+  .trilogy-container .row > [class*="col-"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 2rem;
+  }
+
+  .trilogy-container .card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch;
+    gap: 2.5rem;
+    margin: 4rem 1rem 4rem 2rem;
+  }
+
+  .trilogy-container .ratio {
+    flex: 0 0 50%;
+    max-width: 50%;
+    margin-bottom: 0 !important;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .trilogy-container .card-body {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-right: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .text-block-par {
+    padding-right: 3rem;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .card {
+    flex-direction: row-reverse !important;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-h3 {
+    text-align: left;
+    padding-left: 3rem;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-par {
+    padding-left: 3rem !important;
+    padding-right: 0;
   }
 }
 
@@ -655,20 +773,155 @@ body {
   }
 
   .stat-number {
-    font-size: 3.5rem;
+    font-size: 2.8rem;
+  }
+
+  .stat-label {
+    font-size: 1.2rem;
+  }
+
+  .stats-paragr {
+    font-size: 1.7rem;
+  }
+
+  .feature-container {
+    margin: 2rem auto;
+  }
+
+  .feature-description {
+    gap: 10px;
+    font-size: 1.2rem;
+  }
+
+  .prosfores {
+    font-size: 1.9rem;
+  }
+
+  .discount-badgeMain {
+    font-size: 1.4rem;
+  }
+
+  .tesla-carousel {
+    grid-area: carousel;
+    width: 100%;
+    padding: 0 14px;
+  }
+
+  .tesla-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: -80px;
+  }
+
+  .trilogy-container {
+    margin-top: 4rem;
+    margin-bottom: 5rem;
+  }
+
+  .trilogy-container .row > [class*="col-"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 2rem;
+  }
+
+  .trilogy-container .card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch;
+    gap: 2.5rem;
+    margin: 4rem 1rem 4rem 2rem;
+  }
+
+  .trilogy-container .ratio {
+    flex: 0 0 50%;
+    max-width: 50%;
+    margin-bottom: 0 !important;
+  }
+
+  .trilogy-container .card-body {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-right: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .text-block-h3 {
+    font-size: 1.6rem;
+  }
+
+  .text-block-par {
+    padding-right: 3rem;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .card {
+    flex-direction: row-reverse !important;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-h3 {
+    text-align: left;
+    padding-left: 3rem;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-par {
+    padding-left: 3rem !important;
+    padding-right: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  h1.hero-title {
+    font-size: 3.8rem;
+    font-weight: 300;
+  }
+
+  .hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    color: #fff;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-weight: 300;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  .pill-cta {
+    --icon-size: 40px;
+    padding: 16px 22px 16px 30px;
+    font-size: 1.4rem;
+  }
+
+  .stat-number {
+    font-size: 3.2rem;
     font-weight: bold;
     color: #001858;
   }
 
   .stat-label {
     margin-top: 10px;
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     color: #333;
   }
 
   .stats-paragr {
-    max-width: 80%;
-    margin: 50px auto; /* auto για να μπει στο κέντρο */
+    max-width: 90%;
+    margin: 100px auto; /* auto για να μπει στο κέντρο */
     color: #001858;
     font-family: "Open Sans", sans-serif;
     text-align: center;
@@ -677,64 +930,49 @@ body {
     text-align: center;
   }
 
+  .features-container {
+    gap: 2rem;
+    margin: 100px auto;
+  }
+
+  .feature-card {
+    width: 250px;
+    height: 250px;
+  }
+
+  .feature-icon {
+    width: 200px;
+    height: 200px;
+  }
+
+  .feature-description {
+    font-size: 1.2rem;
+  }
+
   .prosfores {
-    text-align: center;
-    color: #39c0c3;
-    font-weight: 400;
-    margin: 30px;
-    font-size: 1.9rem;
+    font-size: 2.3rem;
+    margin-bottom: 50px;
   }
 
-  .feature-description p {
-    font-size: 1rem;
-    font-weight: 500;
-    margin: 0;
-    color: #002e4d;
+  .tesla-carousel {
+    grid-area: carousel;
+    width: 100%;
+    padding: 0 14px;
   }
 
-  h2.car-title {
-    font-size: 1.7rem;
+  .tesla-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: -80px; /* πόσο χαμηλά */
   }
 
-  /* .cardCar {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative !important;
-  } */
-
-  .price {
-    font-size: 1.6rem;
-  }
-
-  .discount-badgeMain {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
-    font-size: 1.8rem;
-    font-weight: 400;
-    padding: 4px 25px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  }
-
-  .text-block-h3 {
-    font-size: 1.6rem !important;
-    font-weight: bold;
-  }
-
-  .trilogy-text-block p {
-    font-size: 1.2rem !important;
+  .trilogy-container {
+    margin-top: 4rem;
+    margin-bottom: 5rem;
   }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1500px) {
   h1.hero-title {
     font-size: 3.8rem;
     font-weight: 300;
@@ -785,7 +1023,7 @@ body {
 
   .stats-paragr {
     max-width: 90%;
-    margin: 50px auto; /* auto για να μπει στο κέντρο */
+    margin: 100px auto; /* auto για να μπει στο κέντρο */
     color: #001858;
     font-family: "Open Sans", sans-serif;
     text-align: center;
@@ -794,59 +1032,82 @@ body {
     text-align: center;
   }
 
-  .feature-description p {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin: 0;
-    color: #002e4d;
+  .features-container {
+    gap: 3rem;
+    margin: 100px auto;
+  }
+
+  .feature-card {
+    width: 260px;
+    height: 260px;
+  }
+
+  .feature-icon {
+    width: 200px;
+    height: 200px;
+  }
+
+  .feature-description {
+    font-size: 1.15rem;
   }
 
   .prosfores {
-    text-align: center;
-    color: #39c0c3;
-    font-weight: 400;
-    margin: 30px;
     font-size: 2.3rem;
+    margin-bottom: 80px;
   }
 
-  h2.car-title {
+  /* h2.car-title {
     font-size: 1.9rem;
   }
 
-  /* .cardCar {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative !important;
-  } */
-
-  /* .discount-badgeMain {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
-    font-size: 1.8rem;
-    font-weight: 400;
-    padding: 10px 25px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  } */
-
   .price {
     font-size: 1.8rem;
+  } */
+
+  .tesla-carousel {
+    grid-area: carousel;
+    width: 100%;
+    padding: 0 14px;
   }
 
-  .text-block-h3 {
-    font-size: 1.7rem !important;
-    font-weight: bold;
+  .tesla-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: -80px; /* πόσο χαμηλά */
   }
 
-  .trilogy-text-block p {
-    font-size: 1.2rem !important;
+  /* Photo Trilogy */
+  .trilogy-container .row > [class*="col-"] {
+    flex: initial !important;
+    max-width: initial !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* επιστροφή σε κάθετη κάρτα */
+  .trilogy-container .card {
+    display: block !important;
+  }
+
+  /* ratio/image full width πάνω */
+  .trilogy-container .ratio {
+    flex: none !important;
+    max-width: 100% !important;
+    /* margin-bottom: 1rem !important; */
+  }
+
+  /* κείμενο κάτω από εικόνα */
+  .trilogy-container .card-body {
+    max-width: 100% !important;
+    padding-right: 0 !important;
+    display: block !important;
+    margin-top: 40px;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .card {
+    flex-direction: initial !important;
+  }
+
+  .trilogy-container {
+    padding-bottom: 0;
   }
 }

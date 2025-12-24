@@ -117,88 +117,61 @@
 }
 
 @*------------------Carousel-------------------*@
-<h2 class="prosfores">Ανακαλύψτε τις Προσφορές σε ποικιλία μοντέλων</h2>
+<h4 class="prosfores"><span>Ανακαλύψτε</span> τις Προσφορές σε ποικιλία μοντέλων</h4>
 
 @if (carCardBlock != null && carCardBlock.Any())
 {
-    <div class="w-100 mt-5 d-flex justify-content-center">
-						<div id="carouselExampleDark" class="carousel carousel-dark slide custom-carousel"
-							data-bs-ride="carousel">        
-        @* ===== Indicators δυναμικά ===== *@
-        <div class="carousel-indicators">
-            @{
-                var index = 0;
-                foreach (var card in carCardBlock)
-                {
-                    <button type="button" data-bs-target="#carouselExampleDark"
-                            data-bs-slide-to="@index"
-                            class="@(index == 0 ? "active" : "")"
-                            aria-current="@(index == 0 ? "true" : "false")"
-                            aria-label="Slide @(index + 1)">
-                    </button>;
-                    index++;
-                }
+<div class="tesla-carousel-wrapper">
+  <button class="tesla-arrow prev" aria-label="Προηγούμενο">
+    ‹
+  </button>
+    <div class="tesla-carousel">
+        <div class="tesla-track">
+
+            @foreach (var card in carCardBlock)
+            {
+                var content = card?.Content;
+                if (content == null) { continue; }
+
+                var carID = content.Value<string>("carID");
+                var carPic = content.Value<MediaWithCrops>("carPic")?.Url();
+                var maker = content.Value<string>("maker");
+                var modelo = content.Value<string>("model");
+                var price = content.Value<string>("price");
+                var typeOfDiscount = content.Value<string>("typeOfDiscount");
+
+                var targetUrl = isLoggedIn
+                    ? $"/carDetailsMember?id={carID}"
+                    : $"/carDetailsVisitor?id={carID}";
+
+                <div class="tesla-card">
+                    <a href="@targetUrl"
+                       data-car-id="@carID"
+                       onclick="return onCardClick(event, '@carID')"
+                       class="tesla-link">
+
+                        <img src="@carPic" alt="@modelo" />
+
+                        <div class="tesla-overlay">
+                            <span class="discount-badgeMain">@typeOfDiscount</span>
+
+                            <h2>@maker @modelo</h2>
+                            <p>@price €</p>
+
+                            <button class="tesla-btn">
+                                Δείτε λεπτομέρειες
+                            </button>
+                        </div>
+
+                    </a>
+                </div>
             }
         </div>
-
-        @* ===== Carousel Items ===== *@
-        <div class="carousel-inner">
-            @{
-                index = 0;
-                foreach (var card in carCardBlock)
-                {
-                    var content = card?.Content;
-                    if (content == null) { continue; }
-    
-                    var carID = content.Value<string>("carID");
-                    var carPic = content.Value<MediaWithCrops>("carPic")?.Url();
-                    var maker = content.Value<string>("maker");
-                    var modelo = content.Value<string>("model");
-                    var yearRelease = content.Value<string>("yearRelease");
-                    var price = content.Value<string>("price");
-                    var typeOfDiscount = content.Value<string>("typeOfDiscount");
-
-                    var targetUrl = isLoggedIn
-							? $"/carDetailsMember?id={carID}"
-							: $"/carDetailsVisitor?id={carID}";
-                    
-                    <div class="carousel-item @(index == 0 ? "active" : "")" data-bs-interval="4000" style="max-height:1100px;">
-                        <a href="@targetUrl"
-                            data-car-id="@carID"
-                            onclick="return onCardClick(event, '@carID')" class="carousel-link" >
-                            <div class="text-center p-4" data-car-id="@carID">
-                                <div class="discount-badgeMain">@typeOfDiscount</div>
-                                 <h2 class="car-title">@maker @modelo</h2>
-                                <img src="@carPic" class="d-block mx-auto car-image" alt="@modelo" style="max-height:270px; object-fit:contain;" />
-                                <h2 class="price">@price €</h2>
-                                @* <h4>@yearRelease</h4> *@
-
-                                @* <a href="/carDetails/"
-                                class="btn-offer"
-                                onclick="sessionStorage.setItem('selectedCarId', '@carID')">
-                                    Δείτε το
-                                </a> *@
-                            </div>
-                        </a>
-                    </div>
-
-                    index++;
-                }
-            }
-        </div>
-
-        
-        @* ===== Controls (βελάκια) ===== *@
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Προηγούμενο</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Επόμενο</span>
-        </button>
     </div>
-    </div>
+    <button class="tesla-arrow next" aria-label="Επόμενο">
+    ›
+  </button>
+</div>
 }
 
 @*----------------Photo Trilogy------------------*@
@@ -258,11 +231,11 @@
                             <div class="card-body p-0 d-flex flex-column trilogy-text-block">
                                 @if (!string.IsNullOrWhiteSpace(card.Title))
                                 {
-                                    <h6 class="text-block-h3">@card.Title</h6>
+                                    <p class="text-block-h3">@card.Title</p>
                                 }
                                 @if (!string.IsNullOrWhiteSpace(card.BodyHtml))
                                 {
-                                    <p>@Html.Raw(card.BodyHtml)</p>
+                                    <div class="text-block-par">@Html.Raw(card.BodyHtml)</div>
                                 }
                             </div>
                         </div>
@@ -302,10 +275,92 @@
 
 
 <script>
-  function selectCategory(type) {
+function selectCategory(type) {
     sessionStorage.setItem("selectedCarType", type);
     window.location.href = "/πωλήσεις-μεταχειρισμένων"; 
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const track = document.querySelector(".tesla-track");
+  const cards = Array.from(document.querySelectorAll(".tesla-card"));
+  const prev  = document.querySelector(".tesla-arrow.prev");
+  const next  = document.querySelector(".tesla-arrow.next");
+
+  if (!track || !cards.length || !prev || !next) {
+    console.error("TESLA CAROUSEL: λείπουν στοιχεία");
+    return;
   }
+
+  const gap = 24;
+  let index = 0;
+  let isAnimating = false;
+
+  const cardWidth = () =>
+    cards[0].getBoundingClientRect().width + gap;
+
+  /* =============================
+     CLONE CARDS FOR INFINITE LOOP
+     ============================= */
+  cards.forEach(card => {
+    const clone = card.cloneNode(true);
+    clone.classList.add("clone");
+    track.appendChild(clone);
+  });
+
+  const totalCards = track.children.length;
+  const realCardsCount = cards.length;
+
+  function move() {
+    track.style.transition = "transform 0.6s ease";
+    track.style.transform =
+      `translateX(-${index * cardWidth()}px)`;
+  }
+
+  next.addEventListener("click", () => {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    index++;
+    move();
+
+    if (index === realCardsCount) {
+      setTimeout(() => {
+        track.style.transition = "none";
+        index = 0;
+        track.style.transform = "translateX(0)";
+        isAnimating = false;
+      }, 600);
+    } else {
+      setTimeout(() => isAnimating = false, 600);
+    }
+  });
+
+  prev.addEventListener("click", () => {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    if (index === 0) {
+      track.style.transition = "none";
+      index = realCardsCount;
+      track.style.transform =
+        `translateX(-${index * cardWidth()}px)`;
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        track.style.transition = "transform 0.6s ease";
+        index--;
+        track.style.transform =
+          `translateX(-${index * cardWidth()}px)`;
+        setTimeout(() => isAnimating = false, 600);
+      });
+    });
+  });
+
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

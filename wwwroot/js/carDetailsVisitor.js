@@ -161,57 +161,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const original = btn.innerText;
     btn.disabled = true;
-    btn.innerText = "Αποστολή…";
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Αποστολή`;
 
-    try {
-      const res = await fetch(`${API_BASE}/submitofferVisitor`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          carId,
-          firstName,
-          lastName,
-          email,
-          phone: normalizedPhone,
-          paymentPlan,
-          interestCode,
-        }),
-      });
-      if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+    setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_BASE}/submitofferVisitor`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            carId,
+            firstName,
+            lastName,
+            email,
+            phone: normalizedPhone,
+            paymentPlan,
+            interestCode,
+          }),
+        });
 
-      // ✅ Μήνυμα επιτυχίας
-      if (statusEl) {
-        statusEl.style.display = "block";
-        statusEl.textContent = "Η αίτησή σας στάλθηκε επιτυχώς!";
-        statusEl.className = "small mt-2 text-success";
+        if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+
+        // ✅ Μήνυμα επιτυχίας
+        if (statusEl) {
+          statusEl.style.display = "block";
+          statusEl.textContent = "Η αίτησή σας στάλθηκε επιτυχώς!";
+          statusEl.className = "small mt-2 text-success";
+        }
+
+        const modalEl = document.getElementById("offerModal");
+
+        // ✅ Κλείσιμο modal (safe)
+        await waitModalHidden(modalEl);
+
+        document.getElementById("offerForm")?.reset();
+      } catch (err) {
+        console.error("❌ SubmitOffer error:", err);
+        const status = document.getElementById("offerStatus");
+        if (status) {
+          status.textContent = "Κάτι πήγε στραβά. Δοκίμασε ξανά.";
+          status.className = "small mt-2 text-danger";
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerText = original;
+        cleanupBootstrapArtifacts();
       }
-
-      const modalEl = document.getElementById("offerModal");
-      // ✅ Κλείσιμο modal
-      // setTimeout(() => {
-      //   if (window.bootstrap && modalEl) {
-      //     const modalInstance =
-      //       bootstrap.Modal.getInstance(modalEl) ||
-      //       new bootstrap.Modal(modalEl);
-      //     modalInstance.hide();
-      //   }
-      // }, 1000);
-
-      await waitModalHidden(modalEl);
-
-      document.getElementById("offerForm")?.reset();
-    } catch (err) {
-      console.error("❌ SubmitOffer error:", err);
-      const status = document.getElementById("offerStatus");
-      if (status) {
-        status.textContent = "Κάτι πήγε στραβά. Δοκίμασε ξανά.";
-        status.className = "small mt-2 text-danger";
-      }
-    } finally {
-      btn.disabled = false;
-      btn.innerText = original;
-      cleanupBootstrapArtifacts();
-    }
+    }, 1500);
   });
 
   document.addEventListener("submit", (e) => {

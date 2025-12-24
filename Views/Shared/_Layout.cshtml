@@ -32,8 +32,10 @@
     <link rel="stylesheet" href="~/css/contactPage.css" />
     <link rel="stylesheet" href="~/css/userSettings.css" />
     <link rel="stylesheet" href="~/css/getCode.css" />
+    <link rel="stylesheet" href="~/css/scrollbar.css" />
 
     @RenderSection("head", required: false)
+
 </head>
 <body class="@ViewBag.BodyClass">
     
@@ -41,7 +43,7 @@
 
     <div class="layout-wrapper">
         <main class="main-content">
-            @RenderBody()
+          @RenderBody()
         </main>
         @await Html.PartialAsync("~/Views/Footer.cshtml")
     </div>

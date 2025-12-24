@@ -1,8 +1,8 @@
 .hero-blur-wrapper {
   position: relative;
   width: 100%;
-  max-width: 95%; /* <– αφήνουμε κενό δεξιά-αριστερά για να φανούν οι γωνίες */
-  margin: 2rem auto 2rem; /* κέντρο στη σελίδα */
+  max-width: 95%;
+  margin: 2rem auto 2rem;
   height: 70vh;
   overflow: hidden;
   border-radius: 12px;
@@ -177,6 +177,7 @@
   /* 6️⃣ Κουμπί full width */
   .saveBtn {
     width: 100%;
+    margin-top: 20px;
   }
 }
 
@@ -211,6 +212,11 @@
     text-align: center;
     margin: 12px 60px;
   }
+
+  .saveBtn {
+    width: 50%;
+    margin-top: 20px;
+  }
 }
 
 @media (min-width: 992px) {
@@ -243,6 +249,11 @@
     font-size: 0.95rem;
     text-align: center;
     margin: 12px 130px;
+  }
+
+  .saveBtn {
+    width: 30%;
+    margin-top: 20px;
   }
 }
 
@@ -277,6 +288,11 @@
     text-align: center;
     margin: 12px 200px;
   }
+
+  .saveBtn {
+    width: 30%;
+    margin-top: 20px;
+  }
 }
 
 @media (min-width: 1400px) {
@@ -309,5 +325,10 @@
     font-size: 0.95rem;
     text-align: center;
     margin: 12px 180px;
+  }
+
+  .saveBtn {
+    width: 30%;
+    margin-top: 20px;
   }
 }

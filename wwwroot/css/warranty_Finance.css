@@ -144,9 +144,13 @@
 
 @media (min-width: 1200px) {
   .warranty-img-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    height: 720px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    border-radius: 14px;
   }
 
   .warranty-title {

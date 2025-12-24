@@ -23,19 +23,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const original = btn.textContent;
     btn.disabled = true;
-    btn.textContent = "Αποστολή…";
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Αποστολή…`;
 
     try {
       const res = await fetch("/umbraco/api/contactapi/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, lastName, email, message }),
-        credentials: "same-origin", // αν χρειαστεί cookies/preview
+        credentials: "same-origin",
       });
 
       if (!res.ok) throw new Error(await res.text());
 
-      status.textContent = "Το μήνυμα στάλθηκε! Θα επικοινωνήσουμε σύντομα μαζί σας!";
+      status.textContent =
+        "Το μήνυμα στάλθηκε! Θα επικοινωνήσουμε σύντομα μαζί σας!";
       status.className = "mt-2 small text-success";
       form.reset();
 
@@ -43,8 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         status.textContent = "";
         status.className = "";
-      }, 3000);
-
+      }, 4000);
     } catch (err) {
       console.error("Contact submit error:", err);
       status.textContent = "Κάτι πήγε στραβά. Δοκίμασε ξανά.";

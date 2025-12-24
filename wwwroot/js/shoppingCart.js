@@ -330,61 +330,56 @@ document.addEventListener("click", async (e) => {
 
   const original = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtn.innerText = "Αποστολή…";
+  submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Αποστολή`;
   if (statusEl) statusEl.textContent = "";
 
-  try {
-    const r = await fetch("/umbraco/api/modaloffermemberapi/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      credentials: "same-origin",
-    });
+  setTimeout(async () => {
+    try {
+      const r = await fetch("/umbraco/api/modaloffermemberapi/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        credentials: "same-origin",
+      });
 
-    if (!r.ok) throw new Error(await r.text());
-    const res = await r.json(); // { ok: true }
+      if (!r.ok) throw new Error(await r.text());
+      const res = await r.json(); // { ok: true }
 
-    // ✅ Μήνυμα επιτυχίας
-    if (statusEl) {
-      statusEl.style.display = "block";
-      statusEl.textContent = "Η αίτησή σας στάλθηκε επιτυχώς!";
-      statusEl.className = "small mt-2 text-success";
+      // ✅ Μήνυμα επιτυχίας
+      if (statusEl) {
+        statusEl.style.display = "block";
+        statusEl.textContent = "Η αίτησή σας στάλθηκε επιτυχώς!";
+        statusEl.className = "small mt-2 text-success";
+      }
+
+      // ✅ Κλείσιμο modal
+      await waitModalHidden(modalEl);
+
+      // ✅ Reset φόρμας
+      document.getElementById("offerForm")?.reset();
+
+      // καθάρισε καλάθι
+      await fetch("/umbraco/api/cart/clear", { method: "POST" });
+
+      // ενημέρωσε badge + UI
+      window.dispatchEvent(
+        new CustomEvent("cart:updated", { detail: { count: 0 } })
+      );
+      await window.updateCartBadgeFromServer?.();
+      await window.renderCart?.();
+    } catch (err) {
+      console.error("❌ submit offer error:", err);
+      if (statusEl) {
+        statusEl.style.display = "block";
+        statusEl.textContent = "Κάτι πήγε στραβά. Προσπαθήστε ξανά.";
+        statusEl.className = "small mt-2 text-danger";
+      }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = original;
+      clearUiOverlays();
     }
-
-    // ✅ Κλείσιμο modal
-    // setTimeout(() => {
-    //   if (window.bootstrap && modalEl) {
-    //     const modalInstance =
-    //       bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-    //     modalInstance.hide();
-    //   }
-    // }, 1000);
-    await waitModalHidden(modalEl);
-
-    // ✅ Reset φόρμας
-    document.getElementById("offerForm")?.reset();
-
-    // καθάρισε καλάθι
-    await fetch("/umbraco/api/cart/clear", { method: "POST" });
-
-    // ενημέρωσε badge + UI
-    window.dispatchEvent(
-      new CustomEvent("cart:updated", { detail: { count: 0 } })
-    );
-    await window.updateCartBadgeFromServer?.();
-    await window.renderCart?.();
-  } catch (err) {
-    console.error("❌ submit offer error:", err);
-    if (statusEl) {
-      statusEl.style.display = "block";
-      statusEl.textContent = "Κάτι πήγε στραβά. Προσπαθήστε ξανά.";
-      statusEl.className = "small mt-2 text-danger";
-    }
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = original;
-    clearUiOverlays();
-  }
+  }, 1500);
 });
 
 // Ασφάλεια να μη γίνει submit με reload

@@ -21,6 +21,20 @@ a {
 }
 
 /* ============== Navbar layout ============== */
+.nx-toggle {
+  display: inline-flex;
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 6001;
+  color: #023859; /* default (όχι home) */
+}
+
 .navbar-logo {
   height: 40px;
   width: auto;
@@ -231,7 +245,7 @@ nav.navbar {
 .nx-menu .kx-link {
   position: relative;
   display: inline-block;
-  padding: 8px 4px; /* 👉 ίδιο padding για ΟΛΑ */
+  padding: 8px 4px;
   margin: 0;
   line-height: 1.2;
   font-weight: 600;
@@ -262,6 +276,14 @@ nav.navbar {
   transform: translateX(-50%) scaleX(1);
 }
 
+.nx-menu a.nx-link:hover::after,
+.nx-menu .kx-link:hover::after,
+.nx-menu a.nx-link:focus-visible::after,
+.nx-menu .kx-link:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) scaleX(1);
+}
+
 /* ================== Mobile / Tablet ================== */
 @media (max-width: 576px) {
   .navbar-logo {
@@ -287,13 +309,11 @@ nav.navbar {
     justify-content: left;
   }
 
-  /* 2) Μηδενίσεις σε wrappers που συχνά κεντράρουν */
   #nxMenu .nx-right .nx-li {
     align-self: flex-start;
     margin-left: 0;
   }
 
-  /* 3) Το ίδιο το κουμπί */
   #nxMenu #nav-login-btn {
     display: inline-flex;
     width: auto; /* όχι 100% */
@@ -301,7 +321,6 @@ nav.navbar {
     align-self: flex-start; /* κολλάει αριστερά */
   }
 
-  /* αν ο off-canvas είχε text-align:center */
   #nxMenu.nx-offcanvas.is-open {
     text-align: left;
   }
@@ -408,7 +427,7 @@ nav.navbar {
     margin: 20px auto;
   }
 
-  .nx-toggle {
+  /* .nx-toggle {
     width: 40px;
     height: 40px;
     border: 0;
@@ -417,7 +436,7 @@ nav.navbar {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-  }
+  } */
 
   .navbar-logoInner {
     display: block !important;
@@ -452,20 +471,6 @@ nav.navbar {
   }
   .nx-brand .navbar-logo {
     height: 40px;
-  }
-
-  .nx-toggle {
-    display: inline-flex;
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    font-size: 26px;
-    cursor: pointer;
-    z-index: 6001;
-    color: #023859; /* default (όχι home) */
   }
 
   body.is-home .nx-toggle {

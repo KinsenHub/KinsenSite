@@ -327,17 +327,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       try {
         const already = await cartContains(id); // ή await CartAPI.contains(id)
+        const cartMsg = document.getElementById("cartMsg");
+
         if (already) {
-          showToast(
-            "Το συγκεκριμένο αυτοκίνητο υπάρχει ήδη στο καλάθι σου.",
-            "warning"
-          );
-          // optional: μικρό “bounce” στο badge
+          cartMsg.textContent =
+            "Το συγκεκριμένο αυτοκίνητο υπάρχει ήδη στο καλάθι σου.";
+          cartMsg.className =
+            "cartMsg warning d-flex justify-content-center mt-3";
+
+          // badge bounce (σωστό, το κρατάμε)
           const badge = document.querySelector("[data-cart-badge]");
           if (badge) {
             badge.classList.add("animate-bounce");
             setTimeout(() => badge.classList.remove("animate-bounce"), 600);
           }
+
+          // auto-hide
+          setTimeout(() => {
+            cartMsg.textContent = "";
+            cartMsg.className = "cartMsg d-flex justify-content-center mt-3";
+          }, 3500);
+
           return;
         }
 
@@ -351,20 +361,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         const res = await CartAPI.add(payload); // { count, items }
         console.log("📦 server cart:", res);
 
-        // --- ΣΥΜΦΙΛΙΩΣΗ ΜΕ ΤΟΝ SERVER ---
         setCartBadgeCount(res.count);
         window.dispatchEvent(
           new CustomEvent("cart:updated", { detail: { count: res.count } })
         );
 
-        // feedback στο κουμπί
+        cartMsg.textContent = "Το αυτοκίνητο προστέθηκε στο καλάθι σου.";
+        cartMsg.className =
+          "cartMsg success d-flex justify-content-center mt-3";
+
+        // auto-hide
+        setTimeout(() => {
+          cartMsg.textContent = "";
+          cartMsg.className = "cartMsg d-flex justify-content-center mt-3";
+        }, 3000);
+
+        // --- feedback στο κουμπί (κρατάμε το δικό σου) ---
         const prev = btn.textContent;
         btn.disabled = true;
         btn.textContent = "Στο καλάθι ✓";
+
         setTimeout(() => {
           btn.disabled = false;
           btn.textContent = prev;
-        }, 1200);
+        }, 3500);
       } catch (err) {
         if (
           err &&
