@@ -131,6 +131,9 @@ namespace Kinsen.Web.Api
         public int?    Year { get; set; }
         public int?    Km { get; set; }
         public string? Fuel { get; set; }
+        public int?    Cc { get; set; }
+        public int?    Hp { get; set; }
+        public string? Color { get; set; }
         public long    AddedAt { get; set; }
     }
 

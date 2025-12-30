@@ -427,16 +427,16 @@ nav.navbar {
     margin: 20px auto;
   }
 
-  /* .nx-toggle {
-    width: 40px;
-    height: 40px;
+  .nx-toggle {
+    width: 45px;
+    height: 45px;
     border: 0;
     color: #023859 !important;
     display: block !important;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-  } */
+  }
 
   .navbar-logoInner {
     display: block !important;

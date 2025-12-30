@@ -159,6 +159,9 @@ function normalizeCar(c) {
   const year = c?.year ?? c?.Year ?? null;
   const km = c?.km ?? c?.Km ?? c?.mileage ?? null;
   const fuel = c?.fuel ?? c?.Fuel ?? c?.fuelType ?? "";
+  const cc = c?.cc ?? c?.Cc ?? null;
+  const hp = c?.hp ?? c?.Hp ?? null;
+  const color = c?.color ?? c?.Color ?? "";
 
   return {
     id,
@@ -172,6 +175,9 @@ function normalizeCar(c) {
     year,
     km,
     fuel,
+    cc,
+    hp,
+    color,
   };
 }
 
@@ -304,18 +310,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       // --- Payload με σωστούς αριθμούς ---
       const c = window.CURRENT_CAR || {};
       const payload = {
-        id, // υποχρεωτικό
+        id,
         maker: c.maker ?? "",
         model: c.model ?? "",
         title: c.title ?? "",
-        priceText: c.priceText ?? null, // π.χ. "15.000"
-        priceValue: toIntOrNullStrict(c.priceValue ?? c.priceText), // π.χ. 15000
+        priceText: c.priceText ?? "",
+        priceValue: toIntOrNullStrict(c.priceValue ?? c.priceText),
         img: c.img ?? "",
         url: c.url ?? location.pathname + location.search,
         year: toIntOrNullStrict(c.year),
-        km: toIntOrNullStrict(c.km), // ΣΗΜΑΝΤΙΚΟ
+        km: toIntOrNullStrict(c.km),
         fuel: c.fuel ?? "",
-        paymentPlan: paymentPlan, // "efapaks" ή "6" | "12" | ...
+        cc: toIntOrNullStrict(c.cc),
+        hp: toIntOrNullStrict(c.hp),
+        color: typeof c.color === "string" ? c.color.trim() : "",
+        paymentPlan,
         perMonth: perMonthNum,
       };
 

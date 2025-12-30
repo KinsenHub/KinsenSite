@@ -276,28 +276,127 @@ public class CarApiVisitorController : UmbracoApiController
 
         // ================== EMAIL προς Sales (μπορείς να κρατήσεις attachment όπως πριν ή και τίποτα) ==================
         var subject = $"Αίτημα Προσφοράς: {request.FirstName} {request.LastName} για {maker} {model}";
+
         var body = $@"
-            <tr>
-                <td align='left' style='padding:10px 0 15px 0;'>{logoTag}</td>
-            </tr>
-            <h2 style='color:#39c0c3;'>Νέο αίτημα προσφοράς:</h2>
-            <p><strong>Πελάτης:</strong> {request.FirstName} {request.LastName}</p>
-            <p><strong>Email:</strong> {request.Email}</p>
-            <p><strong>Κινητό:</strong> {request.Phone}</p>
-            <p><strong>Πλάνο Πληρωμής:</strong> {planDisplay}</p>
-            <hr/>
-            <h4>Αυτοκίνητο</h4>
-            <ul>
-                <li><strong>ID:</strong> {request.CarId}</li>
-                <li><strong>Μάρκα/Μοντέλο:</strong> {maker} {model}</li>
-                <li><strong>Τιμή:</strong> {price} €</li>
-                <li><strong>Έτος:</strong> {year}</li>
-                <li><strong>Χιλιόμετρα:</strong> {km} χλμ.</li>
-                <li><strong>Καύσιμο:</strong> {fuel}</li>
-                <li><strong>Χρώμα:</strong> {color}</li>
-            </ul>
-            <div style='margin-top:12px'>{salesImageHtml}</div>
-        ";
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width'>
+        </head>
+
+        <body style='margin:0;padding:0;background:#ffffff;'>
+
+        <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
+            style='border-collapse:collapse;background:#ffffff;'>
+        <tr>
+            <td align='left' style='padding:0;margin:0;'>
+
+            <!-- OUTER FIXED WRAPPER -->
+            <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
+                    style='border-collapse:collapse;width:600px;max-width:600px;margin:0;'>
+
+                <!-- HEADER : LOGO + TITLE -->
+                <tr>
+                <td align='left' style='padding:0;margin:0;'>
+                    <table role='presentation' border='0' cellspacing='0' cellpadding='0'
+                        style='border-collapse:collapse;margin:0;'>
+                    
+                    <!-- LOGO -->
+                    <tr>
+                        <td valign='middle'
+                            style='padding:0 12px 0 0;margin:0;'>
+                        {logoTag}
+                        </td>
+                    </tr>
+
+                    <!-- TITLE -->
+                    <tr>
+                        <td valign='middle'
+                            style='padding-top:30px;margin:20;'>
+                        <span style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                                    font-size:22px;
+                                    font-weight:400;
+                                    color:#39c0c3;
+                                    line-height:1;
+                                    white-space:nowrap; margin-top:30px;'>
+                            Νέο αίτημα προσφοράς:
+                        </span>
+                        </td>
+                    </tr>
+                    </table>
+                </td>
+                </tr>
+
+                <!-- SPACER -->
+                <tr><td height='15' style='line-height:15px;font-size:0;'>&nbsp;</td></tr>
+
+                <!-- CUSTOMER INFO -->
+                <tr>
+                <td align='left'
+                    style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                            font-size:14px;
+                            color:#000;
+                            padding:0;margin:0;'>
+                    <p style='margin:0 0 6px 0;'><strong>Πελάτης:</strong> {request.FirstName} {request.LastName}</p>
+                    <p style='margin:0 0 6px 0;'><strong>Email:</strong> {request.Email}</p>
+                    <p style='margin:0 0 6px 0;'><strong>Κινητό:</strong> {request.Phone}</p>
+                    <p style='margin:0;'><strong>Πλάνο Πληρωμής:</strong> {planDisplay}</p>
+                </td>
+                </tr>
+
+                <!-- DIVIDER -->
+                <tr>
+                <td style='padding:15px 0;'>
+                    <hr style='border:none;border-top:1px solid #ddd;margin:0;'>
+                </td>
+                </tr>
+
+                <!-- CAR INFO -->
+                <tr><td align='center' style='padding:20px;'>
+                    <table role='presentation' border='0' cellspacing='0' cellpadding='0' align='center'
+                        style='margin:15px auto;width:100%;max-width:600px;border:1px solid #ccc;border-radius:10px;overflow:hidden;background:#ffffff;'>
+                        <tr>
+                            <!-- Εικόνα αριστερά -->
+                            <td width='240' align='center' style='height:180px;'>
+                                {imgTag}
+                            </td>
+
+                            <!-- Στοιχεία δεξιά -->
+                            <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
+                            <div style='font-size:18px;font-weight:700;margin-bottom:6px;'>{maker} {model}</div>
+
+                            <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
+                                <tr>
+                                <!-- Αριστερή στήλη (3) -->
+                                <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-right:10px;'>
+                                    • {(string.IsNullOrWhiteSpace(year) ? "-" : year)}<br>
+                                    • {(string.IsNullOrWhiteSpace(cc) ? "-" : cc + " cc")}<br>
+                                    • {(string.IsNullOrWhiteSpace(hp) ? "-" : hp + " hp")}
+                                </td>
+
+                                <!-- Δεξιά στήλη (3) -->
+                                <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-left:10px;'>
+                                    • {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")}<br>
+                                    • {(string.IsNullOrWhiteSpace(fuel) ? "-" : fuel)}<br>
+                                    • {(string.IsNullOrWhiteSpace(color) ? "-" : color)}
+                                </td>
+                                </tr>
+                            </table>
+
+                            <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{price} €</div>
+                            </td>
+                        </tr>
+                    </table>
+                    </td></tr>
+            </table>
+
+            </td>
+        </tr>
+        </table>
+
+        </body>
+        </html>";
 
         var msg = new EmailMessage(
             null,
@@ -367,12 +466,27 @@ public class CarApiVisitorController : UmbracoApiController
 
                             <!-- Στοιχεία δεξιά -->
                             <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
-                                <div style='font-size:18px;font-weight:700;margin-bottom:6px;'>{maker} {model}</div>
-                                <div style='font-size:13px;color:#333;margin-bottom:8px;'>
-                                   • {(string.IsNullOrWhiteSpace(year) ? "-" : year)} <br> •
-                                    {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")} <br> • {fuel} <br>
-                                </div>
-                                <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{price} €</div>
+                            <div style='font-size:18px;font-weight:700;margin-bottom:6px;'>{maker} {model}</div>
+
+                            <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
+                                <tr>
+                                <!-- Αριστερή στήλη (3) -->
+                                <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-right:10px;'>
+                                    • {(string.IsNullOrWhiteSpace(year) ? "-" : year)}<br>
+                                    • {(string.IsNullOrWhiteSpace(cc) ? "-" : cc + " cc")}<br>
+                                    • {(string.IsNullOrWhiteSpace(hp) ? "-" : hp + " hp")}
+                                </td>
+
+                                <!-- Δεξιά στήλη (3) -->
+                                <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-left:10px;'>
+                                    • {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")}<br>
+                                    • {(string.IsNullOrWhiteSpace(fuel) ? "-" : fuel)}<br>
+                                    • {(string.IsNullOrWhiteSpace(color) ? "-" : color)}
+                                </td>
+                                </tr>
+                            </table>
+
+                            <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{price} €</div>
                             </td>
                         </tr>
                         </table>

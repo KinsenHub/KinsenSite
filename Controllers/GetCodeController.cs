@@ -30,6 +30,23 @@ public class GetCodeController : ControllerBase
         _memberService = memberService;
     }
 
+    private async Task<string> ToBase64ImgTag(string url, string alt, int maxWidth = 300)
+    {
+        try
+        {
+            using var http = new HttpClient();
+            var bytes = await http.GetByteArrayAsync(url);
+            var base64 = Convert.ToBase64String(bytes);
+            return $"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"{alt}\" " +
+                $"style=\"display:block;width:100%;max-width:{maxWidth}px;height:auto;margin:0 auto;border:0;outline:none;\" />";
+        }
+        catch
+        {
+            // fallback αν αποτύχει
+            return $"<img src=\"{url}\" alt=\"{alt}\" style=\"display:block;width:100%;max-width:{maxWidth}px;height:auto;margin:0 auto;border:0;outline:none;\" />";
+        }
+    }
+
     [HttpPost("send")]
     public async Task<IActionResult> Send([FromForm] string email)
     {
@@ -68,13 +85,140 @@ public class GetCodeController : ControllerBase
         member.SetValue("passwordResetCode", tempCode);
         _memberService.Save(member);
 
+        //****************LOGO Kinsen******************
+        const string logoUrl = "https://production-job-board-public.s3.amazonaws.com/logos/43021810-0cfb-466e-b00c-46c05fd4b394";
+        var logoTag = await ToBase64ImgTag(logoUrl, "Kinsen", 250);
+
         var subject = "Ανάκτηση Κωδικού – Kinsen";
         var body = $@"
-            <p>Γεια σας,</p>
-            <p>Λάβαμε αίτημα ανάκτησης κωδικού.</p>
-            <p><strong>Προσωρινός κωδικός:</strong> {tempCode}</p>
-            <br/>
-            <p>Kinsen Hellas</p>";
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width'>
+        </head>
+
+        <body style='margin:0;padding:0;background:#ffffff;'>
+
+        <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
+            style='border-collapse:collapse;background:#ffffff;'>
+        <tr>
+            <td align='left' style='padding:0;margin:0;'>
+
+            <!-- OUTER FIXED WRAPPER -->
+            <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
+                    style='border-collapse:collapse;width:600px;max-width:600px;margin:0;'>
+
+                <!-- HEADER : LOGO + TITLE -->
+                <tr>
+                <td align='left' style='padding:0;margin:0;'>
+                    <table role='presentation' border='0' cellspacing='0' cellpadding='0'
+                        style='border-collapse:collapse;margin:0;'>
+                    
+                    <!-- LOGO -->
+                    <tr>
+                        <td valign='middle' style='padding:0 12px 0 0; margin:0;'>
+                        {logoTag}
+                        </td>
+                    </tr>
+
+                    <!-- TITLE -->
+                    <tr>
+                        <td valign='middle'
+                            style='padding-top:30px;margin:20;'>
+                        <span style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                                    font-size:22px;
+                                    font-weight:400;
+                                    color:#39c0c3;
+                                    line-height:1;
+                                    white-space:nowrap; margin-top:30px;'>
+                            Ανάκτηση Κωδικού Πρόσβασης
+                        </span>
+                        </td>
+                    </tr>
+                    </table>
+                </td>
+                </tr>
+
+                    <!-- TEXT -->
+                    <tr>
+                        <td align='left'
+                            style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                                font-size:14px;
+                                color:#000;
+                                line-height:1.6;
+                                padding:14px 0;
+                                margin:0;'>
+                            <p style='margin:0 0 8px 0;'>Γεια σας,</p>
+                            <p style='margin:0;'>
+                                Λάβαμε αίτημα για ανάκτηση του κωδικού πρόσβασής σας στον λογαριασμό
+                                <strong>Kinsen</strong>.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- CODE BOX -->
+                    <tr>
+                        <td align='left' style='padding:0;margin:0;'>
+                            <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
+                                style='border-collapse:collapse;border:1px solid #39c0c3;background:#f4fcfd;'>
+                                <tr>
+                                    <td align='left'
+                                        style='padding:14px 16px;
+                                            font-family:Segoe UI,Roboto,Arial,sans-serif;'>
+                                        <div style='font-size:14px;color:#000;margin:0 0 6px 0;'>
+                                            Ο <strong>προσωρινός κωδικός</strong> σας είναι:
+                                        </div>
+                                        <div style='font-size:20px;font-weight:700;color:#39c0c3;letter-spacing:1px;'>
+                                            {tempCode}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- INFO -->
+                    <tr>
+                        <td align='left'
+                            style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                                font-size:13px;
+                                color:#333;
+                                line-height:1.5;
+                                padding:14px 0 0 0;
+                                margin:0;'>
+                            <p style='margin:0;'>
+                                Χρησιμοποιήστε τον παραπάνω κωδικό για να ολοκληρώσετε τη διαδικασία
+                                και να ορίσετε νέο κωδικό πρόσβασης.
+                            </p>
+                            <p style='margin:8px 0 0 0;color:#777;'>
+                                Αν δεν κάνατε εσείς αυτό το αίτημα, μπορείτε να αγνοήσετε το παρόν email.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- SIGNATURE -->
+                    <tr>
+                        <td align='left'
+                            style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                                font-size:13px;
+                                color:#000;
+                                padding:18px 0 0 0;
+                                margin:0;'>
+                            <p style='margin:0;'>Με εκτίμηση,</p>
+                            <p style='margin:4px 0 0 0;'><strong>Kinsen Hellas</strong></p>
+                        </td>
+                    </tr>
+
+                </table>
+                <!-- /INNER WRAPPER -->
+
+            </td>
+            </tr>
+            </table>
+
+            </body>
+            </html>";
 
         // ✅ Στέλνουμε ΑΠΕΥΘΕΙΑΣ στο email που έγραψε ο χρήστης
         var msg = new EmailMessage(
