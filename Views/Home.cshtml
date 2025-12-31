@@ -55,69 +55,8 @@
     </div>
 </div>
 
-
-@*-----------------Animation Counter----------------*@
-<section class="stats-section">
-    <div class="stats-row">
-        <div class="stat-box">
-            <div class="stat-number" data-target="200" data-plus="true" data-unit="">0</div>
-            <div class="stat-label">
-                @(blockListItem?.ElementAtOrDefault(0)?.Content?.Value("statLabel"))
-            </div>
-        </div>
-
-        <div class="stat-box">
-            <div class="stat-number" data-target="300" data-plus="true" data-unit="">0</div>
-            <div class="stat-label">
-                @(blockListItem?.ElementAtOrDefault(1)?.Content?.Value("statLabel"))
-            </div>
-        </div>
-
-        <div class="stat-box">
-            <div class="stat-number" data-target="900" data-plus="false" data-unit="χλμ">0</div>
-            <div class="stat-label">
-                @(blockListItem?.ElementAtOrDefault(2)?.Content?.Value("statLabel"))
-            </div>
-        </div>
-    </div>
-
-    @if (!string.IsNullOrWhiteSpace(paragr?.ToString()))
-    {
-        <div class="stats-paragr">
-            @Html.Raw(paragr)
-        </div>
-    }
-</section>
-
-@*---------------Feature Cards---------------*@
-@if (featureCardsBlock != null && featureCardsBlock.Any())
-{
-    @* <h2 class="featureTitle">Επιλέξτε ανάμεσα σε ποικιλία κατηγοριών</h2> *@
-
-    <div class="features-container">
-        @foreach (var card in featureCardsBlock)
-        {
-            var content = card.Content;
-            var img = content.Value<MediaWithCrops>("featureImg"); 
-            var description = content.Value<string>("description");
-            var targetSlug = content.Value<string>("targetSlug") ?? "";
-
-            <a href="/usedCarSalesPage?carType=@targetSlug" onclick="selectCategory('@targetSlug')" class="feature-card-link">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <img src="@img?.Url()"loading="lazy" style="width: 200px;" />
-                    </div>
-                    <div class="feature-description">
-                        <p>@Html.Raw(description)</p>
-                    </div>
-                </div>
-            </a>
-        }
-    </div>
-}
-
 @*------------------Carousel-------------------*@
-<h4 class="prosfores"><span>Ανακαλύψτε</span> τις Προσφορές σε ποικιλία μοντέλων</h4>
+<h4 class="prosfores">ΠΡΟΣΦΟΡΕΣ</h4>
 
 @if (carCardBlock != null && carCardBlock.Any())
 {
@@ -173,6 +112,68 @@
   </button>
 </div>
 }
+
+@*-----------------Animation Counter----------------*@
+<section class="stats-section">
+    <div class="stats-row">
+        <div class="stat-box">
+            <div class="stat-number" data-target="200" data-plus="true" data-unit="">0</div>
+            <div class="stat-label">
+                @(blockListItem?.ElementAtOrDefault(0)?.Content?.Value("statLabel"))
+            </div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-number" data-target="3000" data-plus="true" data-unit="">0</div>
+            <div class="stat-label">
+                @(blockListItem?.ElementAtOrDefault(1)?.Content?.Value("statLabel"))
+            </div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-number" data-target="900" data-plus="false" data-unit="χλμ">0</div>
+            <div class="stat-label">
+                @(blockListItem?.ElementAtOrDefault(2)?.Content?.Value("statLabel"))
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(paragr?.ToString()))
+    {
+        <div class="stats-paragr">
+            @Html.Raw(paragr)
+        </div>
+    }
+</section>
+
+@*---------------Feature Cards---------------*@
+@if (featureCardsBlock != null && featureCardsBlock.Any())
+{
+    @* <h2 class="featureTitle">Επιλέξτε ανάμεσα σε ποικιλία κατηγοριών</h2> *@
+
+    <div class="features-container">
+        @foreach (var card in featureCardsBlock)
+        {
+            var content = card.Content;
+            var img = content.Value<MediaWithCrops>("featureImg"); 
+            var description = content.Value<string>("description");
+            var targetSlug = content.Value<string>("targetSlug") ?? "";
+
+            <a href="/usedCarSalesPage?carType=@targetSlug" onclick="selectCategory('@targetSlug')" class="feature-card-link">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <img src="@img?.Url()"loading="lazy" style="width: 200px;" />
+                    </div>
+                    <div class="feature-description">
+                        <p>@Html.Raw(description)</p>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+}
+
+
 
 @*----------------Photo Trilogy------------------*@
 <section class="gallery-bg">

@@ -16,6 +16,26 @@
 	ViewBag.BodyClass = "cart-page";
 }
 
+<style>
+  @@keyframes offerSuccessFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @@keyframes offerSuccessFadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  .offer-success-note {
+    animation: offerSuccessFadeIn .3s ease-out forwards;
+  }
+
+  .offer-success-note.fade-out {
+    animation: offerSuccessFadeOut .4s ease-in forwards;
+  }
+</style>
+
 <div class="container my-5" id="offerCartPage">
   <!-- Άδειο καλάθι -->
   <div id="cartEmpty" class="d-none text-center p-5 border rounded-4 bg-light">
@@ -105,8 +125,8 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
         <button id="offerSubmitBtnCart" type="button" class="btn btn-primary">Υποβολή</button>
+        <div id="offerSuccessNote" class="text-center small mt-3" style="display:none;color:#198754;"> Θα ειδοποιηθείτε σύντομα με email.</div>
       </div>
-
       </div>
     </div>
   </div>

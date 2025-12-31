@@ -31,8 +31,6 @@
   .warranty-title {
     margin-top: 30px;
     font-size: 1.3rem;
-    font-family: "Open Sans", sans-serif;
-    color: #39c0c3;
     width: 90%;
   }
 
@@ -76,17 +74,17 @@
   }
 
   .warranty-title {
-    margin-top: 30px;
     font-size: 1.6rem;
-    margin: auto 20px;
-    font-family: "Open Sans", sans-serif;
-    color: #39c0c3;
   }
 
   .warranty-subtitle {
     margin-top: 10px;
     font-size: 1.1rem;
     color: #001858;
+  }
+
+  .my-5 {
+    margin-bottom: 0 !important;
   }
 
   .loan-info-grid {
@@ -116,8 +114,6 @@
   .warranty-title {
     margin-top: 30px;
     font-size: 2rem;
-    font-family: "Open Sans", sans-serif;
-    color: #39c0c3;
   }
 
   .warranty-subtitle {
@@ -154,10 +150,7 @@
   }
 
   .warranty-title {
-    margin-top: 30px;
     font-size: 2.1rem;
-    font-family: "Open Sans", sans-serif;
-    color: #39c0c3;
   }
 
   .warranty-subtitle {

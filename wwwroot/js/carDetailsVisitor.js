@@ -182,18 +182,48 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
 
         // ✅ Μήνυμα επιτυχίας
-        if (statusEl) {
-          statusEl.style.display = "block";
-          statusEl.textContent = "Η αίτησή σας στάλθηκε επιτυχώς!";
-          statusEl.className = "small mt-2 text-success";
+        // if (statusEl) {
+        //   statusEl.style.display = "block";
+        //   statusEl.textContent = "Η αίτησή σας στάλθηκε επιτυχώς!";
+        //   statusEl.className = "small mt-2 text-success";
+        // }
+
+        const successNote = document.getElementById("offerSuccessNote");
+        if (successNote) {
+          successNote.style.display = "block";
         }
+
+        // ⏳ χρόνος να διαβαστεί
+        await new Promise((r) => setTimeout(r, 2200));
+
+        // 🌫️ απαλό fade out
+        if (successNote) {
+          successNote.classList.add("fade-out");
+        }
+        if (statusEl) {
+          statusEl.classList.add("fade-out");
+        }
+
+        await new Promise((r) => setTimeout(r, 800));
 
         const modalEl = document.getElementById("offerModal");
 
-        // ✅ Κλείσιμο modal (safe)
+        // ✅ ΚΛΕΙΣΕ ρητά το modal
+        bootstrap.Modal.getInstance(modalEl)?.hide();
+
+        // περίμενε να κλείσει
         await waitModalHidden(modalEl);
 
+        // reset
         document.getElementById("offerForm")?.reset();
+
+        if (modalEl) {
+          modalEl.addEventListener("show.bs.modal", () => {
+            const note = document.getElementById("offerSuccessNote");
+            note?.classList.remove("fade-out");
+            if (note) note.style.display = "none";
+          });
+        }
       } catch (err) {
         console.error("❌ SubmitOffer error:", err);
         const status = document.getElementById("offerStatus");
@@ -206,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.innerText = original;
         cleanupBootstrapArtifacts();
       }
-    }, 1500);
+    }, 1000);
   });
 
   document.addEventListener("submit", (e) => {

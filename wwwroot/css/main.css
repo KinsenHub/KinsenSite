@@ -4,6 +4,8 @@ body {
   padding: 0;
   overflow-x: hidden;
   overflow-y: auto !important;
+  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+    sans-serif;
 }
 
 .layout-wrapper {
@@ -42,7 +44,6 @@ body {
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
   text-align: center;
   padding: 2rem 1rem;
-  font-family: "Open Sans", sans-serif;
   font-weight: 300;
 }
 
@@ -100,7 +101,7 @@ body {
 
 .stats-section {
   background: #fff;
-  padding: 48px 0 0 0; /* απόσταση από το video */
+  padding: 130px 0 0 0; /* απόσταση από το video */
   position: relative;
   z-index: 2;
 }
@@ -130,7 +131,6 @@ body {
   max-width: 70%;
   margin: 50px auto; /* auto για να μπει στο κέντρο */
   color: #001858;
-  font-family: "Open Sans", sans-serif;
   text-align: center;
   font-size: 1.5rem;
   line-height: 1.8;
@@ -156,7 +156,6 @@ body {
   font-size: 30px;
   margin-top: 70px;
   color: #002e4d;
-  font-family: "Open Sans", sans-serif;
   font-weight: 300;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
   text-align: center;
@@ -226,12 +225,12 @@ body {
 
 /*----------Καρουζέλ-----------*/
 .prosfores {
-  text-align: center;
+  text-align: left;
   color: #39c0c3;
   font-weight: 400;
   margin: 30px;
   font-size: 1.4rem;
-  text-shadow: 0 0 12px rgba(46, 196, 199, 0.25) !important;
+  text-shadow: 0 0 12px rgba(46, 196, 199, 0.35) !important;
 }
 
 /* OUTER VIEWPORT */
@@ -386,7 +385,7 @@ body {
 .trilogy-container {
   border-radius: 16px;
   padding: 1.25rem;
-  margin-top: 3rem;
+  margin-top: 1.5rem;
 }
 
 .trilogy-container .ratio {
@@ -397,7 +396,6 @@ body {
 
 .text-block-h3 {
   font-size: 1.2rem;
-  font-family: "Open Sans", sans-serif;
   margin-bottom: 0.5rem;
   line-height: 1.4;
   color: #023859;
@@ -406,8 +404,7 @@ body {
 
 .text-block-par {
   font-size: 1.1rem;
-  font-family: "Open Sans", sans-serif;
-  margin-top: 0;
+  margin: 0;
   text-align: left;
   font-weight: 300;
   line-height: 2;
@@ -461,7 +458,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr; /* 2 πάνω */
     gap: 22px 18px;
-    margin-top: 24px;
+    margin-top: 50px;
     padding: 0 16px; /* κενό δεξιά/αριστερά */
     justify-items: center;
   }
@@ -562,10 +559,10 @@ body {
   /* η εικόνα να γεμίζει ΟΛΟ το πλάτος (και το ύψος του box) */
   .trilogy-container .card {
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
     align-items: stretch;
-    gap: 2.5rem;
-    margin: 4rem 1rem 4rem 2rem;
+    gap: 1rem;
+    margin: 0 20px;
   }
 
   /* πιο “μαζεμένα” κείμενα 3-pics */
@@ -586,13 +583,16 @@ body {
     border-radius: 8px;
   }
 
-  .trilogy-container {
-    margin-top: 5rem;
+  .trilogy-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* γεμίζει χωρίς παραμόρφωση */
+    display: block;
   }
 
   .text-block-h3 {
     font-size: 1.2rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
   }
 
   .text-block-par {
@@ -638,11 +638,11 @@ body {
   }
 
   .stat-number {
-    font-size: 2.6rem;
+    font-size: 2.4rem;
   }
 
   .stat-label {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .stats-paragr {
@@ -660,7 +660,7 @@ body {
   }
 
   .prosfores {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
   }
 
   .discount-badgeMain {
@@ -680,8 +680,8 @@ body {
   }
 
   .trilogy-container {
-    margin-top: 4rem;
-    margin-bottom: 5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 
   .trilogy-container .row > [class*="col-"] {
@@ -690,12 +690,26 @@ body {
     margin-bottom: 2rem;
   }
 
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .card {
+    flex-direction: row-reverse !important;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-h3 {
+    text-align: left;
+    padding-left: 3rem;
+  }
+
+  .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-par {
+    padding-left: 3rem !important;
+    padding-right: 0;
+  }
+
   .trilogy-container .card {
     display: flex !important;
     flex-direction: row !important;
     align-items: stretch;
     gap: 2.5rem;
-    margin: 4rem 1rem 4rem 2rem;
+    margin: 1rem;
   }
 
   .trilogy-container .ratio {
@@ -718,20 +732,6 @@ body {
 
   .text-block-par {
     padding-right: 3rem;
-  }
-
-  .trilogy-container .row > [class*="col-"]:nth-child(2) .card {
-    flex-direction: row-reverse !important;
-  }
-
-  .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-h3 {
-    text-align: left;
-    padding-left: 3rem;
-  }
-
-  .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-par {
-    padding-left: 3rem !important;
-    padding-right: 0;
   }
 }
 
@@ -794,7 +794,7 @@ body {
   }
 
   .prosfores {
-    font-size: 1.9rem;
+    font-size: 2rem;
   }
 
   .discount-badgeMain {
@@ -813,9 +813,10 @@ body {
     bottom: -80px;
   }
 
+  /* Photo Trilogy */
   .trilogy-container {
     margin-top: 4rem;
-    margin-bottom: 5rem;
+    margin-bottom: 4rem;
   }
 
   .trilogy-container .row > [class*="col-"] {
@@ -852,6 +853,7 @@ body {
   }
 
   .text-block-par {
+    font-size: 1.5rem;
     padding-right: 3rem;
   }
 
@@ -923,7 +925,6 @@ body {
     max-width: 90%;
     margin: 100px auto; /* auto για να μπει στο κέντρο */
     color: #001858;
-    font-family: "Open Sans", sans-serif;
     text-align: center;
     font-size: 1.7rem;
     line-height: 1.4;
@@ -968,7 +969,16 @@ body {
 
   .trilogy-container {
     margin-top: 4rem;
-    margin-bottom: 5rem;
+    margin-bottom: 4rem;
+  }
+
+  .text-block-h3 {
+    font-size: 2rem;
+  }
+
+  /* Photo Trilogy */
+  .text-block-par {
+    font-size: 1.8rem;
   }
 }
 
@@ -1025,7 +1035,6 @@ body {
     max-width: 90%;
     margin: 100px auto; /* auto για να μπει στο κέντρο */
     color: #001858;
-    font-family: "Open Sans", sans-serif;
     text-align: center;
     font-size: 1.9rem;
     line-height: 1.4;
@@ -1034,7 +1043,7 @@ body {
 
   .features-container {
     gap: 3rem;
-    margin: 100px auto;
+    margin: 100px auto 50px auto;
   }
 
   .feature-card {
@@ -1052,17 +1061,10 @@ body {
   }
 
   .prosfores {
-    font-size: 2.3rem;
-    margin-bottom: 80px;
+    font-size: 3.5rem;
+    margin: 80px;
+    font-family: "Manrope", system-ui, -apple-system, sans-serif;
   }
-
-  /* h2.car-title {
-    font-size: 1.9rem;
-  }
-
-  .price {
-    font-size: 1.8rem;
-  } */
 
   .tesla-carousel {
     grid-area: carousel;
@@ -1076,38 +1078,12 @@ body {
     bottom: -80px; /* πόσο χαμηλά */
   }
 
+  .text-block-h3 {
+    font-size: 2.1rem;
+  }
+
   /* Photo Trilogy */
-  .trilogy-container .row > [class*="col-"] {
-    flex: initial !important;
-    max-width: initial !important;
-    margin-bottom: 0 !important;
-  }
-
-  /* επιστροφή σε κάθετη κάρτα */
-  .trilogy-container .card {
-    display: block !important;
-  }
-
-  /* ratio/image full width πάνω */
-  .trilogy-container .ratio {
-    flex: none !important;
-    max-width: 100% !important;
-    /* margin-bottom: 1rem !important; */
-  }
-
-  /* κείμενο κάτω από εικόνα */
-  .trilogy-container .card-body {
-    max-width: 100% !important;
-    padding-right: 0 !important;
-    display: block !important;
-    margin-top: 40px;
-  }
-
-  .trilogy-container .row > [class*="col-"]:nth-child(2) .card {
-    flex-direction: initial !important;
-  }
-
-  .trilogy-container {
-    padding-bottom: 0;
+  .text-block-par {
+    font-size: 1.9rem;
   }
 }

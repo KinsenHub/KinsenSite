@@ -15,6 +15,13 @@
     var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
 }
 
+<style>
+  .fade-out {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+</style>
+
 <div id="carDetailsContainer">
 
 	<script>
@@ -230,6 +237,7 @@
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
 							<button id="offerSubmitBtnVisitor" type="button" class="btn btn-primary">Υποβολή</button>
+							<div id="offerSuccessNote" class="text-center small mt-3" style="display:none;color:#198754;"> Θα ειδοποιηθείτε σύντομα με email.</div>
 						</div>
 
 						</div>

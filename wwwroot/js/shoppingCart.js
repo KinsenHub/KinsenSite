@@ -345,18 +345,39 @@ document.addEventListener("click", async (e) => {
       if (!r.ok) throw new Error(await r.text());
       const res = await r.json(); // { ok: true }
 
-      // ✅ Μήνυμα επιτυχίας
-      if (statusEl) {
-        statusEl.style.display = "block";
-        statusEl.textContent = "Η αίτησή σας στάλθηκε επιτυχώς!";
-        statusEl.className = "small mt-2 text-success";
+      const successNote = document.getElementById("offerSuccessNote");
+      if (successNote) {
+        successNote.style.display = "block";
+        successNote.classList.add("offer-success-note");
       }
+
+      // ⏳ δώσε χρόνο να το διαβάσει
+      await new Promise((r) => setTimeout(r, 2000));
+
+      // 🔥 διακριτικό fade out
+      if (successNote) {
+        successNote.classList.add("fade-out");
+      }
+
+      await new Promise((r) => setTimeout(r, 800));
+
+      // animation στο modal
+      modalEl
+        .querySelector(".modal-content")
+        ?.style.setProperty("animation", "modalFadeOut 0.25s ease-in");
 
       // ✅ Κλείσιμο modal
       await waitModalHidden(modalEl);
 
-      // ✅ Reset φόρμας
+      // reset
       document.getElementById("offerForm")?.reset();
+      if (modalEl) {
+        modalEl.addEventListener("show.bs.modal", () => {
+          const note = document.getElementById("offerSuccessNote");
+          if (note) note.style.display = "none";
+          note.classList.remove("offer-success-note");
+        });
+      }
 
       // καθάρισε καλάθι
       await fetch("/umbraco/api/cart/clear", { method: "POST" });
@@ -379,7 +400,7 @@ document.addEventListener("click", async (e) => {
       submitBtn.textContent = original;
       clearUiOverlays();
     }
-  }, 1500);
+  }, 1000);
 });
 
 // Ασφάλεια να μη γίνει submit με reload
