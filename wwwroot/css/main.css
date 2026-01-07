@@ -417,6 +417,11 @@ body {
   h1.hero-title {
     font-size: 2rem;
     font-weight: 300;
+    margin-top: 20px;
+  }
+
+  .hero-wrapper {
+    height: 65vh;
   }
 
   .hero-video {
@@ -424,7 +429,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 70%;
     object-fit: cover;
     z-index: -1;
   }
@@ -438,6 +443,7 @@ body {
     justify-content: center;
     text-align: center;
     padding: 1rem;
+    height: 70%;
     color: #fff;
     font-size: clamp(1.2rem, 4vw, 2rem);
     font-weight: bold;
@@ -502,6 +508,8 @@ body {
 
   .prosfores {
     font-size: 1.4rem;
+    padding: 0;
+    margin-top: 0 !important;
   }
 
   .tesla-carousel-wrapper {
@@ -606,12 +614,16 @@ body {
     font-size: 3rem;
   }
 
+  .hero-wrapper {
+    height: 65vh;
+  }
+
   .hero-video {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 80%;
     object-fit: cover;
     z-index: -1;
   }
@@ -620,6 +632,7 @@ body {
     position: absolute;
     inset: 0;
     display: flex;
+    height: 80%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -659,8 +672,14 @@ body {
     font-size: 1.1rem;
   }
 
+  /* και μη χρησιμοποιείς τεράστιο margin στο title */
   .prosfores {
-    font-size: 1.7rem;
+    margin-top: 10rem;
+  }
+
+  /* το carousel να ξεκινάει φυσιολογικά κάτω από τον τίτλο */
+  .tesla-carousel-wrapper {
+    margin-top: 1.5rem !important;
   }
 
   .discount-badgeMain {
@@ -741,12 +760,16 @@ body {
     font-size: 3rem;
   }
 
+  .hero-wrapper {
+    height: 65vh;
+  }
+
   .hero-video {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 80%;
     object-fit: cover;
     z-index: -1;
   }
@@ -755,6 +778,7 @@ body {
     position: absolute;
     inset: 0;
     display: flex;
+    height: 80%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -795,6 +819,7 @@ body {
 
   .prosfores {
     font-size: 2rem;
+    margin-top: 10rem;
   }
 
   .discount-badgeMain {
@@ -878,12 +903,16 @@ body {
     font-weight: 300;
   }
 
+  .hero-wrapper {
+    height: 65vh;
+  }
+
   .hero-video {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 80%;
     object-fit: cover;
     z-index: -1;
   }
@@ -892,6 +921,7 @@ body {
     position: absolute;
     inset: 0;
     display: flex;
+    height: 80%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -952,7 +982,7 @@ body {
 
   .prosfores {
     font-size: 2.3rem;
-    margin-bottom: 50px;
+    margin-top: 10rem;
   }
 
   .tesla-carousel {
@@ -988,12 +1018,16 @@ body {
     font-weight: 300;
   }
 
+  .hero-wrapper {
+    height: 65vh;
+  }
+
   .hero-video {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 90%;
     object-fit: cover;
     z-index: -1;
   }
@@ -1002,6 +1036,7 @@ body {
     position: absolute;
     inset: 0;
     display: flex;
+    height: 90%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -1062,7 +1097,7 @@ body {
 
   .prosfores {
     font-size: 3.5rem;
-    margin: 80px;
+    margin-top: 18rem;
     font-family: "Manrope", system-ui, -apple-system, sans-serif;
   }
 
