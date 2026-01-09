@@ -5,8 +5,10 @@
 }
 
 .footer-59391-container {
-  max-width: 1500px;
-  margin: 20px auto;
+  /* max-width: 1500px; */
+  max-width: 100%;
+  padding-right: 0;
+  padding-left: 0;
 }
 
 /* ---------- ΣΩΣΤΗ ΕΥΘΥΓΡΑΜΜΙΣΗ ΠΡΩΤΗΣ ΣΕΙΡΑΣ (LOGO + SOCIAL ICONS) ---------- */
@@ -54,19 +56,18 @@
 }
 
 .footer-59391 .social-icons {
-  margin: 0;
-  padding-left: 0;
-  display: flex; /* οριζόντια σειρά */
-  justify-content: flex-end; /* πάνε δεξιά στη col-md-8 */
-  align-items: center; /* κεντράρονται κάθετα */
-  gap: 1.2rem; /* απόσταση μεταξύ των icons */
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin: 0 -12px 0 0;
+  padding-top: 30px;
+  padding-right: 30px;
 }
 
 .footer-59391 .social-icons li {
   list-style: none;
 }
 
-/* λίγο μέγεθος / στοίχιση για τα <i> αν χρειάζεται */
 .footer-59391 .social-icons li i {
   font-size: 1rem;
   display: inline-block;
@@ -78,6 +79,42 @@
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
+}
+
+.footer-59391 .social-icons a i {
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.footer-59391 .social-icons a[href*="facebook"] i {
+  color: #1877f2 !important;
+}
+
+.footer-59391 .social-icons a[href*="kinsen.gr"] i,
+.footer-59391 .social-icons a[href*="google"] i {
+  color: #db4437 !important;
+}
+
+.footer-59391 .social-icons a[href*="instagram"] i {
+  background: radial-gradient(
+    circle at 30% 110%,
+    #fdf497 0%,
+    #fdf497 5%,
+    #fd5949 45%,
+    #d6249f 60%,
+    #285aeb 90%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+
+.footer-59391 .social-icons a[href*="linkedin"] i {
+  color: #0a66c2 !important;
+}
+
+.footer-59391 .social-icons a:hover i {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
 }
 
 /* ---------- BRAND LOGOS ΠΑΝΩ ΑΠΟ COPYRIGHT ---------- */

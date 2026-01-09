@@ -1,12 +1,15 @@
 .contact-img {
   margin-top: 30px;
+  height: 500px;
 }
 
 .contact-container {
   display: flex;
-  flex-wrap: wrap;
-  margin: 0 auto;
-  padding: 0;
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 30px auto;
+  padding: 8px 66px 14px;
 }
 
 .contact-left {
@@ -28,7 +31,7 @@
 }
 
 .contact-title {
-  color: #001858;
+  color: #39c0c3;
   font-size: 3rem;
   margin: 8px 0 12px;
   line-height: 1.3;
