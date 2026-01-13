@@ -224,13 +224,26 @@ body {
 }
 
 /*----------Καρουζέλ-----------*/
+.shadow-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 3rem;
+  box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px,
+    rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+  width: 20%;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 999px;
+}
+
 .prosfores {
-  text-align: left;
+  text-align: center;
   color: #39c0c3;
   font-weight: 400;
-  margin: 30px;
   font-size: 1.4rem;
-  text-shadow: 0 0 12px rgba(46, 196, 199, 0.35) !important;
 }
 
 /* OUTER VIEWPORT */
@@ -421,7 +434,7 @@ body {
   }
 
   .hero-wrapper {
-    height: 65vh;
+    height: 60vh;
   }
 
   .hero-video {
@@ -506,10 +519,13 @@ body {
     font-size: 1rem;
   }
 
+  .shadow-container {
+    width: 40%;
+    padding: 15px;
+  }
+
   .prosfores {
     font-size: 1.4rem;
-    padding: 0;
-    margin-top: 0 !important;
   }
 
   .tesla-carousel-wrapper {
@@ -615,7 +631,7 @@ body {
   }
 
   .hero-wrapper {
-    height: 65vh;
+    height: 70vh;
   }
 
   .hero-video {
@@ -672,9 +688,12 @@ body {
     font-size: 1.1rem;
   }
 
-  /* και μη χρησιμοποιείς τεράστιο margin στο title */
+  .shadow-container {
+    width: 32%;
+  }
+
   .prosfores {
-    margin-top: 6rem;
+    font-size: 1.7rem;
   }
 
   /* το carousel να ξεκινάει φυσιολογικά κάτω από τον τίτλο */
@@ -715,11 +734,11 @@ body {
 
   .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-h3 {
     text-align: left;
-    padding-left: 3rem;
+    padding-left: 1rem;
   }
 
   .trilogy-container .row > [class*="col-"]:nth-child(2) .text-block-par {
-    padding-left: 3rem !important;
+    padding-left: 1rem !important;
     padding-right: 0;
   }
 
@@ -750,7 +769,7 @@ body {
   }
 
   .text-block-par {
-    padding-right: 3rem;
+    padding-right: 0;
   }
 }
 
@@ -817,9 +836,13 @@ body {
     font-size: 1.2rem;
   }
 
+  .shadow-container {
+    width: 35%;
+    margin-top: 5rem;
+  }
+
   .prosfores {
     font-size: 2rem;
-    margin-top: 10rem;
   }
 
   .discount-badgeMain {
@@ -961,6 +984,26 @@ body {
     text-align: center;
   }
 
+  .shadow-container {
+    margin-top: 6rem;
+  }
+
+  .prosfores {
+    font-size: 2.2rem;
+  }
+
+  .tesla-carousel {
+    grid-area: carousel;
+    width: 100%;
+    padding: 0 14px;
+  }
+
+  .tesla-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: -80px; /* πόσο χαμηλά */
+  }
+
   .features-container {
     gap: 2rem;
     margin: 100px auto;
@@ -978,23 +1021,6 @@ body {
 
   .feature-description {
     font-size: 1.2rem;
-  }
-
-  .prosfores {
-    font-size: 2.3rem;
-    margin-top: 10rem;
-  }
-
-  .tesla-carousel {
-    grid-area: carousel;
-    width: 100%;
-    padding: 0 14px;
-  }
-
-  .tesla-arrow {
-    position: absolute;
-    left: 50%;
-    bottom: -80px; /* πόσο χαμηλά */
   }
 
   .trilogy-container {
@@ -1019,7 +1045,7 @@ body {
   }
 
   .hero-wrapper {
-    height: 65vh;
+    height: 70vh;
   }
 
   .hero-video {
@@ -1076,6 +1102,26 @@ body {
     text-align: center;
   }
 
+  .shadow-container {
+    margin-top: 9rem;
+  }
+
+  .prosfores {
+    font-size: 2.7rem;
+  }
+
+  .tesla-carousel {
+    grid-area: carousel;
+    width: 100%;
+    padding: 0 14px;
+  }
+
+  .tesla-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: -80px;
+  }
+
   .features-container {
     gap: 3rem;
     margin: 100px auto 50px auto;
@@ -1095,30 +1141,19 @@ body {
     font-size: 1.15rem;
   }
 
-  .prosfores {
-    font-size: 3.5rem;
-    margin-top: 18rem;
-    font-family: "Manrope", system-ui, -apple-system, sans-serif;
-  }
-
-  .tesla-carousel {
-    grid-area: carousel;
-    width: 100%;
-    padding: 0 14px;
-  }
-
-  .tesla-arrow {
-    position: absolute;
-    left: 50%;
-    bottom: -80px; /* πόσο χαμηλά */
-  }
-
+  /* Photo Trilogy */
   .text-block-h3 {
     font-size: 2.1rem;
   }
 
-  /* Photo Trilogy */
   .text-block-par {
-    font-size: 1.9rem;
+    font-size: 1.7rem;
+  }
+}
+
+@media (min-width: 1800px) {
+  .shadow-container {
+    margin-top: 11rem;
+    width: 25%;
   }
 }

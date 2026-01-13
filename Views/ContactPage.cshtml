@@ -8,20 +8,21 @@
   var contactImg = Model.Value<MediaWithCrops>("contactImg");
 }
 
-@if (contactImg != null)
-{
-	<div class="contact-img-wrapper text-center my-3">
-    <img src="@contactImg.Url()" alt="Warranty Image" class="contact-img img-fluid shadow" style="border-radius:12px;margin-top:30px;"/>
-  </div>
-}
+<div class="contact-hero-shell">
 
-<div class="d-flex flex-column align-items-center">
-  <div class="contact-container">
-    <div class="contact-left">
-      <h2 class="contact-title">@contactTitle</h2>
+  @if (contactImg != null)
+  {
+    <div class="contact-bg-image">
+      <img src="@contactImg.Url()" alt="Contact Background" />
+    </div>
+  }
 
-      <form id="contactForm" class="contact-form">
-        <div class="form-row">
+  <div class="contact-form-layer">
+    <div class="contact-container">
+      <div class="contact-left">
+        <h3>@contactTitle</h3>
+        <form id="contactForm" class="contact-form">
+          <div class="form-row">
           <div class="form-group">
             <label for="first-name">Όνομα</label>
             <input type="text" id="first-name" placeholder="" />
@@ -43,13 +44,11 @@
         </div>
 
         <button type="button" id="contactSubmit" class="submit-btn">Αποστολή</button>
-        <p id="contactStatus" class="mt-2 small"></p>
-      </form>
+        <div class="form-message d-flex gap-3 justify-content-center mt-4" id="formMsg" aria-live="polite"></div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="~/js/contactPage.js"></script>
-
-
-

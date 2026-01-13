@@ -1,68 +1,339 @@
+.contact-left h3 {
+  color: #002e4d;
+}
+
+.contact-hero-shell {
+  position: relative;
+  width: 100%;
+  height: 75vh;
+  margin: 20px auto;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.contact-bg-image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0 60px;
+}
+
+.contact-bg-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.contact-form-layer {
+  position: relative;
+  z-index: 2;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  margin: 80px auto;
+}
+
+.contact-left h3 {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+/* =========================
+   FORM CONTAINER (GLASS)
+========================= */
 .contact-container {
-  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.359);
+  backdrop-filter: blur(6px);
+  border-radius: 16px;
+  padding: 40px 48px;
+  /* max-width: 50% !important;
+  width: 50% !important; */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.contact-left {
+  width: 100%;
+}
+
+/* =========================
+   FORM ELEMENTS
+========================= */
+.contact-form {
+  text-align: center;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  text-align: left;
+}
+
+input,
+textarea {
+  padding: 14px 18px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* =========================
+   SUBMIT BUTTON
+========================= */
+.submit-btn {
+  margin-top: 25px;
+  padding: 16px 22px;
+  font-size: 16px;
+  background-color: #002e4d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #01436a;
+}
+
+/* =========================
+   FORM MESSAGE (κάτω από κουμπί)
+========================= */
+#formMsg.form-message {
+  width: 70%;
+  display: flex; /* να κεντράρει */
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 44px;
+  border-radius: 10px; /* pill shape */
+  background: rgba(208, 234, 224, 0.95);
+  color: #2f5f52;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.6);
+
+  backdrop-filter: blur(6px);
+  /* ΚΛΕΙΔΙ */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+}
+
+#formMsg.form-message.gap-3 {
+  gap: 0 !important;
+}
+
+#formMsg.form-message.mt-4 {
+  margin-top: 18px !important;
+}
+
+#formMsg.form-message.is-error {
+  background: rgba(255, 220, 220, 0.95);
+  color: #7a1f1f;
 }
 
 @media (max-width: 575px) {
-  .warranty-img-wrapper img {
-    max-width: 80%;
-    object-fit: cover;
+  .contact-hero-shell {
+    min-height: 78vh;
+    margin: 1rem auto;
   }
 
-  .contact-title {
-    font-size: 1.5rem;
+  .contact-bg-image {
+    margin: 0 20px;
+  }
+
+  /* Κεντράρισμα φόρμας */
+  .contact-form-layer {
+    align-items: flex-start;
+    padding: 0 35px;
+  }
+
+  .contact-container {
+    width: 100% !important;
+    max-width: 80% !important;
+    padding: 28px 35px;
+  }
+
+  .contact-left h3 {
     text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 18px;
+  }
+
+  /* Inputs πάντα ένα-ένα */
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .form-group {
+    margin-top: 14px;
+  }
+
+  label {
+    font-size: 0.85rem;
+  }
+
+  input,
+  textarea {
+    font-size: 0.95rem;
+    padding: 12px 14px;
+    border-radius: 8px;
+  }
+
+  textarea {
+    min-height: 100px;
   }
 
   .submit-btn {
-    width: 100px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 10px;
+  }
+
+  #formMsg.form-message {
+    width: 100%;
   }
 }
 
 @media (min-width: 576px) and (max-width: 991px) {
-  .warranty-img-wrapper img {
-    max-width: 80%;
-    object-fit: cover;
+  .contact-left h3 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 18px;
   }
 
-  .contact-title {
-    font-size: 2rem;
-    text-align: center;
+  .contact-container {
+    width: 90% !important;
+    max-width: 70% !important;
+    margin: 0 auto;
+  }
+
+  .contact-form-layer {
+    margin: 50px auto;
+    align-items: flex-start;
+  }
+
+  .submit-btn {
+    width: 50%;
+  }
+
+  #formMsg.form-message {
+    width: 80%;
   }
 }
 
 @media (min-width: 992px) {
-  .warranty-img-wrapper img {
-    max-width: 80%;
-    object-fit: cover;
+  .contact-hero-shell {
+    min-height: 75vh;
   }
 
-  .contact-title {
-    font-size: 2.2rem;
-    text-align: center;
+  .contact-left h3 {
+    font-size: 1.7rem;
   }
 
   .contact-container {
-    padding: 10px 10px;
+    max-width: 70%;
+    width: 100%;
+    margin: 40px auto;
+  }
+
+  .contact-form-layer {
+    margin: 40px auto;
+    align-items: flex-start;
+  }
+
+  .submit-btn {
+    width: 40%;
+  }
+
+  #formMsg.form-message {
+    width: 80%;
+    margin: 0 auto;
   }
 }
 
 @media (min-width: 1200px) {
-  .warranty-img-wrapper img {
-    max-width: 60%;
-    object-fit: cover;
+  .contact-container {
+    max-width: 80%;
+    width: 70%;
+    margin: 40px auto;
   }
 
-  .contact-title {
-    font-size: 2.7rem;
-    text-align: center;
+  .contact-form-layer {
+    margin: 40px auto;
+  }
+
+  .submit-btn {
+    width: 30%;
+  }
+
+  #formMsg.form-message {
+    width: 80%;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1400px) {
+  .contact-container {
+    width: 65%;
+    margin: 50px auto;
+  }
+
+  .contact-left h3 {
+    font-size: 1.9rem;
+  }
+
+  .contact-form-layer {
+    margin: 50px auto;
+    align-items: flex-start;
+  }
+
+  .submit-btn {
+    width: 25%;
+  }
+}
+
+@media (min-width: 1800px) {
+  .contact-left h3 {
+    font-size: 1.9rem;
   }
 
   .contact-container {
-    padding: 10px 10px;
+    width: 40%;
   }
 }

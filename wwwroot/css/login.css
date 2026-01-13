@@ -110,6 +110,12 @@ body {
   width: 100%;
 }
 
+.layout-wrapper {
+  min-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ===== Mobile tweaks ===== */
 @media (max-width: 575px) {
   .login-wrapper {

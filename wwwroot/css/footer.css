@@ -9,6 +9,7 @@
   max-width: 100%;
   padding-right: 0;
   padding-left: 0;
+  padding-top: 50px;
 }
 
 /* ---------- ΣΩΣΤΗ ΕΥΘΥΓΡΑΜΜΙΣΗ ΠΡΩΤΗΣ ΣΕΙΡΑΣ (LOGO + SOCIAL ICONS) ---------- */
@@ -85,38 +86,6 @@
   transition: transform 0.15s ease, filter 0.15s ease;
 }
 
-.footer-59391 .social-icons a[href*="facebook"] i {
-  color: #1877f2 !important;
-}
-
-.footer-59391 .social-icons a[href*="kinsen.gr"] i,
-.footer-59391 .social-icons a[href*="google"] i {
-  color: #db4437 !important;
-}
-
-.footer-59391 .social-icons a[href*="instagram"] i {
-  background: radial-gradient(
-    circle at 30% 110%,
-    #fdf497 0%,
-    #fdf497 5%,
-    #fd5949 45%,
-    #d6249f 60%,
-    #285aeb 90%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent !important;
-}
-
-.footer-59391 .social-icons a[href*="linkedin"] i {
-  color: #0a66c2 !important;
-}
-
-.footer-59391 .social-icons a:hover i {
-  transform: translateY(-2px);
-  filter: brightness(1.05);
-}
-
 /* ---------- BRAND LOGOS ΠΑΝΩ ΑΠΟ COPYRIGHT ---------- */
 .footer-59391 .nav-links.nav-left {
   display: flex;
@@ -141,11 +110,83 @@
 }
 
 /* ---------- COPYRIGHT ---------- */
-.footer-59391 .copyright {
+/* .footer-59391 .copyright {
   padding-top: 30px;
   text-align: center;
   color: #023859;
   font-weight: 500;
+} */
+
+.footer-59391 .footer-bottom {
+  margin-top: 26px;
+  padding-top: 18px;
+
+  border-top: 1px solid #dfe6ee; /* η γραμμή όπως στη φωτό */
+}
+
+.footer-59391 .footer-bottom-inner {
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+}
+
+/* COPYRIGHT CENTER */
+.footer-59391 .footer-copy {
+  grid-column: 2;
+  margin: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #023859;
+}
+
+/* SOCIAL RIGHT */
+.footer-59391 .footer-social {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  gap: 30px;
+  margin-right: 50px;
+  padding: 0;
+}
+
+.footer-59391 .footer-social li {
+  list-style: none;
+}
+
+.footer-59391 .footer-social i {
+  font-size: 1.15rem;
+  color: #023859; /* default */
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* hover colors (μόνο στο hover) */
+.footer-59391 .footer-social a[href*="facebook"]:hover i {
+  color: #1877f2;
+}
+.footer-59391 .footer-social a[href*="instagram"]:hover i {
+  background: radial-gradient(
+    circle at 30% 110%,
+    #fdf497 0%,
+    #fd5949 45%,
+    #d6249f 60%,
+    #285aeb 90%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.footer-59391 .footer-social a[aria-label*="Google"]:hover i {
+  color: #db4437;
+}
+
+.footer-59391 .footer-social a[aria-label="Linkedin"]:hover i {
+  color: #0a66c2;
+}
+.footer-59391 .footer-social a:hover i {
+  transform: translateY(-2px);
 }
 
 /* ---------- RESPONSIVE ---------- */
@@ -153,6 +194,10 @@
 @media (max-width: 575px) {
   .footer-59391 {
     padding: 1.2rem 1rem;
+  }
+
+  .footer-59391-container {
+    padding-top: 20px;
   }
 
   .footer-59391 .logos-row {
@@ -178,24 +223,38 @@
     object-fit: contain;
   }
 
-  /* social icons κεντραρισμένα */
-  .footer-59391 .social-icons,
-  .footer-59391 .footer-social {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 0.5rem;
+  .footer-59391 .footer-bottom-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
 
-  /* copyright κεντραρισμένο */
-  .footer-59391 .copyright,
-  .footer-59391 .footer-copyright {
-    text-align: center;
-    margin-top: 1rem;
+  .footer-copy {
+    width: 100% !important;
+    text-align: center !important;
+    display: block !important;
+  }
+
+  .footer-social {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    gap: 40px;
+    margin-top: 30px !important;
+    margin: 0 auto;
+    padding: 0;
   }
 }
 
 @media (min-width: 576px) and (max-width: 991px) {
+  .footer-59391 {
+    padding: 1rem 1.5rem;
+  }
+
+  .footer-59391-container {
+    padding-top: 20px;
+  }
+
   .footer-59391 .brand-logos {
     display: flex;
     flex-wrap: wrap;
@@ -208,12 +267,26 @@
     max-width: 150px;
   }
 
-  .footer-59391 .footer-social {
-    justify-content: center;
+  .footer-59391 .footer-bottom-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
 
-  .footer-59391 {
-    padding: 2rem 1.5rem;
+  .footer-copy {
+    width: 100% !important;
+    text-align: center !important;
+    display: block !important;
+  }
+
+  .footer-social {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    gap: 40px;
+    margin-top: 30px !important;
+    margin: 0 auto;
+    padding: 0;
   }
 }
 

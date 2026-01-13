@@ -13,7 +13,7 @@
 
 @if (financeImg != null)
 {
-	<div class="warranty-img-wrapper text-center my-5" style="height: 650px;">
+	<div class="warranty-img-wrapper text-center my-5" style="height: 700px;">
         <img src="@financeImg.Url()" alt="Warranty Image" class="warranty-img img-fluid shadow" style="border-radius:12px; margin-top:30px;"/>
 
         <h1 class="warranty-title mt-4">@FinancingTitle</h1>
@@ -22,20 +22,21 @@
 }
 
 
+<div class="loan-info-grid-container">
+    <div class="loan-info-grid">
+        @foreach (var item in blockList ?? Enumerable.Empty<BlockListItem>())
+        {
+            var content = item?.Content;
+            if (content == null) continue;
 
-<section class="loan-info-grid">
-    @foreach (var item in blockList ?? Enumerable.Empty<BlockListItem>())
-    {
-        var content = item?.Content;
-        if (content == null) continue;
+            var titleCard = content.Value<string>("titleCard");
+            var cardBody = content.Value<string>("cardBody");
 
-        var titleCard = content.Value<string>("titleCard");
-        var cardBody = content.Value<string>("cardBody");
-
-        <div class="loan-card">
-            <h2>@(string.IsNullOrWhiteSpace(titleCard) ? "Χωρίς τίτλο" : titleCard)</h2>
-            <hr>
-            <p>@Html.Raw(string.IsNullOrWhiteSpace(cardBody) ? "—" : cardBody)</p>
-        </div>
-    }
-</section>
+            <div class="loan-card">
+                <h2>@(string.IsNullOrWhiteSpace(titleCard) ? "Χωρίς τίτλο" : titleCard)</h2>
+                <hr>
+                <p>@Html.Raw(string.IsNullOrWhiteSpace(cardBody) ? "—" : cardBody)</p>
+            </div>
+        }
+    </div>
+</div>

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("contactForm");
   const btn = document.getElementById("contactSubmit");
-  const status = document.getElementById("contactStatus");
+  const status = document.getElementById("formMsg");
   if (!form || !btn) return;
 
   // Μην επιτρέπεις ΠΟΤΕ native submit (sandbox issue)
@@ -16,8 +16,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     if (!firstName || !lastName || !isEmail || !message) {
-      status.textContent = "Συμπλήρωσε σωστά όλα τα πεδία.";
-      status.className = "mt-2 small text-danger";
+      status.textContent = "Συμπληρώστε σωστά όλα τα πεδία.";
+      status.classList.add("is-error"); // ✅ κάνει το pill κόκκινο
+      status.style.opacity = "1";
+      status.style.visibility = "visible";
+      clearTimeout(window.__formMsgTimer);
+      window.__formMsgTimer = setTimeout(() => {
+        status.textContent = "";
+        status.style.opacity = "0";
+        status.style.visibility = "hidden";
+        status.classList.remove("is-error"); // ✅ καθάρισμα
+      }, 3000);
       return;
     }
 
@@ -37,18 +46,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
       status.textContent =
         "Το μήνυμα στάλθηκε! Θα επικοινωνήσουμε σύντομα μαζί σας!";
-      status.className = "mt-2 small text-success";
+      status.style.opacity = "1";
+      status.style.visibility = "visible";
       form.reset();
 
       // 🔹 Σβήσε το μήνυμα μετά από 3"
       setTimeout(() => {
         status.textContent = "";
-        status.className = "";
+        status.style.opacity = "0";
+        status.style.visibility = "hidden";
       }, 4000);
     } catch (err) {
       console.error("Contact submit error:", err);
       status.textContent = "Κάτι πήγε στραβά. Δοκίμασε ξανά.";
-      status.className = "mt-2 small text-danger";
+      // status.className = "mt-2 small text-danger";
     } finally {
       btn.disabled = false;
       btn.textContent = original;

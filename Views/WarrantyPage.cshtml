@@ -1,4 +1,4 @@
-﻿@using Umbraco.Cms.Core.Models.Blocks;
+﻿﻿@using Umbraco.Cms.Core.Models.Blocks;
 @using Umbraco.Cms.Core.Models; 
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
@@ -21,21 +21,21 @@
 }
 
 
+<div class="loan-info-grid-container">
+    <div class="loan-info-grid">
+        @foreach (var item in blockList ?? Enumerable.Empty<BlockListItem>())
+        {
+            var content = item?.Content;
+            if (content == null) continue;
 
-<section class="loan-info-grid">
-    @foreach (var item in blockList ?? Enumerable.Empty<BlockListItem>())
-    {
-        var content = item?.Content;
-        if (content == null) continue;
+            var titleCard = content.Value<string>("titleCard");
+            var cardBody = content.Value<string>("cardBody");
 
-        var titleCard = content.Value<string>("titleCard");
-        var cardBody = content.Value<string>("cardBody");
-
-        <div class="loan-card">
-            <h2>@(string.IsNullOrWhiteSpace(titleCard) ? "Χωρίς τίτλο" : titleCard)</h2>
-            <hr>
-            <p>@Html.Raw(string.IsNullOrWhiteSpace(cardBody) ? "—" : cardBody)</p>
-        </div>
-    }
-</section>
-
+            <div class="loan-card">
+                <h2>@(string.IsNullOrWhiteSpace(titleCard) ? "Χωρίς τίτλο" : titleCard)</h2>
+                <hr>
+                <p>@Html.Raw(string.IsNullOrWhiteSpace(cardBody) ? "—" : cardBody)</p>
+            </div>
+        }
+    </div>
+</div>

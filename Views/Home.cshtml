@@ -56,62 +56,62 @@
 </div>
 
 @*------------------Carousel-------------------*@
-
-
-
 @if (carCardBlock != null && carCardBlock.Any())
 {
-    <h4 class="prosfores">ΠΡΟΣΦΟΡΕΣ</h4>
-<div class="tesla-carousel-wrapper">
-  <button class="tesla-arrow prev" aria-label="Προηγούμενο">
-    ‹
-  </button>
-    <div class="tesla-carousel">
-        <div class="tesla-track">
+<div class="carousel-outerContainer">
 
-            @foreach (var card in carCardBlock)
-            {
-                var content = card?.Content;
-                if (content == null) { continue; }
+    <div class="shadow-container"><h4 class="prosfores">ΠΡΟΣΦΟΡΕΣ</h4></div>
+    <div class="tesla-carousel-wrapper">
+    <button class="tesla-arrow prev" aria-label="Προηγούμενο">
+        ‹
+    </button>
+        <div class="tesla-carousel">
+            <div class="tesla-track">
 
-                var carID = content.Value<string>("carID");
-                var carPic = content.Value<MediaWithCrops>("carPic")?.Url();
-                var maker = content.Value<string>("maker");
-                var modelo = content.Value<string>("model");
-                var price = content.Value<string>("price");
-                var typeOfDiscount = content.Value<string>("typeOfDiscount");
+                @foreach (var card in carCardBlock)
+                {
+                    var content = card?.Content;
+                    if (content == null) { continue; }
 
-                var targetUrl = isLoggedIn
-                    ? $"/carDetailsMember?id={carID}"
-                    : $"/carDetailsVisitor?id={carID}";
+                    var carID = content.Value<string>("carID");
+                    var carPic = content.Value<MediaWithCrops>("carPic")?.Url();
+                    var maker = content.Value<string>("maker");
+                    var modelo = content.Value<string>("model");
+                    var price = content.Value<string>("price");
+                    var typeOfDiscount = content.Value<string>("typeOfDiscount");
 
-                <div class="tesla-card">
-                    <a href="@targetUrl"
-                       data-car-id="@carID"
-                       onclick="return onCardClick(event, '@carID')"
-                       class="tesla-link">
+                    var targetUrl = isLoggedIn
+                        ? $"/carDetailsMember?id={carID}"
+                        : $"/carDetailsVisitor?id={carID}";
 
-                        <img src="@carPic" alt="@modelo" />
+                    <div class="tesla-card">
+                        <a href="@targetUrl"
+                        data-car-id="@carID"
+                        onclick="return onCardClick(event, '@carID')"
+                        class="tesla-link">
 
-                        <div class="tesla-overlay">
-                            <span class="discount-badgeMain">@typeOfDiscount</span>
+                            <img src="@carPic" alt="@modelo" />
 
-                            <h2>@maker @modelo</h2>
-                            <p>@price €</p>
+                            <div class="tesla-overlay">
+                                <span class="discount-badgeMain">@typeOfDiscount</span>
 
-                            <button class="tesla-btn">
-                                Δείτε λεπτομέρειες
-                            </button>
-                        </div>
+                                <h2>@maker @modelo</h2>
+                                <p>@price €</p>
 
-                    </a>
-                </div>
-            }
+                                <button class="tesla-btn">
+                                    Δείτε λεπτομέρειες
+                                </button>
+                            </div>
+
+                        </a>
+                    </div>
+                }
+            </div>
         </div>
+        <button class="tesla-arrow next" aria-label="Επόμενο">
+        ›
+    </button>
     </div>
-    <button class="tesla-arrow next" aria-label="Επόμενο">
-    ›
-  </button>
 </div>
 }
 

@@ -1,16 +1,21 @@
-.faq-image-wrapper {
+.faq-img-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 !important;
-  margin: 0 !important;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto !important;
+  padding: 0 30px;
+  box-sizing: border-box;
 }
 
-.faq-image {
-  border-radius: 12px;
-  max-width: 60%;
+.faq-img-wrapper img {
+  width: 100%;
+  height: 700px;
+  display: block;
+  border-radius: 14px;
   object-fit: cover;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  margin: 0;
 }
 
 .faq-title {
@@ -19,6 +24,129 @@
   margin: 30px;
 }
 
+.faq-info-grid-container {
+  margin-top: 130px;
+  margin-bottom: 50px;
+}
+
+.faq-info-grid {
+  margin-bottom: 1rem;
+}
+
+.loan-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 30px 50px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.loan-card:hover {
+  transform: translateY(-5px);
+}
+
 .loan-card h2 {
   font-weight: 400;
+  color: #39c0c3;
+}
+
+@media (max-width: 575px) {
+  .faq-title {
+    font-size: 1.5rem;
+  }
+
+  .faq-info-grid-container {
+    margin-top: 0;
+  }
+
+  .faq-info-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 24px;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+
+  .loan-card h2 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .faq-title {
+    font-size: 1.7rem;
+  }
+
+  .faq-info-grid-container {
+    margin-top: 0;
+  }
+
+  .faq-info-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 24px;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+
+  .faq-card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+}
+
+@media (min-width: 992px) {
+  .faq-title {
+    font-size: 2rem;
+  }
+
+  .faq-img-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .faq-info-grid-container {
+    margin-top: 70px;
+  }
+
+  .faq-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 90%;
+    margin: 0 auto;
+  }
+
+  .loan-card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .faq-title {
+    font-size: 2.1rem;
+  }
+
+  .faq-img-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    height: 720px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    border-radius: 14px;
+  }
+
+  .faq-info-grid-container {
+    margin-top: 80px;
+  }
+
+  .loan-card h2 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
 }
