@@ -132,6 +132,19 @@
 							<span class="price-value">${data.price} €</span>
 							<span class="vat-label">με τον ΦΠΑ</span>
 						</div>
+						<div class="prokatavoli_label">Προκαταβολή (€):</div>
+						<input
+							type="text"
+							class="form-control"
+							id="inputProkatavoli"
+							name="prokatavoli"
+							inputmode="numeric"
+							maxlength="5"
+							pattern="^[1-9]\d{2,4}$"
+							placeholder="π.χ. 100"
+							required
+							oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,5);"
+						/>
 						<div class="upologismos_label">Υπολογισμός σε Δόσεις:</div>
 							<div class="btn-group">
 								<button class="custom-dropdown-button dropdown-toggle"
@@ -238,6 +251,7 @@
 			});
 		}
 	});
+
 </script>
 
 

@@ -211,25 +211,9 @@
     }
 }
 
-@* <div class="mt-3" style="display:flex;gap:.5rem;">
-  <a class="nx-btn" href="@backofficeUrl" target="_blank" rel="noopener">
-    Export cars (Backoffice CSV)
-  </a>
-  <a class="nx-btn" href="@apiUrl" target="_blank" rel="noopener">
-    Export cars (API CSV)
-  </a>
-</div> *@
-
 @if (isAdminMember)
 {
 	<a class="btn btn-primary" id="btnExportCars" href="#" role="button">Export Cars</a>
-
-	@* <form id="importForm" enctype="multipart/form-data" method="post" action="/umbraco/api/carimport/upload">
-		<h3>📥 Import Cars</h3>
-		<input type="file" name="csvFile" id="csvFile" accept=".csv" required />
-		<button type="submit" class="btn btn-primary mt-2">Import</button>
-		<p id="importMessage" style="margin-top: 10px;"></p>
-	</form> *@
 }
 
 <div class="usedCars-container">
@@ -836,6 +820,25 @@
 						var targetUrl = isLoggedIn
 							? $"/carDetailsMember?id={carID}"
 							: $"/carDetailsVisitor?id={carID}";
+
+						string formattedPrice = "";
+						if (!string.IsNullOrWhiteSpace(price))
+						{
+							var raw = new string(price.Where(ch => char.IsDigit(ch) || ch == ',' || ch == '.' || ch == '-').ToArray());
+
+							if (raw.Contains('.') && raw.Contains(','))
+								raw = raw.Replace(".", "");
+
+							if (decimal.TryParse(raw.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out var decPrice))
+							{
+								var rounded = (long)decimal.Round(decPrice, 0, MidpointRounding.AwayFromZero);
+								formattedPrice = rounded.ToString("#,0", new CultureInfo("el-GR"));
+							}
+							else
+							{
+								formattedPrice = price;
+							}
+						}
 						
 						<div class="cardCar" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
 							<a href="@targetUrl"
@@ -859,7 +862,7 @@
 									<div>
 										<h4 class="maker-title fw-semibold mb-2">@maker <span class="card-title">@modelo</span></h4>
 										<p class="car-year">@yearRelease</p>
-										<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@price €</p>
+										<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@formattedPrice €</p>
 										<p class="text-muted mb-0">
 											<i class="fa-solid fa-road"></i><span class="klm">&nbsp; @km </span>km &nbsp;&nbsp;
 											<i class="fa fa-wrench"></i><span class="cc">&nbsp; @cc</span>cc &nbsp;&nbsp;

@@ -132,8 +132,18 @@
     box-sizing: border-box !important;
   }
 
+  .prokatavoli_label {
+    font-size: 1rem !important;
+    padding: 10px 0;
+  }
+
   .upologismos_label {
     font-size: 1rem !important;
+    padding: 10px 0;
+  }
+
+  .installment-result {
+    margin: 10px 0 !important;
   }
 
   .addToCartBtn {
