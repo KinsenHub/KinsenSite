@@ -4,6 +4,7 @@
 @using Umbraco.Cms.Core.Security
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Σύνδεση | kinsen.gr";
     var isAuthenticated = Context.User?.Identity?.IsAuthenticated ?? false;
 }
 

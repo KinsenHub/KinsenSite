@@ -5,6 +5,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Λεπτομέρειες οχήματος | kinsen.gr";
     var url = Context.Request.Path.Value; 
     var segments = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
     var carID = Context.Request.Query["id"].ToString();
@@ -98,6 +99,7 @@
 			.then(data => {
 				console.log("API RESPONSE:", data);
 				console.log("VISITOR imageUrl:", data.imageUrl);
+				const formattedPrice = Number(data.price).toLocaleString('el-GR');
 
 				document.getElementById('carDetailsContainer').innerHTML = `	
 					<div class="w-100 mt-5 d-flex justify-content-center">
@@ -137,9 +139,22 @@
 						<div class="price-section">
 						<span class="car-title">${data.maker} ${data.model}<br></span>
 							<span class="price-label">Τιμή αγοράς:</span>
-							<span class="price-value">${data.price} €</span>
+							<span class="price-value">${formattedPrice} €</span>
 							<span class="vat-label">με τον ΦΠΑ</span>
 						</div>
+						<div class="prokatavoli_label">Προκαταβολή (€):</div>
+						<input
+							type="text"
+							class="form-control"
+							id="inputProkatavoli"
+							name="prokatavoli"
+							inputmode="numeric"
+							maxlength="5"
+							pattern="^[1-9]\d{2,4}$"
+							placeholder="π.χ. 100"
+							required
+							oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,5);"
+						/>
 						<div class="upologismos_label">Υπολογισμός σε Δόσεις:</div>
 							<div class="btn-group">
 								<button class="custom-dropdown-button dropdown-toggle"

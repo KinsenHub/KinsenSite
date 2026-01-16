@@ -5,6 +5,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Λεπτομέρειες οχήματος | kinsen.gr";
     var url = Context.Request.Path.Value; 
     var segments = url.Split('/', StringSplitOptions.RemoveEmptyEntries);
     var carID = Context.Request.Query["id"].ToString();
@@ -100,6 +101,7 @@
 				try { sessionStorage.setItem('selectedCarId', carID); } catch {}
 					document.cookie = `selectedCarId=${encodeURIComponent(carID)}; Max-Age=${30*60}; Path=/; SameSite=Lax; Secure`;
 					window.name = 'car:' + carID;
+					const formattedPrice = Number(data.price).toLocaleString('el-GR');
 					document.getElementById('carDetailsContainer').innerHTML = `	
 					<div class="w-100 mt-5 d-flex justify-content-center">
 						<div id="carouselExampleDark" class="carousel carousel-dark slide shadow-lg custom-carousel"
@@ -129,7 +131,7 @@
 						<div class="price-section">
 						<span class="car-title">${data.maker} ${data.model}<br></span>
 							<span class="price-label">Τιμή αγοράς:</span>
-							<span class="price-value">${data.price} €</span>
+							<span class="price-value">${formattedPrice} €</span>
 							<span class="vat-label">με τον ΦΠΑ</span>
 						</div>
 						<div class="prokatavoli_label">Προκαταβολή (€):</div>
@@ -198,10 +200,6 @@
 			window.addEventListener('pageshow', evt => {
 			const nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
 			const isBF = (evt.persisted === true) || (nav && nav.type === 'back_forward');
-			if (isBF) {
-			// αν θες να ξαναφέρνεις δεδομένα, μπορείς να ξανατρέξεις το fetch εδώ
-			// ή άστο όπως είναι αν ήδη φαίνονται στο DOM
-			}
 		});
 	})();
 		

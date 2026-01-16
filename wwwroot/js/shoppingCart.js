@@ -46,7 +46,8 @@ async function renderCart() {
             .filter(Boolean)
             .join(" • ");
           const priceTxt =
-            (x.priceText && `${x.priceText} €`) ||
+            (x.priceText &&
+              `${Number(x.priceText).toLocaleString("el-GR")} €`) ||
             (x.priceValue != null
               ? `${Number(x.priceValue).toLocaleString("el-GR")} €`
               : "-");

@@ -58,7 +58,7 @@
         <img src="~/media/kinsen_vertical.png" alt="Kinsen Hellas Logo" class="navbar-logoInner" style="display:none;"/>
       </a>
       <ul class="nx-left">
-        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq" && x.Name() != "userSettings" && x.Name() != "getcode" && x.Name() != "forgotPassword"))
+        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq" && x.Name() != "userSettings" && x.Name() != "getcode" && x.Name() != "forgotPassword" && x.Name() != "favorites" && x.Name() != "oldOrders"))
         {
           var menuTitle = item.Value("menuTitle") as string ?? item.Name();
           var iconClass = item.Value<string>("menuIcon");
@@ -113,8 +113,10 @@
               </button>
 
               <ul id="accountMenu" class="kx-menu" role="menu" aria-labelledby="accountBtn">
-                <li role="none"><a role="menuitem" class="kx-menu-item kx-primary" href="/usersettings/" id="settingsBtn"><i class="fa-solid fa-user"></i>&nbsp;Ρυθμίσεις Προφίλ</a></li>
-                <li role="none"><a role="menuitem" class="kx-menu-item kx-danger" href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i>&nbsp;Αποσύνδεση</a></li>
+                <li role="none"><a role="menuitem" class="kx-menu-item kx-primary" href="/usersettings/" id="settingsBtn"><i class="fa-solid fa-user" style="color:#023859;"></i>&nbsp;&nbsp;Ρυθμίσεις Προφίλ</a></li>
+                <li role="none"><a role="menuitem" class="kx-menu-item kx-primary" href="/oldOrders/" id="oldOrdersBtn"><i class="fa-solid fa-car" style="color:#023859;"></i>&nbsp;&nbsp;Παραγγελίες</a></li>
+                <li role="none"><a role="menuitem" class="kx-menu-item kx-primary" href="/favorites/" id="myFavoritesBtn"><i class="fa-solid fa-heart" style="color:#023859;"></i>&nbsp;&nbsp;Αγαπημένα</a></li>
+                <li role="none"><a role="menuitem" class="kx-menu-item kx-primary" href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket" style="color:#dc3545;"></i>&nbsp;&nbsp;Αποσύνδεση</a></li>
               </ul>
             </div>
           </li>

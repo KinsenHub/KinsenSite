@@ -12,7 +12,7 @@
         .SelectMany(x => x.DescendantsOrSelf())
         .FirstOrDefault(x => x.ContentType.Alias == "usedCarSalesPage");
 
-    var usedUrl = usedPage?.Url() ?? "/πωλήσεις-μεταχειρισμένων/";
+  var usedUrl = usedPage?.Url() ?? "/πωλήσεις-μεταχειρισμένων/";
 	ViewBag.BodyClass = "cart-page";
 }
 
@@ -70,7 +70,7 @@
           Σύνολο οχημάτων: <span id="cart-total">0</span>
         </div>
         <button id="cartSubmitOfferBtn" class="btn btn-success" data-bs-toggle="modal" 
-        data-bs-target="#offerModalfromCart">Ζήτα προσφορά</button>
+        data-bs-target="#offerModalfromCart">Ζητήστε Προσφορά</button>
       </div>
 
     </div>

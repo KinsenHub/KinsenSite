@@ -4,6 +4,7 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
 	Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewData["Title"] = "Επικοινωνία | kinsen.gr";
 	var contactTitle = Model.Value<string>("contactTitle");
   var contactImg = Model.Value<MediaWithCrops>("contactImg");
 }

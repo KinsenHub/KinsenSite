@@ -1,0 +1,9 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Οι παραγγελίες σας | kinsen.gr";
+	var oldOrdersTitle = Model.Value<string>("oldOrdersTitle");
+}
+
+<h1>@oldOrdersTitle</h1>

@@ -5,7 +5,6 @@
 
     @{
         Layout = null;
-        ViewData["Title"] = "Member Login"; // Ο τίτλος της σελίδας
 
         // ✅ Correct way to check if a user is logged in
         var member = await MemberManager.GetCurrentMemberAsync(); // Επιστρέφει ένα αντικείμενο Member με το ID, UserName, Email etc του χρήστη.

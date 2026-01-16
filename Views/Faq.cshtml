@@ -4,6 +4,7 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
 	Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Συχνές ερωτήσεις | kinsen.gr";
 	var faqImg = Model.Value<MediaWithCrops>("faqImage");
 	var faqTitle = Model.Value<string>("title");
 	IEnumerable<BlockListItem> accordion = Model.Value<IEnumerable<BlockListItem>>("accordionQuestions");

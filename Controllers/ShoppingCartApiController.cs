@@ -139,5 +139,3 @@ namespace Kinsen.Web.Api
 
     public class IdReq { public string Id { get; set; } = ""; }
 }
-
-

@@ -315,19 +315,6 @@ label {
   position: relative;
 }
 
-/* .discount-badge {
-  background-color: #2ec4c7;
-  color: white;
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  font-weight: bold;
-  border-radius: 0.25rem;
-  z-index: 1;
-} */
-
 /* Price Filter Group */
 .input-group {
   display: flex;
@@ -398,6 +385,50 @@ label {
 
 .cardCar.d-none {
   display: none !important;
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.favorite-btn i {
+  font-size: 18px;
+  color: #999;
+  transition: color 0.2s ease;
+}
+
+/* hover */
+.favorite-btn:hover {
+  transform: scale(1.05);
+}
+.favorite-btn:hover i {
+  color: #e63946;
+}
+
+/* active (favorited) */
+.favorite-btn.is-favorite i {
+  color: #e63946;
+}
+.favorite-btn.is-favorite {
+  background: #fff;
 }
 
 @media (max-width: 576px) {

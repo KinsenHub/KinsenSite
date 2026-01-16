@@ -4,6 +4,7 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Αρχική σελίδα | kinsen.gr";
 	
     var pageTitle = Model.Value<string>("pageTitle");
     var media = Model.Value<MediaWithCrops>("homeVideo");

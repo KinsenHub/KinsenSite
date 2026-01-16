@@ -20,57 +20,133 @@ setTimeout(() => {
   const items = document.querySelectorAll(".dropdown-item");
   const dropdownButton = document.querySelector(".custom-dropdown-button");
   const resultSpan = document.getElementById("installmentValue");
+  const depositInput = document.getElementById("inputProkatavoli");
 
-  const PriceText = document.querySelector(".price-value")?.innerText || "";
-  let price = parseFloat(
-    PriceText.replace(/\./g, "")
-      .replace(",", ".")
-      .replace(/[^\d.]/g, "")
-  );
+  if (!dropdownButton || !resultSpan) return;
+
+  // ---------------- helpers ----------------
   const vatMultiplier = 1.24;
 
-  // Βρες carId της σελίδας (π.χ. data-car-id στο body ή σε wrapper)
+  // price από το UI (π.χ. "30.500 €")
+  const priceText = document.querySelector(".price-value")?.innerText || "";
+  const basePrice = Number(
+    priceText
+      .replace(/\./g, "") // remove thousands dot
+      .replace(",", ".") // decimal comma -> dot
+      .replace(/[^\d.]/g, "") // keep digits + dot
+  );
+
+  const formatEUR = (n) =>
+    Number(n).toLocaleString("el-GR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+  const parseDeposit = () => {
+    // input έχει μόνο digits (λόγω oninput), άρα είναι safe
+    const v = (depositInput?.value || "").trim();
+    if (!v) return 0;
+    const num = Number(v);
+    return Number.isFinite(num) ? num : 0;
+  };
+
+  // carId για αποθήκευση
   const carId = Number(
     document.querySelector("[data-car-id]")?.dataset.carId || 0
   );
 
-  items.forEach((item) => {
-    item.addEventListener("click", function () {
-      const selectedText = this.innerText;
-      const selectedValue = this.value; // "efapaks" ή "6" | "12" | ...
+  // κρατάμε σε μνήμη τι έχει διαλέξει ο χρήστης
+  let selectedPlan = dropdownButton.dataset.plan || "efapaks"; // "efapaks" ή "6" κλπ
 
-      dropdownButton.textContent = selectedText;
+  // ---------------- core calc ----------------
+  const updateInstallment = () => {
+    // αν δεν έχουμε τιμή, δεν υπολογίζουμε τίποτα
+    if (!Number.isFinite(basePrice) || basePrice <= 0) {
+      resultSpan.textContent = "-";
+      return;
+    }
 
-      let perMonth = null;
-
-      if (selectedValue === "efapaks") {
-        resultSpan.textContent = "-";
-      } else {
-        const months = parseInt(selectedValue);
-        if (!isNaN(months) && price > 0) {
-          const totalWithVAT = price * vatMultiplier;
-          perMonth = totalWithVAT / months;
-          resultSpan.innerHTML = `<strong>${perMonth.toFixed(
-            2
-          )} €</strong> / μήνα (με ΦΠΑ)`;
-        } else {
-          resultSpan.textContent = "-";
-        }
-      }
-
-      // === ΑΠΟΘΗΚΕΥΣΗ ανά car ===
+    // efapaks => δεν έχει δόση
+    if (selectedPlan === "efapaks") {
+      resultSpan.textContent = "-";
+      // αποθήκευση
       if (carId > 0) {
+        window.installmentsByCar = window.installmentsByCar || {};
         window.installmentsByCar[carId] = {
-          paymentPlan: selectedValue, // "efapaks" ή "6"/"12"/...
-          perMonth: perMonth != null ? Number(perMonth.toFixed(2)) : null,
+          paymentPlan: selectedPlan,
+          perMonth: null,
+          deposit: parseDeposit(),
         };
         sessionStorage.setItem(
           "installmentsByCar",
           JSON.stringify(window.installmentsByCar)
         );
       }
+      return;
+    }
+
+    const months = parseInt(selectedPlan, 10);
+    if (!Number.isFinite(months) || months <= 0) {
+      resultSpan.textContent = "-";
+      return;
+    }
+
+    const totalWithVAT = basePrice * vatMultiplier;
+
+    const deposit = parseDeposit();
+    const remaining = totalWithVAT - deposit;
+
+    // αν προκαταβολή μεγαλύτερη από το σύνολο => δεν βγάζουμε δόση
+    if (remaining <= 0) {
+      resultSpan.textContent = "-";
+      return;
+    }
+
+    const perMonth = remaining / months;
+
+    // ✅ κόμμα στα δεκαδικά (el-GR)
+    resultSpan.innerHTML = `<strong>${formatEUR(
+      perMonth
+    )} €</strong> / μήνα (με ΦΠΑ)`;
+
+    // αποθήκευση
+    if (carId > 0) {
+      window.installmentsByCar = window.installmentsByCar || {};
+      window.installmentsByCar[carId] = {
+        paymentPlan: selectedPlan,
+        perMonth: Number(perMonth.toFixed(2)),
+        deposit: deposit,
+      };
+      sessionStorage.setItem(
+        "installmentsByCar",
+        JSON.stringify(window.installmentsByCar)
+      );
+    }
+  };
+
+  // ---------------- events ----------------
+  items.forEach((item) => {
+    item.addEventListener("click", function () {
+      const selectedText = this.innerText;
+      const selectedValue = this.value; // "efapaks" ή "6" | "12" | ...
+
+      dropdownButton.textContent = selectedText;
+      dropdownButton.dataset.plan = selectedValue;
+
+      selectedPlan = selectedValue;
+      updateInstallment();
     });
   });
+
+  // όταν γράφει προκαταβολή, κάνε live update (αν έχει επιλέξει μήνες)
+  if (depositInput) {
+    depositInput.addEventListener("input", () => {
+      updateInstallment();
+    });
+  }
+
+  // initial render (σε περίπτωση που έχει default επιλογή)
+  updateInstallment();
 }, 500);
 
 // 1) Cart API client (μιλάει με /umbraco/api/cart/*)

@@ -1,7 +1,9 @@
 .footer-59391 {
   border-top: 1px solid #efefef;
-  background-color: #9fc5c519;
+  background-color: #b5c5c519;
   font-family: "Poppins", sans-serif;
+  /* margin: 0 200px !important;
+  border-radius: 20px; */
 }
 
 .footer-59391-container {
@@ -120,8 +122,7 @@
 .footer-59391 .footer-bottom {
   margin-top: 26px;
   padding-top: 18px;
-
-  border-top: 1px solid #dfe6ee; /* η γραμμή όπως στη φωτό */
+  /* border-top: 1px solid #dfe6ee; */
 }
 
 .footer-59391 .footer-bottom-inner {

@@ -15,6 +15,7 @@
 
 @{
 	Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Μεταχειρισμένα οχήματα | kinsen.gr";
 	var usedCarTitle = Model.Value<string>("usedCarTitle");
 	var carCardBlock = Model.Value<IEnumerable<BlockListItem>>("carCardBlock");
 	var notAvailableImg = Model.Value<MediaWithCrops>("imgNotAvail");
@@ -211,10 +212,10 @@
     }
 }
 
-@if (isAdminMember)
+@* @if (isAdminMember)
 {
 	<a class="btn btn-primary" id="btnExportCars" href="#" role="button">Export Cars</a>
-}
+} *@
 
 <div class="usedCars-container">
 
@@ -821,26 +822,31 @@
 							? $"/carDetailsMember?id={carID}"
 							: $"/carDetailsVisitor?id={carID}";
 
+						var gr = new CultureInfo("el-GR");
 						string formattedPrice = "";
-						if (!string.IsNullOrWhiteSpace(price))
+
+						if (!string.IsNullOrWhiteSpace(price) &&
+							long.TryParse(price, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n))
 						{
-							var raw = new string(price.Where(ch => char.IsDigit(ch) || ch == ',' || ch == '.' || ch == '-').ToArray());
-
-							if (raw.Contains('.') && raw.Contains(','))
-								raw = raw.Replace(".", "");
-
-							if (decimal.TryParse(raw.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out var decPrice))
-							{
-								var rounded = (long)decimal.Round(decPrice, 0, MidpointRounding.AwayFromZero);
-								formattedPrice = rounded.ToString("#,0", new CultureInfo("el-GR"));
-							}
-							else
-							{
-								formattedPrice = price;
-							}
+							formattedPrice = n.ToString("#,0", gr);
+						}
+						else
+						{
+							formattedPrice = price ?? "";
 						}
 						
 						<div class="cardCar" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
+							@if(isLoggedIn){
+								<!-- ❤️ FAVORITE BUTTON -->
+								<button 
+									class="favorite-btn"
+									type="button"
+									data-car-id="@carID"
+									aria-label="Προσθήκη στα αγαπημένα">
+									<i class="fa-regular fa-heart"></i>
+								</button>
+							}
+							
 							<a href="@targetUrl"
 								class="cardCarLink" 
 								data-car-id="@carID" 
@@ -903,7 +909,7 @@
 </script>
 
 @* Αφορά το Export: *@
-<script>
+@* <script>
     document.addEventListener("DOMContentLoaded", function () {
         const exportBtn = document.getElementById("btnExportCars");
 
@@ -967,7 +973,7 @@
             });
         }
     });
-</script>
+</script> *@
 
 <script src="~/js/usedCarSalesFilters.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

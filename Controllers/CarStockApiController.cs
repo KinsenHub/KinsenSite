@@ -135,7 +135,7 @@ namespace KinsenOfficial.Controllers
                 Model = NormalizeName(s.Model),
 
                 YearRelease = s.YearRelease ?? 0,
-                Price = s.Price ?? 0m,
+                Price = s.Price.HasValue ? Math.Round(s.Price.Value, 0, MidpointRounding.AwayFromZero) : 0m,
                 Km = s.Km ?? 0,
                 Cc = s.Cc ?? 0,
                 Hp = s.Hp ?? 0,
@@ -677,7 +677,6 @@ namespace KinsenOfficial.Controllers
         [JsonPropertyName("image_url")]
         public string? ImageUrl { get; set; }
     }
-
 
     public class CarDto
     {

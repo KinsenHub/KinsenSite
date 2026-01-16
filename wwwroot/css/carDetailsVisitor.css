@@ -41,10 +41,8 @@
 
 .price-section .car-title {
   display: block;
-  font-size: 1.5rem;
+  color: #023859 !important;
   font-weight: 700;
-  color: #111;
-  margin-bottom: 0.5rem;
 }
 
 .price-section .price-line {
@@ -53,20 +51,18 @@
   color: #333;
 }
 
-.price-section .price-value {
-  font-weight: 700;
-  margin: 0 0.25rem;
-  font-size: 1.4rem;
-}
-
 .price-section .vat-label {
   color: #333;
+}
+
+#inputProkatavoli {
+  border: 2px solid #035171;
+  border-radius: 0.5rem;
 }
 
 .upologismos_label {
   align-content: flex-start;
   font-size: 1.2rem;
-  margin-bottom: 8px;
 }
 
 /*------DropDown Κουμπί Δόσεων-----*/
@@ -192,13 +188,6 @@
 }
 
 @media (max-width: 575px) {
-  .car-specs-section h2 {
-    font-size: 1.4rem;
-    margin-bottom: 1.5rem;
-    font-weight: 700;
-    color: #023859;
-  }
-
   .custom-carousel .carousel-item img {
     width: 80% !important;
     height: auto;
@@ -207,6 +196,35 @@
     margin: 0 auto;
     max-height: 650px;
     image-rendering: -webkit-optimize-contrast;
+  }
+
+  .car-title {
+    font-size: 1.1rem !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .price-section .price-value {
+    font-size: 1.1rem !important;
+  }
+
+  .prokatavoli_label {
+    font-size: 1rem !important;
+    padding: 10px 0;
+  }
+
+  .upologismos_label {
+    font-size: 1rem !important;
+  }
+
+  .addToCartBtn {
+    font-size: 0.8rem;
+  }
+
+  .car-specs-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: #023859;
   }
 
   /* Τα κουτάκια σε 2 στήλες */
@@ -218,57 +236,31 @@
     max-width: 80%;
     box-sizing: border-box !important;
   }
-
-  .upologismos_label {
-    font-size: 1rem !important;
-  }
-
-  .addToCartBtn {
-    width: 100%;
-    background-color: #007c91 !important;
-    color: white;
-    padding: 1rem;
-    font-size: 0.8rem;
-    border: none;
-    border-radius: 1rem;
-    font-weight: 600;
-    text-align: center;
-    transition: background-color 0.3s ease;
-  }
 }
 
 /* Responsive */
 @media (min-width: 576px) and (max-width: 991px) {
-  section.car-specs-section {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 20px auto 40px auto !important;
-    padding: 5px 10px 20px 10px !important;
-    box-sizing: border-box !important;
-    overflow-x: hidden !important;
-    display: block !important;
+  .car-title {
+    font-size: 1.4rem !important;
+    margin-bottom: 0.5rem;
   }
 
-  /* Τίτλος */
-  section.car-specs-section > p {
-    margin: 10px 0 20px 0;
-    padding: 0;
-    font-size: 1.1rem;
-    grid-column: 1 / -1;
+  .price-section .price-value {
+    font-size: 1.3rem !important;
   }
 
-  /* Τα κουτάκια σε 2 στήλες */
-  section.car-specs-section .specs-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box !important;
+  .prokatavoli_label {
+    font-size: 1.1rem !important;
+    padding: 10px 0;
   }
 
   .upologismos_label {
-    font-size: 1rem !important;
+    font-size: 1.1rem !important;
+    padding: 10px 0;
+  }
+
+  .addToCartBtn {
+    font-size: 1rem;
   }
 
   .specs-grid .spec-box {
@@ -280,37 +272,63 @@
     box-sizing: border-box;
   }
 
-  .price-section .car-title {
-    display: block;
-    font-size: 1.2rem !important;
-    font-weight: 700;
-    color: #023859 !important;
-    margin-bottom: 0.5rem;
-  }
-
-  .price-section .price-value {
-    font-weight: 700;
-    margin: 0 0.25rem;
-    font-size: 1rem !important;
-    color: #023859 !important;
-  }
-
-  .upologismos_label {
-    font-size: 1rem !important;
-  }
-
   .car-specs-section p {
     font-size: 1.2rem !important;
     font-weight: 600;
   }
+
+  section.car-specs-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 20px auto 40px auto !important;
+    padding: 5px 10px 20px 10px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    display: block !important;
+  }
+
+  /* Τα κουτάκια σε 2 στήλες */
+  section.car-specs-section .specs-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box !important;
+  }
 }
 
 @media (min-width: 992px) {
-  section.car-specs-section > p {
-    margin: 10px 0 20px 0;
-    padding: 0;
-    font-size: 1.1rem;
-    grid-column: 1 / -1;
+  .car-title {
+    font-size: 1.5rem !important;
+    margin-bottom: 5px;
+  }
+
+  .price-section .price-value {
+    font-size: 1.4rem !important;
+  }
+
+  .prokatavoli_label {
+    font-size: 1.2rem !important;
+    padding: 10px 0;
+  }
+
+  .upologismos_label {
+    font-size: 1.2rem !important;
+    padding: 10px 0;
+  }
+
+  .installment-result {
+    font-size: 1.2rem !important;
+  }
+
+  .addToCartBtn {
+    font-size: 1.2rem;
+  }
+
+  .car-specs-section p {
+    font-size: 1.5rem !important;
+    font-weight: 600;
   }
 
   /* Τα κουτάκια σε 2 στήλες */
@@ -330,19 +348,6 @@
     min-width: 0 !important; /* ΚΡΙΣΙΜΟ */
     white-space: normal;
     box-sizing: border-box;
-  }
-
-  .upologismos_label {
-    font-size: 1.3rem !important;
-  }
-
-  .installment-result {
-    font-size: 1.2rem !important;
-  }
-
-  .car-specs-section p {
-    font-size: 1.5rem !important;
-    font-weight: 600;
   }
 }
 
