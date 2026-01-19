@@ -4,7 +4,13 @@ body {
   padding: 0;
   overflow-x: hidden;
   overflow-y: auto !important;
-  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+  font-family:
+    "Manrope",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial,
     sans-serif;
 }
 
@@ -172,7 +178,9 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   padding: 1.5rem;
 }
 
@@ -231,7 +239,8 @@ body {
   text-align: center;
   align-items: center;
   margin-bottom: 3rem;
-  box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px,
+  box-shadow:
+    rgba(136, 165, 191, 0.48) 6px 2px 16px 0px,
     rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
   width: 20%;
   margin: 30px auto;
@@ -556,7 +565,7 @@ body {
   .tesla-arrow {
     width: 44px;
     height: 38px;
-    border-radius: 6px; /* 👈 όχι κύκλος */
+    border-radius: 6px;
     border: 0;
     background: #f3f3f3;
     color: #111;
@@ -1155,5 +1164,11 @@ body {
   .shadow-container {
     margin-top: 11rem;
     width: 25%;
+  }
+}
+
+@media (min-width: 2500px) {
+  .tesla-carousel-wrapper.hide-arrows .tesla-arrow {
+    display: none !important;
   }
 }

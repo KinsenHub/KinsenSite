@@ -2,6 +2,10 @@ async function renderCart() {
   const emptyBox = document.getElementById("cartEmpty");
   const hasBox = document.getElementById("cartHasItems");
   const list = document.getElementById("cartList");
+  const noImg =
+    list?.dataset.noimg && list.dataset.noimg.trim()
+      ? list.dataset.noimg.trim()
+      : "/images/no-image.png";
   const totalEl = document.getElementById("cart-total");
   const footer = document.getElementById("cartFooter");
 
@@ -58,7 +62,13 @@ async function renderCart() {
 
                 <!-- Εικόνα -->
                 <div class="col-auto">
-                  <img class="car-img" src="${x.img || ""}" alt="">
+                  <img
+                    class="car-img"
+                    src="${x.img && String(x.img).trim() ? x.img : noImg}"
+                    alt=""
+                    onerror="this.onerror=null;this.src=this.dataset.fallback;"
+                    data-fallback="${noImg}"
+                  >
                 </div>
 
                 <!-- Περιεχόμενο: Τίτλος, Specs, Τιμή, Link -->
@@ -66,9 +76,7 @@ async function renderCart() {
                   <div class="car-title">${title}</div>
                   <div class="text-muted small">${specs}</div>
                   <div class="car-price mt-2">${priceTxt}</div>
-                  <a class="small d-inline-block mt-1" href="${
-                    x.url || "#"
-                  }">Προβολή</a>
+                  <a class="small d-inline-block mt-1" style="color:#023859; text-decoration: underline; text-underline-offset: 4px;" href="${x.url || "#"}">Προβολή</a>
                 </div>
 
                 <!-- Actions δεξιά: μόνο κάδος -->
@@ -145,7 +153,7 @@ document.addEventListener(
 
       // 3) Ενημέρωση badge (site-wide)
       window.dispatchEvent(
-        new CustomEvent("cart:updated", { detail: { count: res.count } })
+        new CustomEvent("cart:updated", { detail: { count: res.count } }),
       );
       await window.updateCartBadgeFromServer?.();
       setCartBadge(res.count);
@@ -172,7 +180,7 @@ document.addEventListener(
       card.style.opacity = "1";
     }
   },
-  true
+  true,
 );
 
 // -----------ΟΛΙΚΟΣ ΚΑΘΑΡΙΣΜΟΣ ΤΟΥ ΚΑΛΑΘΙΟΥ!!!-------------------
@@ -188,7 +196,7 @@ document.addEventListener("click", async (e) => {
 
     // ενημέρωσε το badge στο navbar
     window.dispatchEvent(
-      new CustomEvent("cart:updated", { detail: { count } })
+      new CustomEvent("cart:updated", { detail: { count } }),
     );
     await window.updateCartBadgeFromServer?.();
 
@@ -297,7 +305,7 @@ document.addEventListener("click", async (e) => {
     ...new Set(
       (items || [])
         .map((x) => Number(x.carId ?? x.id ?? 0))
-        .filter((n) => Number.isInteger(n) && n > 0)
+        .filter((n) => Number.isInteger(n) && n > 0),
     ),
   ];
 
@@ -385,7 +393,7 @@ document.addEventListener("click", async (e) => {
 
       // ενημέρωσε badge + UI
       window.dispatchEvent(
-        new CustomEvent("cart:updated", { detail: { count: 0 } })
+        new CustomEvent("cart:updated", { detail: { count: 0 } }),
       );
       await window.updateCartBadgeFromServer?.();
       await window.renderCart?.();
@@ -433,7 +441,7 @@ function clearUiOverlays() {
   document.body.style.overflow = "";
   document
     .querySelectorAll(
-      ".modal-backdrop, .nx-overlay, .overlay, .backdrop, .loader"
+      ".modal-backdrop, .nx-overlay, .overlay, .backdrop, .loader",
     )
     .forEach((el) => el.remove());
 }

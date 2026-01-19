@@ -14,6 +14,7 @@
 
   var usedUrl = usedPage?.Url() ?? "/πωλήσεις-μεταχειρισμένων/";
 	ViewBag.BodyClass = "cart-page";
+  var noImgUrl = Model.Value<IPublishedContent>("imgNotAvail")?.Url();
 }
 
 <style>
@@ -34,6 +35,14 @@
   .offer-success-note.fade-out {
     animation: offerSuccessFadeOut .4s ease-in forwards;
   }
+
+  .cart-item .car-img {
+  width: 200px;          
+  height: 150px;          
+  object-fit: contain;   /* να χωράει χωρίς κόψιμο */
+  display: block;
+  border-radius: 6px;
+}
 </style>
 
 <div class="container my-5" id="offerCartPage">
@@ -61,7 +70,7 @@
 
       <!-- λίστα καρτών στο κέντρο -->
       <div class="cart-list-wrap">
-        <div id="cartList" class="cart-list"></div>
+        <div id="cartList" class="cart-list" data-noimg="@noImgUrl"></div>
       </div>
 
       <!-- footer: σύνολο αριστερά, CTA στο κέντρο -->
@@ -74,7 +83,7 @@
       </div>
 
     </div>
-</div>
+  </div>
 </div>
 
 @* ----------------MODAL Για Στοιχεία Πελάτη------------- *@

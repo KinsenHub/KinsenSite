@@ -11,6 +11,7 @@
     var carID = Context.Request.Query["id"].ToString();
 	var carCarouselBlock = Model.Value<IEnumerable<BlockListItem>>("carCarouselImg");
 	var kinsenLogo = Model.Value<MediaWithCrops>("kinsenLogo");
+	var noImgUrl = Model.Value<IPublishedContent>("imgNotAvail")?.Url();
 
 	// Κατάσταση χρήστη
     var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
@@ -77,7 +78,6 @@
 
 		console.log("carID from Razor:", carID); 
 
-		// ------- FETCH όπως το είχες (κρατάω ίδιο endpoint) -------
 		@* const payload = { id: Number(carID) };  *@
 		fetch("/umbraco/api/CarApiMember/getcarbyid", {
 			method: "POST",
@@ -118,10 +118,13 @@
 
 							<div class="carousel-inner">
 								<div class="carousel-item active">
-									<img src="${data.imageUrl}" 
-									class="d-block mx-auto"
-									style="max-width: 500px; max-height: 320px; width: auto; height: auto; image-rendering: auto;" 
-									alt="Car Image" />
+									<img
+										src="${(data.imageUrl && String(data.imageUrl).trim()) ? data.imageUrl : '@noImgUrl'}"
+										class="d-block mx-auto"
+										style="max-width: 500px; max-height: 320px; width: auto; height: auto; image-rendering: auto;"
+										alt="Car Image"
+										onerror="this.onerror=null;this.src='@noImgUrl';"
+									/>
 								</div>
 							</div>
 						</div>
