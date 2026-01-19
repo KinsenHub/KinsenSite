@@ -1,4 +1,5 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+﻿@using Umbraco.Cms.Web.Common.PublishedModels
+@using Umbraco.Cms.Core.Models.PublishedContent
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @inject Umbraco.Cms.Web.Common.UmbracoHelper UmbracoHelper
 @{
@@ -10,11 +11,13 @@
 
   var usedUrl = usedPage?.Url() ?? "/πωλήσεις-μεταχειρισμένων/";
 	var favTitle = Model.Value<string>("favTitle");
+  var noImgUrl = Model.Value<IPublishedContent>("noImgAvail")?.Url();
 }
 
 <h1 id="favTitle" class="favTitle">@favTitle</h1>
 <div class="favorites-page">
   <div id="favoritesList" class="favorites-grid"></div>
+  <div id="favoritesEmpty" class="favorites-empty" style="display:none;"></div>
 </div>
 
 <script>
@@ -33,52 +36,90 @@ function formatGreekThousands(value) {
   return n.toLocaleString("el-GR");
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const containerFavorites = document.getElementById("favoritesList");
-  if (!containerFavorites) return;
+// Εμφάνιση μηνύματος όταν τα αγαπημένα είναι ΑΔΕΙΑ!
+function renderEmptyFavorites() {
+  return `
+    <div class="favorites-empty-icon" aria-hidden="true">
+      <i class="fa-regular fa-heart"></i>
+    </div>
+
+    <h2 class="favorites-empty-title">Δεν έχετε αγαπημένα</h2>
+    <p class="favorites-empty-text">
+      Προσθέστε αυτοκίνητα στα αγαπημένα για να τα βρείτε εδώ.
+    </p>
+
+    <a href="@usedUrl" class="favorites-empty-btn">Πίσω στα αυτοκίνητα</a>
+  `;
+}
+
+function showEmptyState() {
+  const grid = document.getElementById("favoritesList");
+  const emptyBox = document.getElementById("favoritesEmpty");
+  const title = document.getElementById("favTitle");
+
+  if (!grid || !emptyBox) return;
+
+  title?.remove();
+  grid.style.display = "none";
+  emptyBox.style.display = "flex";
+  emptyBox.innerHTML = renderEmptyFavorites();
+}
+
+function showGridState() {
+  const grid = document.getElementById("favoritesList");
+  const emptyBox = document.getElementById("favoritesEmpty");
+
+  if (!grid || !emptyBox) return;
+
+  emptyBox.style.display = "none";
+  emptyBox.innerHTML = "";
+  grid.style.display = "";
+}
+
+async function loadFavorites() {
+  const grid = document.getElementById("favoritesList");
+  if (!grid) return;
 
   try {
-    const r = await fetch("/umbraco/api/favorites/get", {
-      credentials: "same-origin",
-    });
-
+    const r = await fetch("/umbraco/api/favorites/get", { credentials: "same-origin" });
     if (!r.ok) throw new Error(await r.text());
 
     const cars = await r.json();
 
     if (!cars.length) {
-      document.getElementById("favTitle")?.remove(); 
-      containerFavorites.innerHTML = renderEmptyFavorites();
+      showEmptyState();
       return;
     }
 
-    containerFavorites.innerHTML = cars
-    .map( (c) => `
+    showGridState();
+
+    grid.innerHTML = cars.map(c => `
       <div class="favorite-card" data-id="${c.id}">
-        
-        <button class="favorite-btn" data-car-id="${
-          c.id
-        }" title="Αφαίρεση από αγαπημένα">
+        <button class="favorite-btn" data-car-id="${c.id}" title="Αφαίρεση από αγαπημένα">
           <i class="fa-solid fa-heart"></i>
         </button>
 
         <a href="${c.url}" style="text-decoration:none;color:inherit;">
-          <img src="${c.img || "/images/no-image.png"}" alt="">
+          <img
+            src="${(c.img && String(c.img).trim()) ? c.img : '@noImgUrl'}"
+            alt=""
+            onerror="this.onerror=null;this.src='@noImgUrl';">
           <div class="favorite-title">${c.maker} ${c.model}</div>
           <div class="favorite-year">${c.year ?? ""}</div>
           <div class="favorite-price">${formatGreekThousands(c.price)} €</div>
         </a>
-
       </div>
     `).join("");
 
   } catch (err) {
     console.error("Favorites load error:", err);
-    containerFavorites.innerHTML = "<p>Σφάλμα φόρτωσης αγαπημένων.</p>";
+    grid.innerHTML = "<p>Σφάλμα φόρτωσης αγαπημένων.</p>";
   }
-});
+}
 
-// ❤️ Αφαίρεση από αγαπημένα
+document.addEventListener("DOMContentLoaded", loadFavorites);
+
+// ❤️ Toggle / Remove
 document.addEventListener("click", async (e) => {
   const btn = e.target.closest(".favorite-btn");
   if (!btn) return;
@@ -86,57 +127,35 @@ document.addEventListener("click", async (e) => {
   e.preventDefault();
   e.stopPropagation();
 
-  const carId = btn.dataset.carId;
+  const carId = Number(btn.dataset.carId);
+  if (!carId) return;
 
   try {
     const r = await fetch("/umbraco/api/favorites/toggle", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
-      body: JSON.stringify({ carId: Number(carId) }),
+      body: JSON.stringify({ carId }),
     });
 
     if (!r.ok) throw new Error(await r.text());
 
     const { isFavorite } = await r.json();
 
-    // αν αφαιρέθηκε → βγάλ’ το από το grid
-   if (!isFavorite) {
-      const card = btn.closest(".favorite-card");
-      card?.remove();
+    // αν αφαιρέθηκε από favorites page -> remove card
+    if (!isFavorite) {
+      btn.closest(".favorite-card")?.remove();
 
-      // ✅ ΠΑΡΕ ΤΟ CONTAINER ΕΔΩ (σωστό scope)
-      const containerFavorites = document.getElementById("favoritesList");
-
-      if (
-        containerFavorites &&
-        !containerFavorites.querySelector(".favorite-card")
-      ) {
-        document.getElementById("favTitle")?.remove(); 
-        containerFavorites.innerHTML = renderEmptyFavorites();
+      const grid = document.getElementById("favoritesList");
+      if (grid && !grid.querySelector(".favorite-card")) {
+        showEmptyState(); // ✅ εδώ θα φύγει ΚΑΙ ο τίτλος
       }
     }
+
   } catch (err) {
     console.error("Favorite toggle error:", err);
   }
 });
-
-// Εμφάνιση μηνύματος όταν τα αγαπημένα είναι ΑΔΕΙΑ!
-function renderEmptyFavorites() {
-  return `
-    <div class="favorites-empty">
-      <div class="favorites-empty-icon" aria-hidden="true">
-        <i class="fa-regular fa-heart"></i>
-      </div>
-
-      <h2 class="favorites-empty-title">Δεν έχετε αγαπημένα</h2>
-      <p class="favorites-empty-text">
-        Προσθέστε αυτοκίνητα στα αγαπημένα για να τα βρείτε εδώ.
-      </p>
-
-      <a href="@usedUrl" class="favorites-empty-btn">Πίσω στα αυτοκίνητα</a>
-    </div>
-  `;
-}
+ 
 </script>
 

@@ -420,12 +420,12 @@ label {
   transform: scale(1.05);
 }
 .favorite-btn:hover i {
-  color: #e63946;
+  color: #023859;
 }
 
 /* active (favorited) */
 .favorite-btn.is-favorite i {
-  color: #e63946;
+  color: #023859;
 }
 .favorite-btn.is-favorite {
   background: #fff;
@@ -481,7 +481,9 @@ label {
 .filter-content {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
+  transition:
+    max-height 0.3s ease,
+    padding 0.3s ease;
   padding: 0 0;
   font-size: 14px;
   color: #444;
