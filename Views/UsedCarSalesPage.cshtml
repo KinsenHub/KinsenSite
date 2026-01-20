@@ -817,6 +817,7 @@
 						var transmission = car.Value<string>("transmissionType");
 						var color = car.Value<string>("color");
 						var typeOfCar = car.Value<string>("typeOfCar");
+						var tenPhotosBlock = car.Value<IEnumerable<BlockListItem>>("TenPhotosForUsedCarSales");
 
 						var targetUrl = isLoggedIn
 							? $"/carDetailsMember?id={carID}"

@@ -10,7 +10,7 @@
 
 .custom-carousel .carousel-item img {
   width: 100%;
-  height: auto;
+  height: 650px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
@@ -20,7 +20,7 @@
 
 /* Κάρτα */
 .cart-card {
-  border-radius: 12px !important;
+  border-radius: 20px;
   padding: 16px !important;
   background: #fff;
   display: grid;
@@ -33,7 +33,7 @@
   width: 110px;
   height: 72px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 20px;
 }
 
 .price-section .car-title {
@@ -121,10 +121,34 @@
   font-size: 17px;
 }
 
+/*-----------Κουμπί 'Προσθήκη στο καλάθι'--------- */
+.offer-button-container {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.addToCartBtn {
+  width: 100%;
+  background-color: #007c91 !important;
+  color: white;
+  padding: 1rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 1rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.addToCartBtn:hover {
+  background-color: #004c74;
+  cursor: pointer;
+}
+
 @media (max-width: 575px) {
   .custom-carousel .carousel-item img {
     width: 80% !important;
-    height: auto;
+    height: 400px;
     object-fit: contain;
     display: block;
     margin: 0 auto;

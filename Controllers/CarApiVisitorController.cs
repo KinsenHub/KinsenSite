@@ -8,9 +8,8 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
-using Umbraco.Cms.Core.Models;   // για MediaWithCrops
-using Umbraco.Extensions;                           // Url(...)
-using Umbraco.Cms.Core;                             // UrlMode
+using Umbraco.Cms.Core.Models; 
+using System.Globalization;                        
 
 
 [Route("umbraco/api/[controller]")]
@@ -45,7 +44,29 @@ public class CarApiVisitorController : UmbracoApiController
 
         var carBlocks = salesPage.Value<IEnumerable<BlockListItem>>("carCardBlock");
         var car = carBlocks?.Select(x => x.Content)
-            .FirstOrDefault(x => x.Value<int>("carID") == request.CarId);  
+            .FirstOrDefault(x => x.Value<int>("carID") == request.CarId);
+
+        var gallery = new List<string>();
+
+        var tenPhotosBlocks = car.Value<IEnumerable<BlockListItem>>("TenPhotosForUsedCarSales");
+
+        if (tenPhotosBlocks != null)
+        {
+            foreach (var block in tenPhotosBlocks)
+            {
+                var content = block.Content;
+                if (content == null) continue;
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    var img = content.Value<IPublishedContent>($"img{i}");
+                    if (img != null)
+                    {
+                        gallery.Add(img.Url());
+                    }
+                }
+            }
+        }  
             
         if (car == null) return NotFound($"Car with ID {request.CarId} not found.");
         
@@ -66,7 +87,8 @@ public class CarApiVisitorController : UmbracoApiController
             transmission = car.Value<string>("transmissionType"),
             offer = car.Value<string>("typeOfDiscount"),
             typeOfCar = car.Value<string>("typeOfCar"),
-            imageUrl = media?.GetCropUrl() ?? media?.MediaUrl() ?? ""
+            imageUrl = media?.GetCropUrl() ?? media?.MediaUrl() ?? "",
+            gallery = gallery
         };
 
         return Ok(result);
@@ -104,6 +126,19 @@ public class CarApiVisitorController : UmbracoApiController
             // fallback αν αποτύχει
             return $"<img src=\"{url}\" alt=\"{alt}\" style=\"display:block;width:100%;max-width:{maxWidth}px;height:auto;margin:0 auto;border:0;outline:none;\" />";
         }
+    }
+
+    private static string FormatPriceGr(string? raw)
+    {
+      if (string.IsNullOrWhiteSpace(raw)) return "-";
+
+      // κράτα μόνο ψηφία (βγάζει €, τελείες, κόμματα κλπ)
+      var digits = new string(raw.Where(char.IsDigit).ToArray());
+
+      if (!long.TryParse(digits, out var value))
+          return raw;
+
+      return value.ToString("N0", new CultureInfo("el-GR")); // 30.500
     }
 
     [HttpPost("submitofferVisitor")] // POST /umbraco/api/carapi/submitoffer
@@ -364,7 +399,7 @@ public class CarApiVisitorController : UmbracoApiController
 
                             <!-- Στοιχεία δεξιά -->
                             <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
-                            <div style='font-size:18px;font-weight:700;margin-bottom:6px;'>{maker} {model}</div>
+                            <div style='font-size:18px;font-weight:700;margin-bottom:6px;color:#023859;'>{maker} {model}</div>
 
                             <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
                                 <tr>
@@ -384,7 +419,7 @@ public class CarApiVisitorController : UmbracoApiController
                                 </tr>
                             </table>
 
-                            <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{price} €</div>
+                            <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{FormatPriceGr(price)} €</div>
                             </td>
                         </tr>
                     </table>
@@ -466,7 +501,7 @@ public class CarApiVisitorController : UmbracoApiController
 
                             <!-- Στοιχεία δεξιά -->
                             <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
-                            <div style='font-size:18px;font-weight:700;margin-bottom:6px;'>{maker} {model}</div>
+                            <div style='font-size:18px;font-weight:700;margin-bottom:6px;color:#023859;'>{maker} {model}</div>
 
                             <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
                                 <tr>
@@ -486,7 +521,7 @@ public class CarApiVisitorController : UmbracoApiController
                                 </tr>
                             </table>
 
-                            <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{price} €</div>
+                            <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{FormatPriceGr(price)} €</div>
                             </td>
                         </tr>
                         </table>
@@ -494,10 +529,10 @@ public class CarApiVisitorController : UmbracoApiController
 
                     <tr>
                         <td align='center' style='padding:10px 24px 20px 24px;'>
-                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:16px;line-height:1.7;color:#000000;margin:8px 0 10px 0;'>
+                            <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:16px;line-height:1.7;color:#023859;margin:8px 0 10px 0;'>
                                 Παραμένουμε στη διάθεσή σας!
                             </div>
-                            <div style='margin-bottom:6px; font-size:15px; color:#023859;'><b>Kinsen</b></div>
+                            <div style='margin-bottom:6px; font-size:16px; color:#023859;'><b>Kinsen</b></div>
                             <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:400;font-size:14px;line-height:1.9;color:#000000;margin:8px 0;'>
                                 ✉️ <a href='mailto:{companyEmail}' style='color:#000000;text-decoration:none;'>{companyEmail}</a>
                             </div>

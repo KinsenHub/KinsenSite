@@ -332,7 +332,8 @@ body {
 /* PRICE */
 .tesla-overlay p {
   margin: 8px 0 20px;
-  font-size: 16px;
+  font-size: 19px;
+  font-weight: bold;
 }
 
 /* BUTTON */

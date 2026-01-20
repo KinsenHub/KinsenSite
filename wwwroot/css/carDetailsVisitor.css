@@ -17,7 +17,7 @@
 
 .custom-carousel .carousel-item img {
   width: 100%;
-  height: auto;
+  height: 650px;
   object-fit: contain;
   max-height: 650px;
   image-rendering: -webkit-optimize-contrast;
@@ -95,30 +95,6 @@
   font-size: 1.1rem;
 }
 
-/*-----------Κουμπί 'Προσθήκη στο καλάθι'--------- */
-.offer-button-container {
-  margin-top: 2rem;
-  width: 100%;
-}
-
-.addToCartBtn {
-  width: 100%;
-  background-color: #007c91 !important;
-  color: white;
-  padding: 1rem;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 1rem;
-  font-weight: 600;
-  text-align: center;
-  transition: background-color 0.3s ease;
-}
-
-.addToCartBtn:hover {
-  background-color: #004c74;
-  cursor: pointer;
-}
-
 /*-----------Κουμπί 'Θέλω Προσφορά'--------- */
 .offer-button-container {
   margin-top: 2rem;
@@ -190,7 +166,7 @@
 @media (max-width: 575px) {
   .custom-carousel .carousel-item img {
     width: 80% !important;
-    height: auto;
+    height: 400px;
     object-fit: contain;
     display: block;
     margin: 0 auto;

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
+using System.Globalization;
 
 [Route("umbraco/api/[controller]")]
 public class ModalOfferMemberApiController : UmbracoApiController
@@ -103,6 +104,19 @@ public class ModalOfferMemberApiController : UmbracoApiController
             $"style='display:block;width:100%;max-width:{maxWidth}px;height:auto;border:0;outline:none;text-decoration:none;' />";
     }
 
+    private static string FormatPriceGr(string? raw)
+    {
+      if (string.IsNullOrWhiteSpace(raw)) return "-";
+
+      // κράτα μόνο ψηφία (βγάζει €, τελείες, κόμματα κλπ)
+      var digits = new string(raw.Where(char.IsDigit).ToArray());
+
+      if (!long.TryParse(digits, out var value))
+          return raw;
+
+      return value.ToString("N0", new CultureInfo("el-GR")); // 30.500
+    }
+
     [HttpPost("send")]
     public async Task<IActionResult> Send([FromBody] OfferRequest request)
     {
@@ -130,7 +144,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
             <td style='padding:12px;vertical-align:top;
                       font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
 
-              <div style='font-size:18px;font-weight:700;margin-bottom:6px;'>
+              <div style='font-size:18px;font-weight:700;margin-bottom:6px;color:#023859;'>
                 {c.Maker} {c.Model}
               </div>
 
@@ -157,7 +171,7 @@ public class ModalOfferMemberApiController : UmbracoApiController
               </table>
 
               <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>
-                {c.PriceText} €
+                {FormatPriceGr(c.PriceText)} €
               </div>
 
             </td>
@@ -204,10 +218,10 @@ public class ModalOfferMemberApiController : UmbracoApiController
           <tr>
             <td align='center' style='padding:20px;color:#000000;
                                       font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:13px;line-height:1.6;'>
-              <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:16px;line-height:1.7;color:#000000;margin:8px 0 10px 0;'>
+              <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:16px;line-height:1.7;color:#023859;margin:8px 0 10px 0;'>
                   Παραμένουμε στη διάθεσή σας!
               </div>
-              <div style='margin-bottom:6px; font-size:15px; color:#023859;'><b>Kinsen</b></div>
+              <div style='margin-bottom:6px; font-size:16px; color:#023859;'><b>Kinsen</b></div>
               <div style='margin-bottom:6px;'>{companyAddress}</div>
               <div style='margin-bottom:6px;'>📞 {companyPhone}</div>
               <div style='margin-bottom:6px;'>✉️ <a href='mailto:{companyEmail}' style='color:#000000;text-decoration:none;'>{companyEmail}</a></div>

@@ -43,6 +43,28 @@ public class CarApiMemberController : UmbracoApiController
         var car = carBlocks?.Select(x => x.Content)
             .FirstOrDefault(x => x.Value<int>("carID") == request.Id);
 
+        var gallery = new List<string>();
+
+        var tenPhotosBlocks = car.Value<IEnumerable<BlockListItem>>("TenPhotosForUsedCarSales");
+
+        if (tenPhotosBlocks != null)
+        {
+            foreach (var block in tenPhotosBlocks)
+            {
+                var content = block.Content;
+                if (content == null) continue;
+
+                for (int i = 1; i <= 10; i++)
+                {
+                    var img = content.Value<IPublishedContent>($"img{i}");
+                    if (img != null)
+                    {
+                        gallery.Add(img.Url());
+                    }
+                }
+            }
+        }
+
         if (car == null) return NotFound($"Car with ID {request.Id} not found.");
 
         return Ok(new
@@ -59,7 +81,8 @@ public class CarApiMemberController : UmbracoApiController
             hp = car.Value<string>("hp"),
             transmission = car.Value<string>("transmissionType"),
             typeOfCar = car.Value<string>("typeOfCar"),
-            imageUrl = car.Value<IPublishedContent>("carPic")?.Url()
+            imageUrl = car.Value<IPublishedContent>("carPic")?.Url(),
+            gallery = gallery
         });
     }
 }

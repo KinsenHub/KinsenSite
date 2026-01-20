@@ -2,6 +2,7 @@
 @using Umbraco.Cms.Core.Models; 
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@using System.Globalization;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Αρχική σελίδα | kinsen.gr";
@@ -85,6 +86,19 @@
                         ? $"/carDetailsMember?id={carID}"
                         : $"/carDetailsVisitor?id={carID}";
 
+                    var gr = new CultureInfo("el-GR");
+					string formattedPrice = "";
+
+                    if (!string.IsNullOrWhiteSpace(price) &&
+                        long.TryParse(price, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n))
+                    {
+                        formattedPrice = n.ToString("#,0", gr);
+                    }
+                    else
+                    {
+                        formattedPrice = price ?? "";
+                    }
+
                     <div class="tesla-card">
                         <a href="@targetUrl"
                         data-car-id="@carID"
@@ -101,7 +115,7 @@
                                 <span class="discount-badgeMain">@typeOfDiscount</span>
 
                                 <h2>@maker @modelo</h2>
-                                <p>@price €</p>
+                                <p>@formattedPrice €</p>
 
                                 <button class="tesla-btn">
                                     Δείτε λεπτομέρειες

@@ -632,7 +632,6 @@ namespace KinsenOfficial.Controllers
         }    
     }
 
-
     public class CarStockCar
     {
         [JsonPropertyName("carId")]
