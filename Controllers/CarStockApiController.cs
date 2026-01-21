@@ -12,8 +12,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
-using System.Text.Json.Nodes;
-using Umbraco.Extensions;
+// using System.Text.Json.Nodes;
+// using Umbraco.Extensions;
 
 namespace KinsenOfficial.Controllers
 {
@@ -154,29 +154,45 @@ namespace KinsenOfficial.Controllers
             if (page == null)
                 return NotFound("usedCarSalesPage not found.");
 
-            // ✔ Φόρτωση ΥΠΑΡΧΟΝΤΩΝ ΑΥΤΟΚΙΝΗΤΩΝ
             var existingCars = LoadExistingCars(page);
             _logger.LogInformation("EXISTING CARS IN CONTENT = {Count}", existingCars.Count);
 
-            // ✔ Φιλτράρισμα μόνο των νέων (μη-διπλότυπων)
-            var existingIds = existingCars.Select(c => c.CarId).ToHashSet();
-            var carsToAdd = newCars.Where(c => !existingIds.Contains(c.CarId)).ToList();
+            // ✔ Index υπάρχοντα ανά CarId
+            var existingMap = existingCars.ToDictionary(c => c.CarId);
 
-            _logger.LogInformation("CARS TO ADD (not duplicates) = {Count}", carsToAdd.Count);
+            // ✔ Για να μείνει το return ίδιο, κρατάμε carsToAdd μόνο για τα πραγματικά νέα
+            var carsToAdd = new List<CarDto>();
 
-            if (carsToAdd.Count == 0)
+            foreach (var incoming in newCars)
             {
-                _logger.LogInformation("NO NEW CARS — NOTHING ADDED");
-                return Ok(new { ok = true, added = 0 });
+                if (existingMap.ContainsKey(incoming.CarId))
+                {
+                    var existing = existingMap[incoming.CarId];
+
+                    // ⛔ ΔΕΝ ΠΕΙΡΑΖΟΥΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ
+                    incoming.CarPic = existing.CarPic;
+
+                    // ✅ OVERWRITE ΟΛΑ ΤΑ ΥΠΟΛΟΙΠΑ
+                    existingMap[incoming.CarId] = incoming;
+                }
+                else
+                {
+                    // ✅ NEW
+                    existingMap.Add(incoming.CarId, incoming);
+                    carsToAdd.Add(incoming);
+                }
             }
 
-            // ✔ Merge → Υπάρχοντα + Νέα
-            var merged = existingCars.Concat(carsToAdd).ToList();
+            _logger.LogInformation("CARS TO ADD (new only) = {Count}", carsToAdd.Count);
+
+            // ✔ Τελικό merged (με updates + adds)
+            var merged = existingMap.Values.ToList();
             _logger.LogInformation("FINAL MERGED CAR COUNT = {Total}", merged.Count);
 
             // ✔ Αντικατάσταση block list
-           ReplaceBlockListWithCars(page, merged);
+            ReplaceBlockListWithCars(page, merged);
 
+            // ✅ ΑΚΡΙΒΩΣ ΟΠΩΣ ΤΟ ΘΕΣ
             return Ok(new { ok = true, added = carsToAdd.Count });
         }
 
