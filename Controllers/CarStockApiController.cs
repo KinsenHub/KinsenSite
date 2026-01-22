@@ -12,8 +12,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
-// using System.Text.Json.Nodes;
-// using Umbraco.Extensions;
+using System.Text.Json.Nodes;
 
 namespace KinsenOfficial.Controllers
 {
@@ -171,6 +170,7 @@ namespace KinsenOfficial.Controllers
 
                     // ⛔ ΔΕΝ ΠΕΙΡΑΖΟΥΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ
                     incoming.CarPic = existing.CarPic;
+                    incoming.TenPhotosForUsedCarSales = existing.TenPhotosForUsedCarSales;
 
                     // ✅ OVERWRITE ΟΛΑ ΤΑ ΥΠΟΛΟΙΠΑ
                     existingMap[incoming.CarId] = incoming;
@@ -229,6 +229,18 @@ namespace KinsenOfficial.Controllers
                 index++;
 
                 var content = block.Content;
+
+                JsonNode? tenPhotosNode = null;
+
+                var tenProp = content.GetProperty("tenPhotosForUsedCarSales");
+                var tenSource = tenProp?.GetSourceValue()?.ToString();
+
+                if (!string.IsNullOrWhiteSpace(tenSource))
+                {
+                    // κρατάς το ακριβές JSON του nested blocklist
+                    tenPhotosNode = JsonNode.Parse(tenSource);
+                }
+
                 if (content == null)
                 {
                     _logger.LogWarning("LoadExistingCars: block #{Index} έχει null Content", index);
@@ -286,7 +298,8 @@ namespace KinsenOfficial.Controllers
                     Color = color,
                     TransmissionType = transmissionType,
                     TypeOfCar = typeOfCar,
-                    CarPic = carPicUdi
+                    CarPic = carPicUdi,
+                    TenPhotosForUsedCarSales = tenPhotosNode
                 });
             }
 
@@ -495,7 +508,8 @@ namespace KinsenOfficial.Controllers
                         ["transmissionType"] = transmissionTypeNormalized,
                         ["typeOfCar"]        = typeOfCarNormalized,
                         ["typeOfDiscount"]   = car.TypeOfDiscount,
-                        ["carPic"]           = car.CarPic
+                        ["carPic"]           = car.CarPic,
+                        ["tenPhotosForUsedCarSales"] = car.TenPhotosForUsedCarSales
                     };
                 }
 
@@ -709,5 +723,7 @@ namespace KinsenOfficial.Controllers
         public string TypeOfDiscount { get; set; } = "";
         public string TypeOfCar { get; set; } = "";
         public string CarPic { get; set; } = "";
+        public JsonNode? TenPhotosForUsedCarSales { get; set; }
+
     }
 }
