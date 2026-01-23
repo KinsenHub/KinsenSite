@@ -812,7 +812,7 @@
 						var km = car.Value<string>("km");
 						var cc = car.Value<string>("cc");
 						var hp = car.Value<string>("hp");
-						var typeOfDiscount = car.Value<string>("typeOfDiscount");
+						var typeOfDiscount = car.Value<string>("offer");
 						var typeOfFuel = car.Value<string>("fuel");
 						var transmission = car.Value<string>("transmissionType");
 						var color = car.Value<string>("color");
@@ -853,9 +853,9 @@
 								data-car-id="@carID" 
 								style="text-decoration: none; color: inherit;">
 							
-								@if (!string.IsNullOrWhiteSpace(typeOfDiscount))
+								@if (typeOfDiscount == "True")
 								{
-									<span class="discount-badge">@typeOfDiscount</span>
+									<span class="discount-badge">Offer</span>
 								}
 								@if(carPic != null)
 								{

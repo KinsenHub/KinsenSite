@@ -1160,7 +1160,7 @@ label {
     color: #fff;
     font-size: 1.2rem;
     font-weight: 400;
-    padding: 8px 15px;
+    padding: 6px 15px;
     border-radius: 6px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
@@ -1246,7 +1246,7 @@ label {
     color: #fff;
     font-size: 1.3rem;
     font-weight: 400;
-    padding: 8px 17px;
+    padding: 7px 17px;
     border-radius: 6px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
@@ -1300,7 +1300,7 @@ label {
     color: #fff;
     font-size: 1.4rem;
     font-weight: 400;
-    padding: 10px 20px;
+    padding: 7px 18px;
     border-radius: 6px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }

@@ -149,7 +149,7 @@ function filterCards(filters) {
       klmText
         .replace(/\u00A0|\u202F/g, "") // non-breaking spaces
         .replace(/[^\d]/g, ""), // κράτα μόνο ψηφία
-      10
+      10,
     );
 
     ccText = card.querySelector(".cc")?.textContent.trim().replace(/\D/g, "");
@@ -183,7 +183,7 @@ function filterCards(filters) {
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "")
               .toLowerCase()
-              .trim()
+              .trim(),
         ),
 
       filters.transmission.length === 0 ||
@@ -198,7 +198,7 @@ function filterCards(filters) {
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "")
               .toLowerCase()
-              .trim()
+              .trim(),
         ),
 
       filters.color.length === 0 ||
@@ -307,7 +307,7 @@ function filterCards(filters) {
 
   if (!window.currentPriceOrder) {
     [...displayCars.querySelectorAll(".cardCar")].forEach((card) =>
-      card.remove()
+      card.remove(),
     );
 
     filteredCards.forEach((card) => {
@@ -325,42 +325,42 @@ function filterCards(filters) {
 //-------------------------------------------------//
 //------------------Update Filters-----------------//
 //-------------------------------------------------//
-function updateAvailableOffers(filters, cards) {
-  const offerCheckboxes = document.querySelectorAll(".offerTypeCheckbox");
-  const visibleOffers = new Set();
+// function updateAvailableOffers(filters, cards) {
+//   const offerCheckboxes = document.querySelectorAll(".offerTypeCheckbox");
+//   const visibleOffers = new Set();
 
-  const priceIsRestricted = filters.minPrice > 0 || filters.maxPrice < 999999;
+//   const priceIsRestricted = filters.minPrice > 0 || filters.maxPrice < 999999;
 
-  if (!priceIsRestricted) {
-    offerCheckboxes.forEach((checkbox) => {
-      checkbox.disabled = false;
-      checkbox.parentElement.style.opacity = "1";
-    });
-    return;
-  }
+//   if (!priceIsRestricted) {
+//     offerCheckboxes.forEach((checkbox) => {
+//       checkbox.disabled = false;
+//       checkbox.parentElement.style.opacity = "1";
+//     });
+//     return;
+//   }
 
-  cards.forEach((card) => {
-    const badge = card.querySelector(".discount-badge");
-    const offerText = badge?.innerText.trim().toLowerCase() || "";
+//   cards.forEach((card) => {
+//     const badge = card.querySelector(".discount-badge");
+//     const offerText = badge?.innerText.trim().toLowerCase() || "";
 
-    if (offerText === "έκπτωση") visibleOffers.add("discount");
-    if (offerText === "προσφορά") visibleOffers.add("offer");
-  });
+//     if (offerText === "έκπτωση") visibleOffers.add("discount");
+//     if (offerText === "προσφορά") visibleOffers.add("offer");
+//   });
 
-  offerCheckboxes.forEach((checkbox) => {
-    const value = checkbox.value;
-    const label = checkbox.parentElement;
+//   offerCheckboxes.forEach((checkbox) => {
+//     const value = checkbox.value;
+//     const label = checkbox.parentElement;
 
-    if (visibleOffers.size === 0 || visibleOffers.has(value)) {
-      checkbox.disabled = false;
-      label.style.opacity = "1";
-    } else {
-      checkbox.disabled = true;
-      checkbox.checked = false;
-      label.style.opacity = "0.5";
-    }
-  });
-}
+//     if (visibleOffers.size === 0 || visibleOffers.has(value)) {
+//       checkbox.disabled = false;
+//       label.style.opacity = "1";
+//     } else {
+//       checkbox.disabled = true;
+//       checkbox.checked = false;
+//       label.style.opacity = "0.5";
+//     }
+//   });
+// }
 
 function updateAvailableBrands(filters, filteredCards) {
   const brandCheckboxes = document.querySelectorAll(".brandCheckbox");
@@ -402,7 +402,7 @@ function updateAvailableBrands(filters, filteredCards) {
 
   // visible set από τα counts
   const visibleBrands = new Set(
-    Object.keys(brandCounts).filter((k) => brandCounts[k] > 0)
+    Object.keys(brandCounts).filter((k) => brandCounts[k] > 0),
   );
 
   // Ενημέρωση UI (μόνο αριθμοί, όχι ονόματα)
@@ -502,7 +502,7 @@ function collectFilters() {
   let maxPrice = readNumVisible(
     Infinity,
     "maxPriceInputDesk",
-    "maxPriceInputMobile"
+    "maxPriceInputMobile",
   );
 
   // 🔥 MONO αυτό προσθέτουμε (και μόνο για maxPrice)
@@ -590,7 +590,7 @@ function parsePrice(value) {
 
 function getCheckedValues(selector) {
   return Array.from(document.querySelectorAll(`${selector}:checked`)).map(
-    (cb) => cb.value
+    (cb) => cb.value,
   );
 }
 
@@ -600,7 +600,7 @@ document.addEventListener("DOMContentLoaded", () => {
   paginationContainer = document.getElementById("paginationControls");
 
   const filterInputs = document.querySelectorAll(
-    "input[type='checkbox'], input[type='number'], input[type='text'], select"
+    "input[type='checkbox'], input[type='number'], input[type='text'], select",
   );
 
   function getSelectedFilters() {
@@ -964,7 +964,7 @@ function initInfinite(sourceList) {
         if (e.isIntersecting) appendNextBatch();
       });
     },
-    { rootMargin: "200px" }
+    { rootMargin: "200px" },
   );
   inf.observer.observe(sentinel);
 }
@@ -1086,7 +1086,7 @@ function setCookie(name, value, minutes) {
   const d = new Date();
   d.setTime(d.getTime() + minutes * 60 * 1000);
   document.cookie = `${name}=${encodeURIComponent(
-    value
+    value,
   )}; Expires=${d.toUTCString()}; Path=/; SameSite=Lax; Secure`;
 }
 

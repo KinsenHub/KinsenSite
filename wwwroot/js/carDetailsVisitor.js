@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ DOM fully loaded");
-
   setTimeout(() => {
     const items = document.querySelectorAll(".dropdown-item");
     const dropdownButton = document.querySelector(".custom-dropdown-button");
@@ -11,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let price = parseFloat(
       PriceText.replace(/\./g, "")
         .replace(",", ".")
-        .replace(/[^\d.]/g, "")
+        .replace(/[^\d.]/g, ""),
     );
 
     const vatMultiplier = 1.24;
@@ -20,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
       item.addEventListener("click", function () {
         const selectedText = this.innerText;
         const button = this.closest(".btn-group").querySelector(
-          ".custom-dropdown-button"
+          ".custom-dropdown-button",
         );
 
         const selectedValue = this.value;
@@ -35,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const totalWithVAT = price * vatMultiplier;
             const perMonth = totalWithVAT / months;
             resultSpan.innerHTML = `<strong>${perMonth.toFixed(
-              2
+              2,
             )} €</strong> / μήνα (με ΦΠΑ)`;
           }
         }
@@ -43,29 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }, 500);
 });
-
-// const carId =
-//   parseInt(sessionStorage.getItem("selectedCarId") || "0", 10) ||
-//   parseInt(new URLSearchParams(location.search).get("id") || "0", 10) ||
-//   parseInt(document.querySelector("[data-car-id]")?.dataset.carId || "0", 10);
-
-// fetch("/umbraco/api/CarApiVisitor/getcarbyid", {
-//   method: "POST",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//       body: JSON.stringify({ carId: parseInt(carID, 10) })
-// })
-//   .then((res) => {
-//     if (!res.ok) throw new Error(`API ${res.status} - ${res.statusText}`);
-//     return res.json();
-//   })
-//   .then((data) => {
-//     console.log("✅ Car loaded (Visitor):", data);
-//   })
-//   .catch((err) => {
-//     console.error("❌ API ERROR (Visitor):", err);
-//   });
 
 (function () {
   const API_BASE = "/umbraco/api/CarApiVisitor";
@@ -76,7 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const isValidEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s || "");
   const normalizeGreekMobile = (s) => {
     let d = (s || "").replace(/\D/g, ""); // κράτα μόνο ψηφία
-    if (d.startsWith("0030")) d = d.slice(4); // 0030 -> κόψ' το
+    if (d.startsWith("0030"))
+      d = d.slice(4); // 0030 -> κόψ' το
     else if (d.startsWith("30")) d = d.slice(2);
     return d; // π.χ. 69XXXXXXXX
   };
@@ -114,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
       parseInt(new URLSearchParams(location.search).get("id") || "0", 10) ||
       parseInt(
         document.querySelector("[data-car-id]")?.dataset.carId || "0",
-        10
+        10,
       );
 
     console.log("🔎 CarId που θα σταλεί στο submit:", carId);
@@ -128,6 +104,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastName = document.getElementById("lastName")?.value.trim() || "";
     const email = document.getElementById("email")?.value.trim() || "";
     const phone = document.getElementById("phone")?.value.trim() || "";
+
+    const maker =
+      document.querySelector("[data-maker]")?.dataset.maker ||
+      document.querySelector(".car-maker")?.innerText?.trim() ||
+      "";
+
+    const model =
+      document.querySelector("[data-model]")?.dataset.model ||
+      document.querySelector(".car-model")?.innerText?.trim() ||
+      "";
+
+    const priceText =
+      document.querySelector(".price-value")?.innerText?.trim() || "";
 
     // ✅ (#efapaks, #toko)
     const planBtn = document.querySelector(".custom-dropdown-button");
@@ -165,6 +154,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(async () => {
       try {
+        // ============================
+        // 1️⃣ FETCH → UMBRACO (EMAIL)
+        // ============================
         const res = await fetch(`${API_BASE}/submitofferVisitor`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -181,12 +173,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
 
-        // ✅ Μήνυμα επιτυχίας
-        // if (statusEl) {
-        //   statusEl.style.display = "block";
-        //   statusEl.textContent = "Η αίτησή σας στάλθηκε επιτυχώς!";
-        //   statusEl.className = "small mt-2 text-success";
-        // }
+        // ============================
+        // 2️⃣ FETCH → CRM (INTERACTION)
+        // ============================
+        const crmPayload = {
+          FlowId: 2401,
+          AccountId: 0,
+          Id: 0,
+          StatusId: 0,
+          Title: `Αίτημα προσφοράς – ${maker} ${model}`,
+          Comments:
+            `Αίτημα προσφοράς από επισκέπτη\n` +
+            `Όνομα: ${firstName} ${lastName}\n` +
+            `Email: ${email}\n` +
+            `Τηλέφωνο: ${phone}\n\n` +
+            `Όχημα: ${maker} ${model}\n` +
+            `Τιμή: ${priceText}\n` +
+            `Πλάνο: ${paymentPlan}`,
+
+          Account: {
+            Email: email,
+            AFM: "",
+            PhoneNumber: normalizedPhone,
+            Name: firstName,
+            Surname: lastName,
+            CompanyName: "",
+            CustomerType: "Visitor",
+            Address: {
+              City: "",
+              Address: "",
+              PostalCode: "",
+              CountryCode: "GR",
+              County: "",
+            },
+          },
+
+          CustomFields: [],
+        };
+
+        const crmRes = await fetch(
+          "https://kineticsuite.saracakis.gr/api/InteractionAPI/CreateInteraction",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(crmPayload),
+          },
+        );
+
+        if (!crmRes.ok) {
+          console.error("CRM ERROR:", await crmRes.text());
+        }
 
         const successNote = document.getElementById("offerSuccessNote");
         if (successNote) {

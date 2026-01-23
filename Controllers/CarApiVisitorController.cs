@@ -1,16 +1,14 @@
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Extensions;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Models; 
-using System.Globalization;                        
-
+using System.Globalization;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 [Route("umbraco/api/[controller]")]
 public class CarApiVisitorController : UmbracoApiController
@@ -245,8 +243,8 @@ public class CarApiVisitorController : UmbracoApiController
                         {
                             ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator // μόνο για dev
                         };
-                        using var http = new HttpClient(handler);
-                        bytes = await http.GetByteArrayAsync(carUrl);
+                        using var imageHttp = new HttpClient(handler);
+                        bytes = await imageHttp.GetByteArrayAsync(carUrl);
                     }
                 }
                 catch { /* optional: log */ }
@@ -298,152 +296,200 @@ public class CarApiVisitorController : UmbracoApiController
             : (!string.IsNullOrWhiteSpace(imageUrl) ? $"{Request.Scheme}://{Request.Host}{imageUrl}" : "");
 
         // Τι εικόνα θα βάλουμε τελικά στο email που πάει στη Sales
-        var salesImageHtml = !string.IsNullOrEmpty(imgTag)
-            ? imgTag // προτιμάμε το ήδη παραγμένο Base64 (inline)
-            : (string.IsNullOrWhiteSpace(carImageUrlAbs) 
-                ? "" 
-                : $"<img src='{carImageUrlAbs}' alt='{maker} {model}' width='480' style='display:block;width:100%;max-width:480px;height:auto;border:0;outline:none;text-decoration:none;'/>");
+        // var salesImageHtml = !string.IsNullOrEmpty(imgTag)
+        //     ? imgTag // προτιμάμε το ήδη παραγμένο Base64 (inline)
+        //     : (string.IsNullOrWhiteSpace(carImageUrlAbs) 
+        //         ? "" 
+        //         : $"<img src='{carImageUrlAbs}' alt='{maker} {model}' width='480' style='display:block;width:100%;max-width:480px;height:auto;border:0;outline:none;text-decoration:none;'/>");
 
         // ✅ Απόδοση “πλάνου πληρωμής”
         var planText = (request.PaymentPlan == "efapaks") ? "Εφάπαξ" : $"{request.PaymentPlan} Μήνες";
         var interestText = (request.InterestCode == "toko") ? "Με τόκο" : "Χωρίς τόκους";
         var planDisplay = $"{planText} · {interestText}";
 
-        // ================== EMAIL προς Sales (μπορείς να κρατήσεις attachment όπως πριν ή και τίποτα) ==================
-        var subject = $"Αίτημα Προσφοράς: {request.FirstName} {request.LastName} για {maker} {model}";
+        // // ================== EMAIL προς Sales (μπορείς να κρατήσεις attachment όπως πριν ή και τίποτα) ==================
+        // var subject = $"Αίτημα Προσφοράς: {request.FirstName} {request.LastName} για {maker} {model}";
 
-        var body = $@"
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <meta charset='utf-8'>
-        <meta name='viewport' content='width=device-width'>
-        </head>
+        // var body = $@"
+        // <!DOCTYPE html>
+        // <html>
+        // <head>
+        // <meta charset='utf-8'>
+        // <meta name='viewport' content='width=device-width'>
+        // </head>
 
-        <body style='margin:0;padding:0;background:#ffffff;'>
+        // <body style='margin:0;padding:0;background:#ffffff;'>
 
-        <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
-            style='border-collapse:collapse;background:#ffffff;'>
-        <tr>
-            <td align='left' style='padding:0;margin:0;'>
+        // <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
+        //     style='border-collapse:collapse;background:#ffffff;'>
+        // <tr>
+        //     <td align='left' style='padding:0;margin:0;'>
 
-            <!-- OUTER FIXED WRAPPER -->
-            <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
-                    style='border-collapse:collapse;width:600px;max-width:600px;margin:0;'>
+        //     <!-- OUTER FIXED WRAPPER -->
+        //     <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
+        //             style='border-collapse:collapse;width:600px;max-width:600px;margin:0;'>
 
-                <!-- HEADER : LOGO + TITLE -->
-                <tr>
-                <td align='left' style='padding:0;margin:0;'>
-                    <table role='presentation' border='0' cellspacing='0' cellpadding='0'
-                        style='border-collapse:collapse;margin:0;'>
+        //         <!-- HEADER : LOGO + TITLE -->
+        //         <tr>
+        //         <td align='left' style='padding:0;margin:0;'>
+        //             <table role='presentation' border='0' cellspacing='0' cellpadding='0'
+        //                 style='border-collapse:collapse;margin:0;'>
                     
-                    <!-- LOGO -->
-                    <tr>
-                        <td valign='middle'
-                            style='padding:0 12px 0 0;margin:0;'>
-                        {logoTag}
-                        </td>
-                    </tr>
+        //             <!-- LOGO -->
+        //             <tr>
+        //                 <td valign='middle'
+        //                     style='padding:0 12px 0 0;margin:0;'>
+        //                 {logoTag}
+        //                 </td>
+        //             </tr>
 
-                    <!-- TITLE -->
-                    <tr>
-                        <td valign='middle'
-                            style='padding-top:30px;margin:20;'>
-                        <span style='font-family:Segoe UI,Roboto,Arial,sans-serif;
-                                    font-size:22px;
-                                    font-weight:400;
-                                    color:#39c0c3;
-                                    line-height:1;
-                                    white-space:nowrap; margin-top:30px;'>
-                            Νέο αίτημα προσφοράς:
-                        </span>
-                        </td>
-                    </tr>
-                    </table>
-                </td>
-                </tr>
+        //             <!-- TITLE -->
+        //             <tr>
+        //                 <td valign='middle'
+        //                     style='padding-top:30px;margin:20;'>
+        //                 <span style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+        //                             font-size:22px;
+        //                             font-weight:400;
+        //                             color:#39c0c3;
+        //                             line-height:1;
+        //                             white-space:nowrap; margin-top:30px;'>
+        //                     Νέο αίτημα προσφοράς:
+        //                 </span>
+        //                 </td>
+        //             </tr>
+        //             </table>
+        //         </td>
+        //         </tr>
 
-                <!-- SPACER -->
-                <tr><td height='15' style='line-height:15px;font-size:0;'>&nbsp;</td></tr>
+        //         <!-- SPACER -->
+        //         <tr><td height='15' style='line-height:15px;font-size:0;'>&nbsp;</td></tr>
 
-                <!-- CUSTOMER INFO -->
-                <tr>
-                <td align='left'
-                    style='font-family:Segoe UI,Roboto,Arial,sans-serif;
-                            font-size:14px;
-                            color:#000;
-                            padding:0;margin:0;'>
-                    <p style='margin:0 0 6px 0;'><strong>Πελάτης:</strong> {request.FirstName} {request.LastName}</p>
-                    <p style='margin:0 0 6px 0;'><strong>Email:</strong> {request.Email}</p>
-                    <p style='margin:0 0 6px 0;'><strong>Κινητό:</strong> {request.Phone}</p>
-                    <p style='margin:0;'><strong>Πλάνο Πληρωμής:</strong> {planDisplay}</p>
-                </td>
-                </tr>
+        //         <!-- CUSTOMER INFO -->
+        //         <tr>
+        //         <td align='left'
+        //             style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+        //                     font-size:14px;
+        //                     color:#000;
+        //                     padding:0;margin:0;'>
+        //             <p style='margin:0 0 6px 0;'><strong>Πελάτης:</strong> {request.FirstName} {request.LastName}</p>
+        //             <p style='margin:0 0 6px 0;'><strong>Email:</strong> {request.Email}</p>
+        //             <p style='margin:0 0 6px 0;'><strong>Κινητό:</strong> {request.Phone}</p>
+        //             <p style='margin:0;'><strong>Πλάνο Πληρωμής:</strong> {planDisplay}</p>
+        //         </td>
+        //         </tr>
 
-                <!-- DIVIDER -->
-                <tr>
-                <td style='padding:15px 0;'>
-                    <hr style='border:none;border-top:1px solid #ddd;margin:0;'>
-                </td>
-                </tr>
+        //         <!-- DIVIDER -->
+        //         <tr>
+        //         <td style='padding:15px 0;'>
+        //             <hr style='border:none;border-top:1px solid #ddd;margin:0;'>
+        //         </td>
+        //         </tr>
 
-                <!-- CAR INFO -->
-                <tr><td align='center' style='padding:20px;'>
-                    <table role='presentation' border='0' cellspacing='0' cellpadding='0' align='center'
-                        style='margin:15px auto;width:100%;max-width:600px;border:1px solid #ccc;border-radius:10px;overflow:hidden;background:#ffffff;'>
-                        <tr>
-                            <!-- Εικόνα αριστερά -->
-                            <td width='240' align='center' style='height:180px;'>
-                                {imgTag}
-                            </td>
+        //         <!-- CAR INFO -->
+        //         <tr><td align='center' style='padding:20px;'>
+        //             <table role='presentation' border='0' cellspacing='0' cellpadding='0' align='center'
+        //                 style='margin:15px auto;width:100%;max-width:600px;border:1px solid #ccc;border-radius:10px;overflow:hidden;background:#ffffff;'>
+        //                 <tr>
+        //                     <!-- Εικόνα αριστερά -->
+        //                     <td width='240' align='center' style='height:180px;'>
+        //                         {imgTag}
+        //                     </td>
 
-                            <!-- Στοιχεία δεξιά -->
-                            <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
-                            <div style='font-size:18px;font-weight:700;margin-bottom:6px;color:#023859;'>{maker} {model}</div>
+        //                     <!-- Στοιχεία δεξιά -->
+        //                     <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
+        //                     <div style='font-size:18px;font-weight:700;margin-bottom:6px;color:#023859;'>{maker} {model}</div>
 
-                            <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
-                                <tr>
-                                <!-- Αριστερή στήλη (3) -->
-                                <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-right:10px;'>
-                                    • {(string.IsNullOrWhiteSpace(year) ? "-" : year)}<br>
-                                    • {(string.IsNullOrWhiteSpace(cc) ? "-" : cc + " cc")}<br>
-                                    • {(string.IsNullOrWhiteSpace(hp) ? "-" : hp + " hp")}
-                                </td>
+        //                     <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
+        //                         <tr>
+        //                         <!-- Αριστερή στήλη (3) -->
+        //                         <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-right:10px;'>
+        //                             • {(string.IsNullOrWhiteSpace(year) ? "-" : year)}<br>
+        //                             • {(string.IsNullOrWhiteSpace(cc) ? "-" : cc + " cc")}<br>
+        //                             • {(string.IsNullOrWhiteSpace(hp) ? "-" : hp + " hp")}
+        //                         </td>
 
-                                <!-- Δεξιά στήλη (3) -->
-                                <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-left:10px;'>
-                                    • {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")}<br>
-                                    • {(string.IsNullOrWhiteSpace(fuel) ? "-" : fuel)}<br>
-                                    • {(string.IsNullOrWhiteSpace(color) ? "-" : color)}
-                                </td>
-                                </tr>
-                            </table>
+        //                         <!-- Δεξιά στήλη (3) -->
+        //                         <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-left:10px;'>
+        //                             • {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")}<br>
+        //                             • {(string.IsNullOrWhiteSpace(fuel) ? "-" : fuel)}<br>
+        //                             • {(string.IsNullOrWhiteSpace(color) ? "-" : color)}
+        //                         </td>
+        //                         </tr>
+        //                     </table>
 
-                            <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{FormatPriceGr(price)} €</div>
-                            </td>
-                        </tr>
-                    </table>
-                    </td></tr>
-            </table>
+        //                     <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{FormatPriceGr(price)} €</div>
+        //                     </td>
+        //                 </tr>
+        //             </table>
+        //             </td></tr>
+        //     </table>
 
-            </td>
-        </tr>
-        </table>
+        //     </td>
+        // </tr>
+        // </table>
 
-        </body>
-        </html>";
+        // </body>
+        // </html>";
 
-        var msg = new EmailMessage(
-            null,
-            new[] { "Eirini.Skliri@kinsen.gr" },
-            null, null,
-            new[] { request.Email },
-            subject,
-            body,
-            true,
-            null // attachments προαιρετικά
+        // var msg = new EmailMessage(
+        //     null,
+        //     new[] { "Eirini.Skliri@kinsen.gr" },
+        //     null, null,
+        //     new[] { request.Email },
+        //     subject,
+        //     body,
+        //     true,
+        //     null // attachments προαιρετικά
+        // );
+        // await _emailSender.SendAsync(msg, "Offer");
+
+        // ================== CRM INTERACTION ======================
+        var crmPayload = new
+        {
+            FlowId = 2401, 
+            AccountId = 0,
+            CustomFields = Array.Empty<object>(),
+            Title = $"Αίτημα προσφοράς – {maker} {model}",
+            Id = 0,
+            StatusId = 0,
+            Account = new
+            {
+                Email = request.Email,
+                AFM = "",
+                PhoneNumber = request.Phone,
+                Name = request.FirstName,
+                Surname = request.LastName,
+                CompanyName = "-",
+                
+                Address = new
+                {
+                    City = "",
+                    Address = "",
+                    PostalCode = "",
+                    CountryCode = "GR",
+                    County = ""
+                },
+                CustomerType = "Visitor"
+            },
+            Comments = "Αίτημα Προσφοράς"
+        };
+
+        using var http = new HttpClient
+        {
+            BaseAddress = new Uri("https://kineticsuite.saracakis.gr/")
+        };
+
+        var crmResponse = await http.PostAsJsonAsync(
+            "api/InteractionAPI/CreateInteraction",
+            crmPayload
         );
-        await _emailSender.SendAsync(msg, "Offer");
+
+        if (!crmResponse.IsSuccessStatusCode)
+        {
+            var err = await crmResponse.Content.ReadAsStringAsync();
+            Console.WriteLine("CRM ERROR: " + err);
+        }
+
 
         var companyEmail = "sales@kinsen.gr";
         var companyPhone = "+30 211 190 3000";
@@ -484,8 +530,8 @@ public class CarApiVisitorController : UmbracoApiController
                         <td align='left' style='padding:0 24px 5px 24px;'>
                             <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:14px;line-height:1.7;color:#000000;font-weight:400;'>
                                 <div style='margin-bottom:5px;'>Αγαπητέ/ή <b> {request.FirstName} {request.LastName}</b></div>
-                                Λάβαμε το αίτημά σας για προσφορά. Ετοιμάσαμε αναλυτικά τα στοιχεία του οχήματος που επιλέξατε. 
-                                Η προσφορά ισχύει για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής της.
+                                Λάβαμε το αίτημά σας για προσφορά. Θα επικοινωνήσουμε μαζί σας το συντομότερο δυνατόν. 
+                                *Οι προσφορές ισχύουν για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής.
                             </div>
                         </td>
                     </tr>
@@ -575,7 +621,7 @@ public class CarApiVisitorController : UmbracoApiController
 }
 
 // Μοντέλο για το GetCarById
-public class CarRequest
-{
-    public int Id { get; set; }
-}
+// public class CarRequest
+// {
+//     public int Id { get; set; }
+// }
