@@ -7,8 +7,6 @@ using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Models; 
 using System.Globalization;
-using System.Net.Http;
-using System.Net.Http.Json;
 
 [Route("umbraco/api/[controller]")]
 public class CarApiVisitorController : UmbracoApiController
@@ -471,7 +469,10 @@ public class CarApiVisitorController : UmbracoApiController
                 },
                 CustomerType = "Visitor"
             },
-            Comments = "Αίτημα Προσφοράς"
+            Comments = $@"Αίτημα προσφοράς από επισκέπτη
+                        Όνομα: {request.FirstName} {request.LastName}
+                        Email: {request.Email}
+                        Τηλέφωνο: {request.Phone}"
         };
 
         using var http = new HttpClient
@@ -516,14 +517,14 @@ public class CarApiVisitorController : UmbracoApiController
                         <td align='center' style='padding:8px 24px 6px 24px;'>
                             <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='margin:0 auto; margin-bottom:20px;'>
                                 <tr>
-                                    <td align='left' style='padding:10px;'>{logoTag}</td>
+                                    <td align='left' style='padding:10px; width:180'>{logoTag}</td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
                     <tr>
-                    <td align='center' style='padding:0 24px 2px 24px;'> <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:18px;line-height:1.2;font-weight:400;color:#39c0c3;;margin:10px;'>Σας ευχαριστούμε για το ενδιαφέρον σας!</div> </td>
+                    <td align='center' style='padding:0 24px 2px 24px;'> <div style='font-size:18px;line-height:1.2;font-weight:400;color:#39c0c3;;margin:10px;text-align:left;'>Σας ευχαριστούμε για το ενδιαφέρον σας!</div> </td>
                     </tr>
 
                     <tr>
@@ -541,7 +542,7 @@ public class CarApiVisitorController : UmbracoApiController
                             style='margin:15px auto;width:100%;max-width:600px;border:1px solid #ccc;border-radius:10px;overflow:hidden;background:#ffffff;'>
                         <tr>
                             <!-- Εικόνα αριστερά -->
-                            <td width='240' align='center' style='height:180px;'>
+                            <td width='220' align='center' style='height:180px;'>
                                 {imgTag}
                             </td>
 

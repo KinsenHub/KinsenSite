@@ -116,8 +116,8 @@ namespace KinsenOfficial.Controllers
 
             foreach (var car in carsPayload)
             {
-                _logger.LogInformation("Payload Car → ID:{Id}, Maker:{Maker}, Model:{Model}",
-                    car.CarId, car.Maker, car.Model);
+                _logger.LogInformation("Payload Car → ID:{Id}, Maker:{Maker}, Model:{Model}, Offer={Offer}",
+                    car.CarId, car.Maker, car.Model, car.Offer, car.Offer?.GetType().Name ?? "null");
             }
 
             static string NormalizeName(string? value)
@@ -737,11 +737,23 @@ namespace KinsenOfficial.Controllers
 
                 finalMap[incoming.CarId] = incoming;
                 updated++;
+
+                _logger.LogInformation(
+                    "SYNC CHECK → CarId={Id}, IncomingOffer={Offer}",
+                    incoming.CarId,
+                    incoming.Offer
+                );
             }
 
             // 🔹 Πρόσθεσε νέα offer cars που ΔΕΝ υπήρχαν
             foreach (var incoming in incomingMap.Values)
             {
+                 _logger.LogInformation(
+                    "SYNC NEW CHECK → CarId={Id}, Offer={Offer}",
+                    incoming.CarId,
+                    incoming.Offer
+                );
+
                 if (!incoming.Offer)
                     continue;
 

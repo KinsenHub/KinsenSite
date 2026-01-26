@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const items = document.querySelectorAll(".dropdown-item");
     const dropdownButton = document.querySelector(".custom-dropdown-button");
     const resultSpan = document.getElementById("installmentValue");
-    console.log("🔁 Retried dropdown items:", items.length);
 
     const PriceText = document.querySelector(".price-value")?.innerText || "";
     let price = parseFloat(
@@ -93,8 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
         10,
       );
 
-    console.log("🔎 CarId που θα σταλεί στο submit:", carId);
-
     if (!carId) {
       console.error("❌ Δεν βρέθηκε έγκυρο CarId");
       return;
@@ -176,53 +173,53 @@ document.addEventListener("DOMContentLoaded", () => {
         // ============================
         // 2️⃣ FETCH → CRM (INTERACTION)
         // ============================
-        const crmPayload = {
-          FlowId: 2401,
-          AccountId: 0,
-          Id: 0,
-          StatusId: 0,
-          Title: `Αίτημα προσφοράς – ${maker} ${model}`,
-          Comments:
-            `Αίτημα προσφοράς από επισκέπτη\n` +
-            `Όνομα: ${firstName} ${lastName}\n` +
-            `Email: ${email}\n` +
-            `Τηλέφωνο: ${phone}\n\n` +
-            `Όχημα: ${maker} ${model}\n` +
-            `Τιμή: ${priceText}\n` +
-            `Πλάνο: ${paymentPlan}`,
+        // const crmPayload = {
+        //   FlowId: 2401,
+        //   AccountId: 0,
+        //   Id: 0,
+        //   StatusId: 0,
+        //   Title: `Αίτημα προσφοράς – ${maker} ${model}`,
+        //   Comments:
+        //     `Αίτημα προσφοράς από επισκέπτη\n` +
+        //     `Όνομα: ${firstName} ${lastName}\n` +
+        //     `Email: ${email}\n` +
+        //     `Τηλέφωνο: ${phone}\n\n` +
+        //     `Όχημα: ${maker} ${model}\n` +
+        //     `Τιμή: ${priceText}\n` +
+        //     `Πλάνο: ${paymentPlan}`,
 
-          Account: {
-            Email: email,
-            AFM: "",
-            PhoneNumber: normalizedPhone,
-            Name: firstName,
-            Surname: lastName,
-            CompanyName: "",
-            CustomerType: "Visitor",
-            Address: {
-              City: "",
-              Address: "",
-              PostalCode: "",
-              CountryCode: "GR",
-              County: "",
-            },
-          },
+        //   Account: {
+        //     Email: email,
+        //     AFM: "",
+        //     PhoneNumber: normalizedPhone,
+        //     Name: firstName,
+        //     Surname: lastName,
+        //     CompanyName: "",
+        //     CustomerType: "Visitor",
+        //     Address: {
+        //       City: "",
+        //       Address: "",
+        //       PostalCode: "",
+        //       CountryCode: "GR",
+        //       County: "",
+        //     },
+        //   },
 
-          CustomFields: [],
-        };
+        //   CustomFields: [],
+        // };
 
-        const crmRes = await fetch(
-          "https://kineticsuite.saracakis.gr/api/InteractionAPI/CreateInteraction",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(crmPayload),
-          },
-        );
+        // const crmRes = await fetch(
+        //   "https://kineticsuite.saracakis.gr/api/InteractionAPI/CreateInteraction",
+        //   {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify(crmPayload),
+        //   },
+        // );
 
-        if (!crmRes.ok) {
-          console.error("CRM ERROR:", await crmRes.text());
-        }
+        // if (!crmRes.ok) {
+        //   console.error("CRM ERROR:", await crmRes.text());
+        // }
 
         const successNote = document.getElementById("offerSuccessNote");
         if (successNote) {

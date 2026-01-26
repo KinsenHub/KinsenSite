@@ -81,8 +81,6 @@
 		}
 		history.replaceState({ carId: carID }, '', location.pathname);
 
-		console.log("carID from Razor:", carID); 
-
 		if (carID) {
 		fetch("/umbraco/api/carApiVisitor/getcarbyid", {
 			method: "POST",
@@ -96,8 +94,6 @@
 			})
 			
 			.then(data => {
-				console.log("API RESPONSE:", data);
-				console.log("VISITOR imageUrl:", data.imageUrl);
 				const formattedPrice = Number(data.price).toLocaleString('el-GR');
 
 				const mainImage = (data.imageUrl && data.imageUrl.trim()) ? data.imageUrl : '@noImgUrl';

@@ -80,7 +80,6 @@ function normalizeColorStrict(v) {
 document.addEventListener("change", (e) => {
   if (e.target && e.target.id === "priceOrderSelect") {
     const val = e.target.value;
-    console.log("🟢 delegated value =", val);
 
     window.currentPriceOrder = val;
 
@@ -220,13 +219,13 @@ function filterCards(filters) {
             .replace(/-/g, "")
             .replace(/\s+/g, "");
 
-          console.log("🎨 compare(color):", {
-            filterColorOriginal: c,
-            cardColorOriginal: colorName,
-            leftNorm,
-            right,
-            eq: leftNorm === right,
-          });
+          // console.log("🎨 compare(color):", {
+          //   filterColorOriginal: c,
+          //   cardColorOriginal: colorName,
+          //   leftNorm,
+          //   right,
+          //   eq: leftNorm === right,
+          // });
 
           return leftNorm === right;
         }),
@@ -236,7 +235,7 @@ function filterCards(filters) {
           const left = normalizeGreek(t);
           const right = normalizeGreek(typeOfCarName);
 
-          console.log("Σύγκριση typeOfCar:", { t, left, typeOfCarName, right });
+          // console.log("Σύγκριση typeOfCar:", { t, left, typeOfCarName, right });
 
           return left === right;
         }),
@@ -278,8 +277,6 @@ function filterCards(filters) {
     window.currentPriceOrder === "asc" ||
     window.currentPriceOrder === "desc"
   ) {
-    console.log("🔵 Sorting active:", window.currentPriceOrder);
-
     filteredCards.sort((a, b) => {
       const priceA = parsePrice(a.querySelector(".card-text")?.innerText || "");
       const priceB = parsePrice(b.querySelector(".card-text")?.innerText || "");
@@ -319,7 +316,7 @@ function filterCards(filters) {
     paginateVisibleCars(filteredCards);
   }
 
-  updateAvailableOffers(filters, filteredCards);
+  // updateAvailableOffers(filters, filteredCards);
 }
 
 //-------------------------------------------------//
@@ -614,12 +611,10 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("input", getSelectedFilters);
   });
 
-  //Fetch auth status ΓΙΑ ΝΑ ΜΑΣ ΠΗΓΑΙΝΕΙ ΕΙΤΕ ΣΤΗ carDetails είτε στη carDetailsAnonymous
+  //Fetch auth status ΓΙΑ ΝΑ ΜΑΣ ΠΗΓΑΙΝΕΙ ΕΙΤΕ ΣΤΗ carDetailsVisitor είτε στη carDetailsMember
   fetch("/umbraco/api/auth/status")
     .then((r) => r.json())
     .then((data) => {
-      console.log("LoggedIn:", data.loggedIn);
-
       document.querySelectorAll(".cardCarLink").forEach((link) => {
         const currentHref = link.getAttribute("href"); // π.χ. /carDetailsVisitor?id=37
 
@@ -642,8 +637,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     let carTypeParam = urlParams.get("carType");
 
-    console.log("🔎 Διαβάζουμε από URL carType:", carTypeParam);
-
     if (carTypeParam) {
       const typeOfCarMap = {
         suv: "SUV",
@@ -653,14 +646,12 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       const mappedValue = typeOfCarMap[carTypeParam.toLowerCase()];
-      console.log("🎯 Αντιστοιχημένο value:", mappedValue);
 
       let matchedCheckbox = null;
 
       document.querySelectorAll(".carTypeCheckbox").forEach((cb) => {
         const left = normalizeGreek(cb.value);
         const right = normalizeGreek(mappedValue);
-        console.log("👉 Σύγκριση:", cb.value, "=>", left, "vs", right);
 
         if (left === right) {
           matchedCheckbox = cb;
@@ -861,7 +852,7 @@ function clearAllFilters() {
 
       // 6) Counters
       updateAvailableBrands?.(filters, cardsArray);
-      updateAvailableOffers?.(filters, cardsArray);
+      // updateAvailableOffers?.(filters, cardsArray);
     }
 
     // 6) Recompute counters & τρέξε κενό filter για συγχρονισμό UI

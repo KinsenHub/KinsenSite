@@ -180,13 +180,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🔵 NAVBAR ACTIVE HIGHLIGHT INIT");
 
   // 1) Πάρε το NodeId της σελίδας από το HTML tag
   const html = document.documentElement;
   const currentNodeId = html.getAttribute("data-umbraco-page-id");
-
-  console.log("🔎 Current Umbraco NodeId =", currentNodeId);
 
   if (!currentNodeId) {
     console.warn("⚠️ Δεν βρέθηκε data-umbraco-page-id στο <html>!");
@@ -195,13 +192,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2) Πάρε όλα τα links του main menu που έχουν data-node
   const links = document.querySelectorAll(".nx-left .nx-link[data-node]");
 
-  console.log("🔎 Βρέθηκαν", links.length, "nav links με data-node");
-
   if (!links.length) {
     console.warn("⚠️ Δεν βρέθηκαν καθόλου .nx-link με data-node!");
   }
-
-  console.log("🔵 NAVBAR ACTIVE HIGHLIGHT INIT");
 
 // ... εδώ παίρνεις currentNodeId & links ...
 
