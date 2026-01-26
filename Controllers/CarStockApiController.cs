@@ -957,9 +957,9 @@ namespace KinsenOfficial.Controllers
             }
             else
             {
-                page.SetValue(blockAlias, json);
+                page.SetValue(blockAlias, json, "el-GR");
                 _contentService.Save(page);
-                _contentService.Publish(page, Array.Empty<string>());
+                // _contentService.Publish(page, Array.Empty<string>());
             }
         }
     }
