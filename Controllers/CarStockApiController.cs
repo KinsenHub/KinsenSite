@@ -116,8 +116,8 @@ namespace KinsenOfficial.Controllers
 
             foreach (var car in carsPayload)
             {
-                _logger.LogInformation("Payload Car → ID:{Id}, Maker:{Maker}, Model:{Model}, Offer={Offer}",
-                    car.CarId, car.Maker, car.Model, car.Offer, car.Offer?.GetType().Name ?? "null");
+                _logger.LogInformation("Payload Car → ID:{Id}, Maker:{Maker}, Model:{Model}",
+                    car.CarId, car.Maker, car.Model);
             }
 
             static string NormalizeName(string? value)
@@ -156,7 +156,8 @@ namespace KinsenOfficial.Controllers
             if (page == null)
                 return NotFound("usedCarSalesPage not found.");
 
-            var existingCars = LoadExistingCars(page);
+            var existingCars = LoadExistingCarsFromBlock(page, BlockPropertyAlias, includeOffer: true);
+
             _logger.LogInformation("EXISTING CARS IN CONTENT = {Count}", existingCars.Count);
 
             // ✔ Index υπάρχοντα ανά CarId
@@ -193,7 +194,7 @@ namespace KinsenOfficial.Controllers
             _logger.LogInformation("FINAL MERGED CAR COUNT = {Total}", merged.Count);
 
             // ✔ Αντικατάσταση block list
-            ReplaceBlockListWithCars(page, merged);
+            ReplaceBlockListWithCarsToAlias(page,BlockPropertyAlias, merged);
 
             try
             {
@@ -208,120 +209,7 @@ namespace KinsenOfficial.Controllers
             // ✅ ΑΚΡΙΒΩΣ ΟΠΩΣ ΤΟ ΘΕΣ
             return Ok(new { ok = true, added = carsToAdd.Count });
         }
-
-        private List<CarDto> LoadExistingCars(IContent page)
-        {
-            var result = new List<CarDto>();
-            const string blockAlias = "carCardBlock";
-
-            // 1) Πήγαινε στον PUBLISHED κόσμο
-            using var cref = _umbracoContextFactory.EnsureUmbracoContext();
-            var published = cref.UmbracoContext.Content?.GetById(page.Id);
-
-            if (published == null)
-            {
-                _logger.LogWarning("LoadExistingCars: ΔΕΝ βρέθηκε published node για Id={Id}", page.Id);
-                return result;
-            }
-
-            // 2) Πάρε το BlockListModel από published
-            var blocks = published.Value<BlockListModel>(blockAlias);
-
-            if (blocks == null || !blocks.Any())
-            {
-                _logger.LogWarning("LoadExistingCars: το BlockList '{Alias}' είναι NULL ή άδειο στο node {Id}", blockAlias, page.Id);
-                return result;
-            }
-
-            _logger.LogInformation("LoadExistingCars: βρέθηκαν {Count} block items στο '{Alias}'", blocks.Count(), blockAlias);
-
-            int index = 0;
-
-            foreach (var block in blocks)
-            {
-                index++;
-
-                var content = block.Content;
-
-                JsonNode? tenPhotosNode = null;
-
-                var tenProp = content.GetProperty("tenPhotosForUsedCarSales");
-                var tenSource = tenProp?.GetSourceValue()?.ToString();
-
-                if (!string.IsNullOrWhiteSpace(tenSource))
-                {
-                    // κρατάς το ακριβές JSON του nested blocklist
-                    tenPhotosNode = JsonNode.Parse(tenSource);
-                }
-
-                if (content == null)
-                {
-                    _logger.LogWarning("LoadExistingCars: block #{Index} έχει null Content", index);
-                    continue;
-                }
-
-                // 🔁 Τα aliases ΠΡΕΠΕΙ να είναι αυτά που έχεις στο στοιχείο Car block
-                var carId  = content.Value<int?>("carId") ?? 0;
-                var maker  = content.Value<string>("maker") ?? "";
-                var model  = content.Value<string>("model") ?? "";
-                var yearRelease = content.Value<int?>("yearRelease") ?? 0;
-                var price = content.Value<decimal?>("price") ?? 0;
-                var km = content.Value<int?>("km") ?? 0;
-                var cc = content.Value<double?>("cc") ?? 0;
-                var hp = content.Value<double?>("hp") ?? 0;
-                var fuel = content.Value<string>("fuel") ?? "";
-                var color = content.Value<string>("color") ?? "";
-                var transmissionType = content.Value<string>("transmissionType") ?? "";
-                var typeOfCar = content.Value<string>("typeOfCar") ?? "";
-                string carPicUdi = "";
-
-                var media = content.Value<IPublishedContent>("carPic");
-                if (media != null)
-                {
-                    carPicUdi = Udi.Create(Constants.UdiEntityType.Media, media.Key).ToString();
-                }
-                else
-                {
-                    // 2) Αν είναι αποθηκευμένο ως string (π.χ. ήδη UDI ή url)
-                    carPicUdi = content.Value<string>("carPic") ?? "";
-                }
-
-                _logger.LogInformation(
-                    "LoadExistingCars: block #{Index} → ID:{Id}, Maker:{Maker}, Model:{Model}, Price:{Price}",
-                    index, carId, maker, model, price
-                );
-
-                if (carId == 0)
-                {
-                    _logger.LogWarning("LoadExistingCars: block #{Index} έχει carId=0, παραλείπεται", index);
-                    continue;
-                }
-
-                result.Add(new CarDto
-                {
-                    CarId = carId,
-                    Maker = maker,
-                    Model = model,
-                    YearRelease = yearRelease,
-                    Price = price,
-                    Km = km,
-                    Cc = cc,
-                    Hp = hp,
-                    Fuel = fuel,
-                    Color = color,
-                    TransmissionType = transmissionType,
-                    TypeOfCar = typeOfCar,
-                    CarPic = carPicUdi,
-                    TenPhotosForUsedCarSales = tenPhotosNode
-                });
-            }
-
-            _logger.LogInformation("LoadExistingCars: ΤΕΛΙΚΑ φορτώθηκαν {Count} cars από content", result.Count);
-
-            return result;
-        }
         
-
         private static string Fold(string? s)
         {
             if (string.IsNullOrWhiteSpace(s)) return "";
@@ -473,216 +361,6 @@ namespace KinsenOfficial.Controllers
 
             return Ok(finalColors);
         }
-        
-        private void ReplaceBlockListWithCars(IContent page, List<CarDto> cars)
-        {
-            var cardType = _contentTypeService.Get(CardElementAlias)
-                ?? throw new InvalidOperationException($"Element type '{CardElementAlias}' not found.");
-
-            var layoutItems  = new List<object>();
-            var contentData  = new List<object>();
-            var settingsData = new List<object>();
-
-            foreach (var car in cars)
-            {
-                var elementKey = Guid.NewGuid();
-                var elementUdi = $"umb://element/{elementKey:D}";
-
-                // layout
-                layoutItems.Add(new Dictionary<string, object?>
-                {
-                    ["contentUdi"]  = elementUdi,
-                    ["settingsUdi"] = null
-                });
-
-                var makerNormalized           = Canonicalize("maker", car.Maker);
-                var fuelNormalized            = Canonicalize("fuel", car.Fuel);
-                var colorNormalized           = Canonicalize("color", car.Color);
-                var transmissionTypeNormalized= Canonicalize("transmissionType", car.TransmissionType);
-                var typeOfCarNormalized       = Canonicalize("typeOfCar", car.TypeOfCar);
-
-                Dictionary<string, object?> BuildProps()
-                {
-                    return new Dictionary<string, object?>
-                    {
-                        ["carId"]            = car.CarId,
-                        ["maker"]            = makerNormalized,
-                        ["model"]            = car.Model,
-
-                        // 🔥 ΤΩΡΑ ΕΙΝΑΙ ΟΙ ΣΩΣΤΟΙ ΤΥΠΟΙ — ΟΧΙ PARSE
-                        ["price"]            = car.Price,
-                        ["yearRelease"]      = car.YearRelease,
-                        ["km"]               = car.Km,
-                        ["cc"]               = car.Cc,
-                        ["hp"]               = car.Hp,
-
-                        ["fuel"]             = fuelNormalized,
-                        ["color"]            = colorNormalized,
-                        ["transmissionType"] = transmissionTypeNormalized,
-                        ["typeOfCar"]        = typeOfCarNormalized,
-                        ["offer"]            = car.Offer,
-                        ["carPic"]           = car.CarPic,
-                        ["tenPhotosForUsedCarSales"] = car.TenPhotosForUsedCarSales
-                    };
-                }
-
-                var elementVaries = cardType.VariesByCulture();
-                var content = new Dictionary<string, object?>
-                {
-                    ["key"]              = elementKey,
-                    ["udi"]              = elementUdi,
-                    ["contentTypeKey"]   = cardType.Key,
-                    ["contentTypeAlias"] = cardType.Alias
-                };
-
-                if (elementVaries)
-                {
-                    var cultures = page.AvailableCultures?.ToArray() ?? Array.Empty<string>();
-                    if (cultures.Length == 0)
-                    {
-                        content["variants"] = new[]
-                        {
-                            new Dictionary<string, object?>
-                            {
-                                ["culture"]    = null,
-                                ["segment"]    = null,
-                                ["name"]       = null,
-                                ["properties"] = BuildProps()
-                            }
-                        };
-                    }
-                    else
-                    {
-                        var vars  = new List<object>();
-                        var props = BuildProps();
-                        foreach (var iso in cultures)
-                        {
-                            vars.Add(new Dictionary<string, object?>
-                            {
-                                ["culture"]    = iso,
-                                ["segment"]    = null,
-                                ["name"]       = null,
-                                ["properties"] = props
-                            });
-                        }
-                        content["variants"] = vars;
-                    }
-                }
-                else
-                {
-                    foreach (var kv in BuildProps())
-                        content[kv.Key] = kv.Value;
-                }
-
-                contentData.Add(content);
-            }
-
-            var blockValue = new Dictionary<string, object?>
-            {
-                ["layout"] = new Dictionary<string, object?>
-                {
-                    ["Umbraco.BlockList"] = layoutItems
-                },
-                ["contentData"]  = contentData,
-                ["settingsData"] = settingsData
-            };
-
-            var json = System.Text.Json.JsonSerializer.Serialize(blockValue);
-
-            var prop           = page.Properties[BlockPropertyAlias];
-            var propType       = prop?.PropertyType;
-            var culturesForNode= page.AvailableCultures?.ToArray() ?? Array.Empty<string>();
-
-            if (propType?.VariesByCulture() == true && culturesForNode.Length > 0)
-            {
-                foreach (var iso in culturesForNode)
-                    page.SetValue(BlockPropertyAlias, json, iso);
-
-                _contentService.Save(page);
-                _contentService.Publish(page, culturesForNode);
-            }
-            else
-            {
-                page.SetValue(BlockPropertyAlias, json);
-                _contentService.Save(page);
-                _contentService.Publish(page, Array.Empty<string>());
-            }
-        }
-        
-        // Απεικόνιση των αυτοκινήτων στο front
-        [HttpPost("displayCars")]
-        [AllowAnonymous]
-        [IgnoreAntiforgeryToken]
-        [Consumes("application/json")]
-        public IActionResult DisplayCars([FromBody] object? _ = null)
-        {
-            if (UsedCarSalesPageKey == Guid.Empty)
-                return BadRequest("CarStock:UsedCarSalesPageId missing or invalid.");
-
-            var page = _contentService.GetById(UsedCarSalesPageKey);
-            if (page == null)
-                return NotFound("usedCarSalesPage not found.");
-
-            var json = page.GetValue<string>(BlockPropertyAlias)?.ToString();
-            if (string.IsNullOrWhiteSpace(json))
-                return Ok(Array.Empty<CarDto>());
-
-            var cars = new List<CarDto>();
-            try
-            {
-                using var doc = JsonDocument.Parse(json);
-
-                if (!doc.RootElement.TryGetProperty("contentData", out var contentData) ||
-                    contentData.ValueKind != JsonValueKind.Array)
-                    return Ok(Array.Empty<CarDto>());
-
-                foreach (var e in contentData.EnumerateArray())
-                {
-                    var dto = new CarDto
-                    {
-                        CarId = e.TryGetProperty("carId", out var p) && p.TryGetInt32(out var id) ? id : 0,
-
-                        Maker = e.TryGetProperty("maker", out p) ? p.GetString() ?? "" : "",
-                        Model = e.TryGetProperty("model", out p) ? p.GetString() ?? "" : "",
-
-                        YearRelease = e.TryGetProperty("yearRelease", out p) && p.TryGetInt32(out var year) ? year : 0,
-
-                        Price = e.TryGetProperty("price", out p) && p.TryGetDecimal(out var price) ? price : 0m,
-
-                        Km = e.TryGetProperty("km", out p) && p.TryGetInt32(out var km) ? km : 0,
-
-                        Fuel = e.TryGetProperty("fuel", out p) ? p.GetString() ?? "" : "",
-                        Color = e.TryGetProperty("color", out p) ? p.GetString() ?? "" : "",
-                        TransmissionType = e.TryGetProperty("transmissionType", out p) ? p.GetString() ?? "" : "",
-                        Offer = e.TryGetProperty("offer", out p) && p.ValueKind == JsonValueKind.False ? false : p.ValueKind == JsonValueKind.True,
-                        TypeOfCar = e.TryGetProperty("typeOfCar", out p) ? p.GetString() ?? "" : "",
-
-                        Cc = e.TryGetProperty("cc", out p) && p.TryGetDouble(out var cc) ? cc : 0,
-                        Hp = e.TryGetProperty("hp", out p) && p.TryGetDouble(out var hp) ? hp : 0,
-
-                        CarPic = e.TryGetProperty("carPic", out p) ? p.GetString() ?? "" : ""
-                    };
-
-                    if (dto.CarId > 0) cars.Add(dto);
-                }
-
-                return Ok(cars);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"BlockList JSON parse error: {ex.Message}");
-            }
-        }    
-    
-        private static bool IsOfferTrue(string? offer)
-        {
-            if (string.IsNullOrWhiteSpace(offer)) return false;
-            var v = offer.Trim();
-
-            return v.Equals("true", StringComparison.OrdinalIgnoreCase)
-                || v.Equals("1")
-                || v.Equals("yes", StringComparison.OrdinalIgnoreCase);
-        }
     
         private void SyncHomeCarouselOffers(List<CarDto> incomingCars)
         {
@@ -737,23 +415,11 @@ namespace KinsenOfficial.Controllers
 
                 finalMap[incoming.CarId] = incoming;
                 updated++;
-
-                _logger.LogInformation(
-                    "SYNC CHECK → CarId={Id}, IncomingOffer={Offer}",
-                    incoming.CarId,
-                    incoming.Offer
-                );
             }
 
             // 🔹 Πρόσθεσε νέα offer cars που ΔΕΝ υπήρχαν
             foreach (var incoming in incomingMap.Values)
             {
-                 _logger.LogInformation(
-                    "SYNC NEW CHECK → CarId={Id}, Offer={Offer}",
-                    incoming.CarId,
-                    incoming.Offer
-                );
-
                 if (!incoming.Offer)
                     continue;
 
@@ -767,7 +433,7 @@ namespace KinsenOfficial.Controllers
             // 🔹 Αν δεν υπάρχει τίποτα να γράψουμε, καθάρισε το carousel
             var finalList = finalMap.Values.ToList();
 
-            ReplaceBlockListWithCarsToAlias(home, CarouselBlockPropertyAlias, finalList);
+            ReplaceBlockListWithCarsToAlias(home,CarouselBlockPropertyAlias,finalList);
 
             _logger.LogInformation(
                 "Home carousel synced. Added={Added}, Updated={Updated}, Removed={Removed}, Final={Total}",
@@ -816,6 +482,7 @@ namespace KinsenOfficial.Controllers
                     CarId = carId,
                     Maker = content.Value<string>("maker") ?? "",
                     Model = content.Value<string>("model") ?? "",
+                    Offer = includeOffer ? (content.Value<bool?>("offer") ?? false) : false,
                     YearRelease = content.Value<int?>("yearRelease") ?? 0,
                     Price = content.Value<decimal?>("price") ?? 0,
                     Km = content.Value<int?>("km") ?? 0,
@@ -825,7 +492,6 @@ namespace KinsenOfficial.Controllers
                     Color = content.Value<string>("color") ?? "",
                     TransmissionType = content.Value<string>("transmissionType") ?? "",
                     TypeOfCar = content.Value<string>("typeOfCar") ?? "",
-                    Offer = includeOffer ? (content.Value<bool?>("offer") ?? false) : false,
                     CarPic = carPicUdi,
                     TenPhotosForUsedCarSales = tenPhotosNode
                 });
@@ -957,11 +623,70 @@ namespace KinsenOfficial.Controllers
             }
             else
             {
-                page.SetValue(blockAlias, json, "el-GR");
+                page.SetValue(blockAlias, json);
                 _contentService.Save(page);
-                // _contentService.Publish(page, Array.Empty<string>());
+                _contentService.Publish(page, Array.Empty<string>());
             }
         }
+
+
+        // Απεικόνιση των αυτοκινήτων στο front
+        [HttpPost("displayCars")]
+        [AllowAnonymous]
+        [IgnoreAntiforgeryToken]
+        [Consumes("application/json")]
+        public IActionResult DisplayCars([FromBody] object? _ = null)
+        {
+            if (UsedCarSalesPageKey == Guid.Empty)
+                return BadRequest("CarStock:UsedCarSalesPageId missing or invalid.");
+
+            var page = _contentService.GetById(UsedCarSalesPageKey);
+            if (page == null)
+                return NotFound("usedCarSalesPage not found.");
+
+            var json = page.GetValue<string>(BlockPropertyAlias)?.ToString();
+            if (string.IsNullOrWhiteSpace(json))
+                return Ok(Array.Empty<CarDto>());
+
+            var cars = new List<CarDto>();
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+
+                if (!doc.RootElement.TryGetProperty("contentData", out var contentData) ||
+                    contentData.ValueKind != JsonValueKind.Array)
+                    return Ok(Array.Empty<CarDto>());
+
+                foreach (var e in contentData.EnumerateArray())
+                {
+                    var dto = new CarDto
+                    {
+                        CarId = e.TryGetProperty("carId", out var p) && p.TryGetInt32(out var id) ? id : 0,
+                        Maker = e.TryGetProperty("maker", out p) ? p.GetString() ?? "" : "",
+                        Model = e.TryGetProperty("model", out p) ? p.GetString() ?? "" : "",
+                        Offer = e.TryGetProperty("offer", out p) && p.ValueKind == JsonValueKind.True,
+                        YearRelease = e.TryGetProperty("yearRelease", out p) && p.TryGetInt32(out var year) ? year : 0,
+                        Price = e.TryGetProperty("price", out p) && p.TryGetDecimal(out var price) ? price : 0m,
+                        Km = e.TryGetProperty("km", out p) && p.TryGetInt32(out var km) ? km : 0,
+                        Fuel = e.TryGetProperty("fuel", out p) ? p.GetString() ?? "" : "",
+                        Color = e.TryGetProperty("color", out p) ? p.GetString() ?? "" : "",
+                        TransmissionType = e.TryGetProperty("transmissionType", out p) ? p.GetString() ?? "" : "",
+                        TypeOfCar = e.TryGetProperty("typeOfCar", out p) ? p.GetString() ?? "" : "",
+                        Cc = e.TryGetProperty("cc", out p) && p.TryGetDouble(out var cc) ? cc : 0,
+                        Hp = e.TryGetProperty("hp", out p) && p.TryGetDouble(out var hp) ? hp : 0,
+                        CarPic = e.TryGetProperty("carPic", out p) ? p.GetString() ?? "" : ""
+                    };
+
+                    if (dto.CarId > 0) cars.Add(dto);
+                }
+
+                return Ok(cars);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"BlockList JSON parse error: {ex.Message}");
+            }
+        }    
     }
 
     
