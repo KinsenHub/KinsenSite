@@ -198,7 +198,7 @@ namespace KinsenOfficial.Controllers
 
             try
             {
-                SyncHomeCarouselOffers(newCars); // ή carsPayload mapped list (newCars είναι mapped/normalized)
+                SyncHomeCarouselOffers(merged);
             }
             catch (Exception ex)
             {
@@ -362,83 +362,45 @@ namespace KinsenOfficial.Controllers
             return Ok(finalColors);
         }
     
-        private void SyncHomeCarouselOffers(List<CarDto> incomingCars)
+        private void SyncHomeCarouselOffers(List<CarDto> carCardBlockCars)
         {
+            _logger.LogWarning("=== SYNC HOME CAROUSEL (SOURCE = carCardBlock ONLY) START ===");
+
             if (HomePageKey == Guid.Empty)
             {
-                _logger.LogWarning("HomePageKey is empty. Skipping Home carousel sync.");
+                _logger.LogError("HomePageKey is EMPTY");
                 return;
             }
 
             var home = _contentService.GetById(HomePageKey);
             if (home == null)
             {
-                _logger.LogWarning("Home page not found for key {Key}.", HomePageKey);
+                _logger.LogError("Home page NOT FOUND");
                 return;
             }
 
-            // 🔹 Όλα τα incoming cars indexed by CarId
-            var incomingMap = incomingCars
+            // ✅ 1) SOURCE = carCardBlock (ΤΕΛΟΣ)
+            var offerCars = carCardBlockCars
                 .Where(c => c.CarId > 0)
-                .ToDictionary(c => c.CarId);
+                .Where(c => c.Offer == true)
+                .ToList();
 
-            // 🔹 Φόρτωση υπαρχόντων από carouselCars
-            var existingHomeCars = LoadExistingCarsFromBlock(home, CarouselBlockPropertyAlias, includeOffer: true);
-
-            // 🔹 Κρατάμε ΜΟΝΟ όσα:
-            //   - έχουν carId
-            //   - ΚΑΙ το incoming λέει offer == true
-            var finalMap = new Dictionary<int, CarDto>();
-
-            int added = 0;
-            int updated = 0;
-            int removed = 0;
-
-            foreach (var existing in existingHomeCars)
-            {
-                if (!incomingMap.TryGetValue(existing.CarId, out var incoming))
-                {
-                    // ❌ δεν υπάρχει πια στο payload → φεύγει
-                    removed++;
-                    continue;
-                }
-
-                if (!incoming.Offer)
-                {
-                    removed++;
-                    continue;
-                }
-
-                // ✅ υπάρχει & είναι offer → UPDATE (κρατάμε media)
-                incoming.CarPic = existing.CarPic;
-                incoming.TenPhotosForUsedCarSales = existing.TenPhotosForUsedCarSales;
-
-                finalMap[incoming.CarId] = incoming;
-                updated++;
-            }
-
-            // 🔹 Πρόσθεσε νέα offer cars που ΔΕΝ υπήρχαν
-            foreach (var incoming in incomingMap.Values)
-            {
-                if (!incoming.Offer)
-                    continue;
-
-                if (finalMap.ContainsKey(incoming.CarId))
-                    continue;
-
-                finalMap.Add(incoming.CarId, incoming);
-                added++;
-            }
-
-            // 🔹 Αν δεν υπάρχει τίποτα να γράψουμε, καθάρισε το carousel
-            var finalList = finalMap.Values.ToList();
-
-            ReplaceBlockListWithCarsToAlias(home,CarouselBlockPropertyAlias,finalList);
-
-            _logger.LogInformation(
-                "Home carousel synced. Added={Added}, Updated={Updated}, Removed={Removed}, Final={Total}",
-                added, updated, removed, finalList.Count
+            _logger.LogWarning(
+                "CARDBLOCK offer=true COUNT = {Count}",
+                offerCars.Count
             );
+
+            foreach (var c in offerCars)
+                _logger.LogInformation("OFFER → ID:{Id}", c.CarId);
+
+            // ✅ 2) ΓΡΑΦΟΥΜΕ ΑΠΕΥΘΕΙΑΣ το carouselCars
+            ReplaceBlockListWithCarsToAlias(
+                home,
+                CarouselBlockPropertyAlias,
+                offerCars
+            );
+
+            _logger.LogWarning("=== SYNC HOME CAROUSEL END ===");
         }
 
         private List<CarDto> LoadExistingCarsFromBlock(IContent page, string blockAlias, bool includeOffer)
