@@ -84,6 +84,8 @@ namespace KinsenOfficial.Controllers
         private string CardElementAlias   => _cfg["CarStock:CardElementAlias"] ?? "carCard";
         private string CarouselBlockPropertyAlias => _cfg["CarStock:CarouselBlockPropertyAlias"] ?? "carouselCars";
         private string WebhookSecret      => _cfg["CarStock:WebhookSecret"] ?? "";
+        private const string FallbackCarPicUdi = "umb://media/8ac305f4c3b347349ea1bc846552b3f9";
+                                                 
 
         public CarStockWriteController(
             IConfiguration cfg,
@@ -391,7 +393,8 @@ namespace KinsenOfficial.Controllers
             );
 
             foreach (var c in offerCars)
-                _logger.LogInformation("OFFER → ID:{Id}", c.CarId);
+                _logger.LogWarning("WRITE → ID:{Id} Offer:{Offer} CarPic:'{CarPic}' ImgMissing:{Missing}",
+                    c.CarId, c.Offer, c.CarPic ?? "", string.IsNullOrWhiteSpace(c.CarPic));
 
             // ✅ 2) ΓΡΑΦΟΥΜΕ ΑΠΕΥΘΕΙΑΣ το carouselCars
             ReplaceBlockListWithCarsToAlias(
@@ -401,6 +404,13 @@ namespace KinsenOfficial.Controllers
             );
 
             _logger.LogWarning("=== SYNC HOME CAROUSEL END ===");
+
+            _logger.LogError(
+                "HOME TARGET → Id={Id}, Key={Key}, Name={Name}",
+                home.Id,
+                home.Key,
+                home.Name
+            );
         }
 
         private List<CarDto> LoadExistingCarsFromBlock(IContent page, string blockAlias, bool includeOffer)
@@ -503,7 +513,7 @@ namespace KinsenOfficial.Controllers
                     ["transmissionType"] = transmissionTypeNormalized,
                     ["typeOfCar"] = typeOfCarNormalized,
                     ["offer"] = car.Offer,
-                    ["carPic"] = car.CarPic,
+                    ["carPic"] = string.IsNullOrWhiteSpace(car.CarPic) ? FallbackCarPicUdi : car.CarPic,
                     ["tenPhotosForUsedCarSales"] = car.TenPhotosForUsedCarSales
                 };
 
