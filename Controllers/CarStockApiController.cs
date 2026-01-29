@@ -198,7 +198,7 @@ namespace KinsenOfficial.Controllers
             // ✔ Αντικατάσταση block list
             ReplaceBlockListWithCarsToAlias(page,BlockPropertyAlias, merged);
 
-            SyncCarouselCarsFromCarCardBlock();
+            //SyncCarouselCarsFromCarCardBlock();
 
             // ✅ ΑΚΡΙΒΩΣ ΟΠΩΣ ΤΟ ΘΕΣ
             return Ok(new { ok = true, added = carsToAdd.Count });
@@ -356,100 +356,100 @@ namespace KinsenOfficial.Controllers
             return Ok(finalColors);
         }
     
-        private void SyncCarouselCarsFromCarCardBlock()
-        {
-            _logger.LogWarning("=== SYNC OFFERS → carouselCars START ===");
+        // private void SyncCarouselCarsFromCarCardBlock()
+        // {
+        //     _logger.LogWarning("=== SYNC OFFERS → carouselCars START ===");
 
-            // 1️⃣ Φέρνουμε τη MASTER σελίδα
-            var usedCarsPage = _contentService.GetById(UsedCarSalesPageKey);
-            if (usedCarsPage == null)
-            {
-                _logger.LogError("UsedCarSales page NOT FOUND");
-                return;
-            }
+        //     // 1️⃣ Φέρνουμε τη MASTER σελίδα
+        //     var usedCarsPage = _contentService.GetById(UsedCarSalesPageKey);
+        //     if (usedCarsPage == null)
+        //     {
+        //         _logger.LogError("UsedCarSales page NOT FOUND");
+        //         return;
+        //     }
 
-            // 2️⃣ Φέρνουμε το Home (TARGET)
-            var home = _contentService.GetById(HomePageKey);
-            if (home == null)
-            {
-                _logger.LogError("Home page NOT FOUND");
-                return;
-            }
+        //     // 2️⃣ Φέρνουμε το Home (TARGET)
+        //     var home = _contentService.GetById(HomePageKey);
+        //     if (home == null)
+        //     {
+        //         _logger.LogError("Home page NOT FOUND");
+        //         return;
+        //     }
 
-            // 3️⃣ Διαβάζουμε ΟΛΑ τα cars από το carCardBlock (CMS truth)
-            var allCars = LoadExistingCarsFromBlock(
-                usedCarsPage,
-                BlockPropertyAlias,
-                includeOffer: true
-            );
+        //     // 3️⃣ Διαβάζουμε ΟΛΑ τα cars από το carCardBlock (CMS truth)
+        //     var allCars = LoadExistingCarsFromBlock(
+        //         usedCarsPage,
+        //         BlockPropertyAlias,
+        //         includeOffer: true
+        //     );
 
-            // 4️⃣ Κρατάμε ΜΟΝΟ όσα είναι offer == true
-            var offerCars = allCars
-                .Where(c => c.CarId > 0 && c.Offer)
-                .ToList();
+        //     // 4️⃣ Κρατάμε ΜΟΝΟ όσα είναι offer == true
+        //     var offerCars = allCars
+        //         .Where(c => c.CarId > 0 && c.Offer)
+        //         .ToList();
 
-            _logger.LogWarning(
-                "carCardBlock offer cars count = {Count}",
-                offerCars.Count
-            );
+        //     _logger.LogWarning(
+        //         "carCardBlock offer cars count = {Count}",
+        //         offerCars.Count
+        //     );
 
-            // 5️⃣ Διαβάζουμε ΤΙ ΥΠΑΡΧΕΙ ΤΩΡΑ στο carouselCars
-            var currentCarouselCars = LoadExistingCarsFromBlock(
-                home,
-                CarouselBlockPropertyAlias,
-                includeOffer: true
-            );
+        //     // 5️⃣ Διαβάζουμε ΤΙ ΥΠΑΡΧΕΙ ΤΩΡΑ στο carouselCars
+        //     var currentCarouselCars = LoadExistingCarsFromBlock(
+        //         home,
+        //         CarouselBlockPropertyAlias,
+        //         includeOffer: true
+        //     );
 
-            // 6️⃣ Χτίζουμε sets για ΣΩΣΤΕΣ συγκρίσεις
-            var offerIds = new HashSet<int>(offerCars.Select(c => c.CarId));
-            var carouselIds = new HashSet<int>(currentCarouselCars.Select(c => c.CarId));
+        //     // 6️⃣ Χτίζουμε sets για ΣΩΣΤΕΣ συγκρίσεις
+        //     var offerIds = new HashSet<int>(offerCars.Select(c => c.CarId));
+        //     var carouselIds = new HashSet<int>(currentCarouselCars.Select(c => c.CarId));
 
-            // ➕ Ποια πρέπει να προστεθούν
-            var addedIds = new HashSet<int>(offerIds);
-            addedIds.ExceptWith(carouselIds);
+        //     // ➕ Ποια πρέπει να προστεθούν
+        //     var addedIds = new HashSet<int>(offerIds);
+        //     addedIds.ExceptWith(carouselIds);
 
-            // ➖ Ποια πρέπει να αφαιρεθούν
-            var removedIds = new HashSet<int>(carouselIds);
-            removedIds.ExceptWith(offerIds);
+        //     // ➖ Ποια πρέπει να αφαιρεθούν
+        //     var removedIds = new HashSet<int>(carouselIds);
+        //     removedIds.ExceptWith(offerIds);
 
-            // 7️⃣ Χτίζουμε ΤΗΝ ΤΕΛΙΚΗ λίστα carouselCars
-            //    (μόνο offers, μοναδικά, με σωστό content)
-            var carouselMap = new Dictionary<int, CarDto>();
-            foreach (var c in currentCarouselCars)
-                carouselMap[c.CarId] = c;
+        //     // 7️⃣ Χτίζουμε ΤΗΝ ΤΕΛΙΚΗ λίστα carouselCars
+        //     //    (μόνο offers, μοναδικά, με σωστό content)
+        //     var carouselMap = new Dictionary<int, CarDto>();
+        //     foreach (var c in currentCarouselCars)
+        //         carouselMap[c.CarId] = c;
 
-            var finalCarouselCars = new List<CarDto>(offerCars.Count);
-            foreach (var offerCar in offerCars)
-            {
-                // Αν υπάρχει ήδη στο carousel, κράτα το υπάρχον
-                if (carouselMap.TryGetValue(offerCar.CarId, out var existing))
-                    finalCarouselCars.Add(existing);
-                else
-                    finalCarouselCars.Add(offerCar);
-            }
+        //     var finalCarouselCars = new List<CarDto>(offerCars.Count);
+        //     foreach (var offerCar in offerCars)
+        //     {
+        //         // Αν υπάρχει ήδη στο carousel, κράτα το υπάρχον
+        //         if (carouselMap.TryGetValue(offerCar.CarId, out var existing))
+        //             finalCarouselCars.Add(existing);
+        //         else
+        //             finalCarouselCars.Add(offerCar);
+        //     }
 
-            _logger.LogWarning(
-                "Carousel sync → added={Added}, removed={Removed}, final={Final}",
-                addedIds.Count,
-                removedIds.Count,
-                finalCarouselCars.Count
-            );
+        //     _logger.LogWarning(
+        //         "Carousel sync → added={Added}, removed={Removed}, final={Final}",
+        //         addedIds.Count,
+        //         removedIds.Count,
+        //         finalCarouselCars.Count
+        //     );
 
-            if (addedIds.Count > 0)
-                _logger.LogWarning("Added to carousel (carIds): {Ids}", string.Join(",", addedIds.OrderBy(x => x)));
+        //     if (addedIds.Count > 0)
+        //         _logger.LogWarning("Added to carousel (carIds): {Ids}", string.Join(",", addedIds.OrderBy(x => x)));
 
-            if (removedIds.Count > 0)
-                _logger.LogWarning("Removed from carousel (carIds): {Ids}", string.Join(",", removedIds.OrderBy(x => x)));
+        //     if (removedIds.Count > 0)
+        //         _logger.LogWarning("Removed from carousel (carIds): {Ids}", string.Join(",", removedIds.OrderBy(x => x)));
 
-            // 8️⃣ ΓΡΑΦΟΥΜΕ το carouselCars (DERIVED STATE)
-            ReplaceBlockListWithCarsToAlias(
-                home,
-                CarouselBlockPropertyAlias,
-                finalCarouselCars
-            );
+        //     // 8️⃣ ΓΡΑΦΟΥΜΕ το carouselCars (DERIVED STATE)
+        //     ReplaceBlockListWithCarsToAlias(
+        //         home,
+        //         CarouselBlockPropertyAlias,
+        //         finalCarouselCars
+        //     );
 
-            _logger.LogWarning("=== SYNC OFFERS → carouselCars END ===");
-        }
+        //     _logger.LogWarning("=== SYNC OFFERS → carouselCars END ===");
+        // }
 
 
         private List<CarDto> LoadExistingCarsFromBlock(IContent page, string blockAlias, bool includeOffer)

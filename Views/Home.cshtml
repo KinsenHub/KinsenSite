@@ -15,12 +15,13 @@
     var heroDescription = Model.Value<string>("heroDescription");
 	var blockListItem = Model.Value<IEnumerable<BlockListItem>>("statsItem");
     var paragr = Model.Value<string>("paragr");
-    var carouselCars = Model.Value<IEnumerable<BlockListItem>>("carouselCars");
+    @* var carouselCars = Model.Value<IEnumerable<BlockListItem>>("carouselCars"); *@
+    var usedCarSalesPage = Model.Root().DescendantsOfType("usedCarSalesPage").FirstOrDefault();
+    var carCardBlock = usedCarSalesPage?.Value<BlockListModel>("carCardBlock");
     var photoTrilogy = Model.Value<IEnumerable<BlockListItem>>("photoTrilogy");
     var trilogyBlock = Model.Value<IEnumerable<BlockListItem>>("trilogyBlock");
 	var featureCardsBlock = Model.Value<IEnumerable<BlockListItem>>("featureCard");
     var redirectUrl = "/πωλήσεις-μεταχειρισμένων/"; 
-	@* var fourStepsBlock = Model.Value<IEnumerable<BlockListItem>>("fourSteps"); *@
 	var accordionQuestionsBlock = Model.Value<IEnumerable<BlockListItem>>("accordionQuestions");
     var noImgUrl = Model.Value<IPublishedContent>("imgNotAvail")?.Url();
     // Κατάσταση χρήστη
@@ -58,80 +59,87 @@
 </div>
 
 @*------------------Carousel-------------------*@
-@if (carouselCars != null && carouselCars.Any())
+@if (carCardBlock != null)
 {
-<div class="carousel-outerContainer">
+    var offerCars = carCardBlock
+        .Where(b => b?.Content?.Value<bool>("offer") == true)
+        .ToList();
 
-    <div class="shadow-container"><h4 class="prosfores">ΠΡΟΣΦΟΡΕΣ</h4></div>
-    <div class="tesla-carousel-wrapper">
-    <button class="tesla-arrow prev" aria-label="Προηγούμενο">
-        ‹
-    </button>
-        <div class="tesla-carousel">
-            <div class="tesla-track">
+    if (offerCars.Any())
+    {
+        <div class="carousel-outerContainer">
 
-                @foreach (var card in carouselCars)
-                {
-                    var content = card?.Content;
-                    if (content == null) { continue; }
+            <div class="shadow-container"><h4 class="prosfores">ΠΡΟΣΦΟΡΕΣ</h4></div>
+            <div class="tesla-carousel-wrapper">
+            <button class="tesla-arrow prev" aria-label="Προηγούμενο">
+                ‹
+            </button>
+                <div class="tesla-carousel">
+                    <div class="tesla-track">
 
-                    var carID = content.Value<string>("carID");
-                    var carPic = content.Value<MediaWithCrops>("carPic")?.Url();
-                    var maker = content.Value<string>("maker");
-                    var modelo = content.Value<string>("model");
-                    var price = content.Value<string>("price");
-                    var typeOfDiscount = content.Value<string>("typeOfDiscount");
+                        @foreach (var card in offerCars)
+                        {
+                            var content = card?.Content;
+                            if (content == null) { continue; }
 
-                    var targetUrl = isLoggedIn
-                        ? $"/carDetailsMember?id={carID}"
-                        : $"/carDetailsVisitor?id={carID}";
+                            var carID = content.Value<string>("carID");
+                            var carPic = content.Value<MediaWithCrops>("carPic")?.Url();
+                            var maker = content.Value<string>("maker");
+                            var modelo = content.Value<string>("model");
+                            var price = content.Value<string>("price");
+                            var typeOfDiscount = content.Value<string>("typeOfDiscount");
 
-                    var gr = new CultureInfo("el-GR");
-					string formattedPrice = "";
+                            var targetUrl = isLoggedIn
+                                ? $"/carDetailsMember?id={carID}"
+                                : $"/carDetailsVisitor?id={carID}";
 
-                    if (!string.IsNullOrWhiteSpace(price) &&
-                        long.TryParse(price, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n))
-                    {
-                        formattedPrice = n.ToString("#,0", gr);
-                    }
-                    else
-                    {
-                        formattedPrice = price ?? "";
-                    }
+                            var gr = new CultureInfo("el-GR");
+                            string formattedPrice = "";
 
-                    <div class="tesla-card">
-                        <a href="@targetUrl"
-                        data-car-id="@carID"
-                        onclick="return onCardClick(event, '@carID')"
-                        class="tesla-link">
+                            if (!string.IsNullOrWhiteSpace(price) &&
+                                long.TryParse(price, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n))
+                            {
+                                formattedPrice = n.ToString("#,0", gr);
+                            }
+                            else
+                            {
+                                formattedPrice = price ?? "";
+                            }
 
-                        @if(carPic != null){
-                            <img src="@carPic" alt="@modelo" />
-                        }
-                        else {
-                            <img src="@noImgUrl" alt="@modelo" />
-                        }
-                            <div class="tesla-overlay">
-                                <span class="discount-badgeMain">Offer</span>
+                            <div class="tesla-card">
+                                <a href="@targetUrl"
+                                data-car-id="@carID"
+                                onclick="return onCardClick(event, '@carID')"
+                                class="tesla-link">
 
-                                <h2>@maker @modelo</h2>
-                                <p>@formattedPrice €</p>
+                                @if(carPic != null){
+                                    <img src="@carPic" alt="@modelo" />
+                                }
+                                else {
+                                    <img src="@noImgUrl" alt="@modelo" />
+                                }
+                                    <div class="tesla-overlay">
+                                        <span class="discount-badgeMain">Offer</span>
 
-                                <button class="tesla-btn">
-                                    Δείτε λεπτομέρειες
-                                </button>
+                                        <h2>@maker @modelo</h2>
+                                        <p>@formattedPrice €</p>
+
+                                        <button class="tesla-btn">
+                                            Δείτε λεπτομέρειες
+                                        </button>
+                                    </div>
+
+                                </a>
                             </div>
-
-                        </a>
+                        }
                     </div>
-                }
+                </div>
+                <button class="tesla-arrow next" aria-label="Επόμενο">
+                ›
+            </button>
             </div>
         </div>
-        <button class="tesla-arrow next" aria-label="Επόμενο">
-        ›
-    </button>
-    </div>
-</div>
+    }
 }
 
 @*-----------------Animation Counter----------------*@
