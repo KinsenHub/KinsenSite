@@ -399,6 +399,45 @@ label {
   background: #fff;
 }
 
+.discount-badge {
+  position: absolute !important;
+  top: 10px;
+  left: 10px;
+  background: #2ec4c7;
+  color: #fff;
+  font-weight: 400;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.cardCar.frozen {
+  opacity: 0.45;
+  filter: grayscale(70%);
+  position: relative;
+}
+
+.cardCar.frozen .cardCarLink {
+  cursor: not-allowed;
+}
+
+.cardCar.frozen::after {
+  content: "Μη διαθέσιμο";
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #d10000;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  border: 2px solid rgba(209, 0, 0, 0.35);
+  box-shadow: 0 6px 18px rgba(209, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 5;
+}
+
 @media (max-width: 576px) {
   .pagination li.page-item:not(.active):not(:first-child):not(:last-child) {
     display: none;
@@ -666,16 +705,8 @@ label {
   }
 
   .discount-badge {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
     font-size: 1rem;
-    font-weight: 400;
-    padding: 8px 11px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    padding: 8px 15px;
   }
 
   #filtersSidebar .offcanvas-header {
@@ -858,16 +889,8 @@ label {
   }
 
   .discount-badge {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
     font-size: 1.1rem;
-    font-weight: 400;
-    padding: 8px 13px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    padding: 8px 15px;
   }
 
   .filters-container {
@@ -1038,16 +1061,8 @@ label {
   }
 
   .discount-badge {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
-    font-size: 1.2rem;
-    font-weight: 400;
-    padding: 8px 13px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    font-size: 1.1rem;
+    padding: 8px 15px;
   }
 
   #displayCars.is-empty #noResultsBox {
@@ -1153,16 +1168,8 @@ label {
   }
 
   .discount-badge {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
     font-size: 1.2rem;
-    font-weight: 400;
-    padding: 6px 15px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    padding: 6px 17px;
   }
 
   #displayCars.is-empty {
@@ -1239,16 +1246,7 @@ label {
   }
 
   .discount-badge {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
-    font-size: 1.3rem;
-    font-weight: 400;
     padding: 7px 17px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
   .cardCar {
@@ -1293,16 +1291,7 @@ label {
   }
 
   .discount-badge {
-    position: absolute !important;
-    top: 10px;
-    left: 10px;
-    background: #2ec4c7;
-    color: #fff;
-    font-size: 1.4rem;
-    font-weight: 400;
     padding: 7px 18px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 }
 

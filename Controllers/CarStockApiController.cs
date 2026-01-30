@@ -148,6 +148,8 @@ namespace KinsenOfficial.Controllers
                 TransmissionType = s.TransmissionType ?? "",
                 Color = NormalizeName(s.Color),
                 Offer = s.Offer ?? false,
+                Froze = s.Froze ?? false,
+                Delete = s.Delete ?? false,
                 TypeOfCar = s.TypeOfCar ?? "",
                 CarPic = ""
             })
@@ -170,20 +172,28 @@ namespace KinsenOfficial.Controllers
 
             foreach (var incoming in newCars)
             {
-                if (existingMap.ContainsKey(incoming.CarId))
+                if (incoming.Delete)
                 {
-                    var existing = existingMap[incoming.CarId];
+                    if (existingMap.Remove(incoming.CarId))
+                    {
+                        _logger.LogWarning("DELETED carId={CarId} from carCardBlock", incoming.CarId);
+                    }
 
-                    // ⛔ ΔΕΝ ΠΕΙΡΑΖΟΥΜΕ ΤΗ ΦΩΤΟΓΡΑΦΙΑ
+                    continue; // ΤΕΛΟΣ για αυτό το car
+                }
+
+                // 🔁 UPDATE
+                if (existingMap.TryGetValue(incoming.CarId, out var existing))
+                {
+                    // ⛔ ΔΕΝ ΠΕΙΡΑΖΟΥΜΕ ΦΩΤΟ / PHOTOS
                     incoming.CarPic = existing.CarPic;
                     incoming.TenPhotosForUsedCarSales = existing.TenPhotosForUsedCarSales;
 
-                    // ✅ OVERWRITE ΟΛΑ ΤΑ ΥΠΟΛΟΙΠΑ
                     existingMap[incoming.CarId] = incoming;
                 }
                 else
                 {
-                    // ✅ NEW
+                    // ➕ NEW
                     existingMap.Add(incoming.CarId, incoming);
                     carsToAdd.Add(incoming);
                 }
@@ -356,102 +366,6 @@ namespace KinsenOfficial.Controllers
             return Ok(finalColors);
         }
     
-        // private void SyncCarouselCarsFromCarCardBlock()
-        // {
-        //     _logger.LogWarning("=== SYNC OFFERS → carouselCars START ===");
-
-        //     // 1️⃣ Φέρνουμε τη MASTER σελίδα
-        //     var usedCarsPage = _contentService.GetById(UsedCarSalesPageKey);
-        //     if (usedCarsPage == null)
-        //     {
-        //         _logger.LogError("UsedCarSales page NOT FOUND");
-        //         return;
-        //     }
-
-        //     // 2️⃣ Φέρνουμε το Home (TARGET)
-        //     var home = _contentService.GetById(HomePageKey);
-        //     if (home == null)
-        //     {
-        //         _logger.LogError("Home page NOT FOUND");
-        //         return;
-        //     }
-
-        //     // 3️⃣ Διαβάζουμε ΟΛΑ τα cars από το carCardBlock (CMS truth)
-        //     var allCars = LoadExistingCarsFromBlock(
-        //         usedCarsPage,
-        //         BlockPropertyAlias,
-        //         includeOffer: true
-        //     );
-
-        //     // 4️⃣ Κρατάμε ΜΟΝΟ όσα είναι offer == true
-        //     var offerCars = allCars
-        //         .Where(c => c.CarId > 0 && c.Offer)
-        //         .ToList();
-
-        //     _logger.LogWarning(
-        //         "carCardBlock offer cars count = {Count}",
-        //         offerCars.Count
-        //     );
-
-        //     // 5️⃣ Διαβάζουμε ΤΙ ΥΠΑΡΧΕΙ ΤΩΡΑ στο carouselCars
-        //     var currentCarouselCars = LoadExistingCarsFromBlock(
-        //         home,
-        //         CarouselBlockPropertyAlias,
-        //         includeOffer: true
-        //     );
-
-        //     // 6️⃣ Χτίζουμε sets για ΣΩΣΤΕΣ συγκρίσεις
-        //     var offerIds = new HashSet<int>(offerCars.Select(c => c.CarId));
-        //     var carouselIds = new HashSet<int>(currentCarouselCars.Select(c => c.CarId));
-
-        //     // ➕ Ποια πρέπει να προστεθούν
-        //     var addedIds = new HashSet<int>(offerIds);
-        //     addedIds.ExceptWith(carouselIds);
-
-        //     // ➖ Ποια πρέπει να αφαιρεθούν
-        //     var removedIds = new HashSet<int>(carouselIds);
-        //     removedIds.ExceptWith(offerIds);
-
-        //     // 7️⃣ Χτίζουμε ΤΗΝ ΤΕΛΙΚΗ λίστα carouselCars
-        //     //    (μόνο offers, μοναδικά, με σωστό content)
-        //     var carouselMap = new Dictionary<int, CarDto>();
-        //     foreach (var c in currentCarouselCars)
-        //         carouselMap[c.CarId] = c;
-
-        //     var finalCarouselCars = new List<CarDto>(offerCars.Count);
-        //     foreach (var offerCar in offerCars)
-        //     {
-        //         // Αν υπάρχει ήδη στο carousel, κράτα το υπάρχον
-        //         if (carouselMap.TryGetValue(offerCar.CarId, out var existing))
-        //             finalCarouselCars.Add(existing);
-        //         else
-        //             finalCarouselCars.Add(offerCar);
-        //     }
-
-        //     _logger.LogWarning(
-        //         "Carousel sync → added={Added}, removed={Removed}, final={Final}",
-        //         addedIds.Count,
-        //         removedIds.Count,
-        //         finalCarouselCars.Count
-        //     );
-
-        //     if (addedIds.Count > 0)
-        //         _logger.LogWarning("Added to carousel (carIds): {Ids}", string.Join(",", addedIds.OrderBy(x => x)));
-
-        //     if (removedIds.Count > 0)
-        //         _logger.LogWarning("Removed from carousel (carIds): {Ids}", string.Join(",", removedIds.OrderBy(x => x)));
-
-        //     // 8️⃣ ΓΡΑΦΟΥΜΕ το carouselCars (DERIVED STATE)
-        //     ReplaceBlockListWithCarsToAlias(
-        //         home,
-        //         CarouselBlockPropertyAlias,
-        //         finalCarouselCars
-        //     );
-
-        //     _logger.LogWarning("=== SYNC OFFERS → carouselCars END ===");
-        // }
-
-
         private List<CarDto> LoadExistingCarsFromBlock(IContent page, string blockAlias, bool includeOffer)
         {
             var result = new List<CarDto>();
@@ -552,6 +466,8 @@ namespace KinsenOfficial.Controllers
                     ["transmissionType"] = transmissionTypeNormalized,
                     ["typeOfCar"] = typeOfCarNormalized,
                     ["offer"] = car.Offer,
+                    ["froze"] = car.Froze,
+                    ["delete"] = car.Delete,
                     ["carPic"] = string.IsNullOrWhiteSpace(car.CarPic) ? FallbackCarPicUdi : car.CarPic,
                     ["tenPhotosForUsedCarSales"] = car.TenPhotosForUsedCarSales
                 };
@@ -670,12 +586,16 @@ namespace KinsenOfficial.Controllers
 
                 foreach (var e in contentData.EnumerateArray())
                 {
+                    var froze = e.TryGetProperty("froze", out var pf) && pf.ValueKind == JsonValueKind.True;
+                    if (froze) continue;
+
                     var dto = new CarDto
                     {
                         CarId = e.TryGetProperty("carId", out var p) && p.TryGetInt32(out var id) ? id : 0,
                         Maker = e.TryGetProperty("maker", out p) ? p.GetString() ?? "" : "",
                         Model = e.TryGetProperty("model", out p) ? p.GetString() ?? "" : "",
                         Offer = e.TryGetProperty("offer", out p) && p.ValueKind == JsonValueKind.True,
+                        Froze = false,
                         YearRelease = e.TryGetProperty("yearRelease", out p) && p.TryGetInt32(out var year) ? year : 0,
                         Price = e.TryGetProperty("price", out p) && p.TryGetDecimal(out var price) ? price : 0m,
                         Km = e.TryGetProperty("km", out p) && p.TryGetInt32(out var km) ? km : 0,
@@ -730,6 +650,12 @@ namespace KinsenOfficial.Controllers
         [JsonPropertyName("offer")]
         public bool? Offer { get; set; }
 
+        [JsonPropertyName("froze")]
+        public bool? Froze { get; set; }
+
+        [JsonPropertyName("delete")]
+        public bool? Delete { get; set; } 
+
         [JsonPropertyName("fuel")]
         public string? Fuel { get; set; }
 
@@ -751,15 +677,17 @@ namespace KinsenOfficial.Controllers
         public int CarId { get; set; }
         public string Maker { get; set; } = "";
         public string Model { get; set; } = "";
-        public int YearRelease { get; set; }            // FIXED
-        public decimal Price { get; set; }              // FIXED
-        public int Km { get; set; }                     // FIXED
+        public int YearRelease { get; set; }           
+        public decimal Price { get; set; }              
+        public int Km { get; set; }                     
         public double Cc { get; set; }
         public double Hp { get; set; }
         public string Fuel { get; set; } = "";
         public string TransmissionType { get; set; } = "";
         public string Color { get; set; } = "";
         public bool Offer { get; set; } 
+        public bool Froze { get; set; } 
+        public bool Delete { get; set; } 
         public string TypeOfCar { get; set; } = "";
         public string CarPic { get; set; } = "";
         public JsonNode? TenPhotosForUsedCarSales { get; set; }

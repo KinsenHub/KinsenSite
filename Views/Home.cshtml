@@ -18,6 +18,7 @@
     @* var carouselCars = Model.Value<IEnumerable<BlockListItem>>("carouselCars"); *@
     var usedCarSalesPage = Model.Root().DescendantsOfType("usedCarSalesPage").FirstOrDefault();
     var carCardBlock = usedCarSalesPage?.Value<BlockListModel>("carCardBlock");
+    var visibleCars = carCardBlock?.Where(b => b?.Content?.Value<bool>("froze") != true).ToList();
     var photoTrilogy = Model.Value<IEnumerable<BlockListItem>>("photoTrilogy");
     var trilogyBlock = Model.Value<IEnumerable<BlockListItem>>("trilogyBlock");
 	var featureCardsBlock = Model.Value<IEnumerable<BlockListItem>>("featureCard");
@@ -61,9 +62,12 @@
 @*------------------Carousel-------------------*@
 @if (carCardBlock != null)
 {
-    var offerCars = carCardBlock
-        .Where(b => b?.Content?.Value<bool>("offer") == true)
-        .ToList();
+    var offerCars = carCardBlock?
+    .Where(b =>
+        b?.Content?.Value<bool>("offer") == true &&
+        b?.Content?.Value<bool>("froze") != true
+    )
+    .ToList();
 
     if (offerCars.Any())
     {

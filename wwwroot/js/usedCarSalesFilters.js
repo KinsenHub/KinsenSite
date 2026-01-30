@@ -120,6 +120,7 @@ function filterCards(filters) {
 
     modelPriceText = card.querySelector(".card-text")?.innerText || "";
     modelPrice = parsePrice(modelPriceText);
+    console.log(modelPrice);
 
     fuelName =
       card.querySelector(".fuel")?.innerText.trim().toLowerCase() || "";
@@ -145,9 +146,7 @@ function filterCards(filters) {
 
     klmText = card.querySelector(".klm")?.textContent.trim().replace(/\D/g, "");
     carKlm = parseInt(
-      klmText
-        .replace(/\u00A0|\u202F/g, "") // non-breaking spaces
-        .replace(/[^\d]/g, ""), // κράτα μόνο ψηφία
+      klmText.replace(/\u00A0|\u202F/g, "").replace(/[^\d]/g, ""),
       10,
     );
 
@@ -557,32 +556,10 @@ function collectFilters() {
 function parsePrice(value) {
   if (!value) return null;
 
-  let s = value.toString().trim();
-
-  // Βγάζουμε όλα τα κενά, € κλπ
-  s = s.replace(/[^\d.,]/g, "");
-
-  // Αν υπάρχουν ΠΟΛΛΑ σημεία ".", τότε αυτά είναι χιλιοδιαχωριστές → αφαιρούνται
-  // Αν υπάρχει ένα μόνο ".", τότε είναι δεκαδικό και ΔΕΝ αφαιρείται
-  const parts = s.split(".");
-
-  if (parts.length > 2) {
-    // Π.χ. "30.500.02" → κρατάμε το τελευταίο ως δεκαδικό
-    const decimals = parts.pop();
-    s = parts.join("") + "." + decimals;
-  }
-
-  // Αν υπάρχει κόμμα, είναι δεκαδικό
-  s = s.replace(",", ".");
-
-  let num = parseFloat(s);
-
-  if (isNaN(num)) return null;
-
-  // ⬆ Γιατί έχουμε δεκαδικά → στρογγυλοποιούμε προς τα πάνω
-  num = Math.ceil(num);
-
-  return num;
+  return parseInt(
+    value.replace(/[^\d]/g, ""), // κρατά ΜΟΝΟ ψηφία
+    10,
+  );
 }
 
 function getCheckedValues(selector) {

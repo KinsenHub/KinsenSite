@@ -32,13 +32,13 @@
         => new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
 
     // Βρες τον φάκελο Logos στα Media
-    var logosFolder = Umbraco.MediaAtRoot()
+    @* var logosFolder = Umbraco.MediaAtRoot()
         .FirstOrDefault(x => x.Name.Equals("Logos", StringComparison.InvariantCultureIgnoreCase));
 
     // Map: Normalized όνομα → Url εικόνας
     var brandLogos = logosFolder?.Children
         .ToDictionary(m => Norm(m.Name), m => m.Url(), StringComparer.InvariantCulture)
-        ?? new Dictionary<string, string>(StringComparer.InvariantCulture);
+        ?? new Dictionary<string, string>(StringComparer.InvariantCulture); *@
 
     // Μάζεψε τις μάρκες από τα blocks
     var brandsRaw = carCardBlock
@@ -52,9 +52,9 @@
         .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
 
     // Counts ανά μάρκα (δυναμικά)
-    var brandCounts = brandsRaw
+    @* var brandCounts = brandsRaw
         .GroupBy(s => Norm(s!))
-        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture); *@
 
 	// Τελική λίστα (normalized keys)
 	var comparer = StringComparer.Create(new CultureInfo("el-GR"), true);
@@ -65,8 +65,8 @@
 		.ToList();
 
 	//----------------Καύσιμο---------------
-	string Normalize(string? s)
-        => new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
+	 string Normalize(string? s)
+        => new string((s ?? "").Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant(); 
 
     // Μάζεψε τα καύσιμα από τα blocks
     var fuelRaw = carCardBlock
@@ -80,9 +80,9 @@
         .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
 
 	 // Counts ανά καύσιμο (δυναμικά)
-    var fuelCounts = fuelRaw
+    @* var fuelCounts = fuelRaw
         .GroupBy(s => Normalize(s!))
-        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture); *@
 
 	// Τελική λίστα (normalized keys)
 	var allFuels = fuelDisplayNames
@@ -107,9 +107,9 @@
         .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
 
 	 // Counts ανά κιβώτιο (δυναμικά)
-    var transmissionTypeCounts = transmissionTypeRaw
+    @* var transmissionTypeCounts = transmissionTypeRaw
         .GroupBy(s => Norma(s!))
-        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture); *@
 
 	// Τελική λίστα (normalized keys)
 	var allTransmissionTypes = transmissionTypelDisplayNames
@@ -133,9 +133,9 @@
         .ToDictionary(g => g.Key, g => g.First()!, StringComparer.InvariantCulture);
 
 	 // Counts ανά χρώμα (δυναμικά)
-    var colorCounts = colorRaw
+    @* var colorCounts = colorRaw
         .GroupBy(s => Normal(s!))
-        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture); *@
 
 	// Τελική λίστα (normalized keys)
     var allColors = colorNames
@@ -165,7 +165,7 @@
 		.ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
 
 	// Τελική λίστα
-	var allTypeOfCars = typeOfCarCounts.Keys.OrderBy(k => k).ToList();
+	var allTypeOfCars = typeOfCarCounts.Keys.OrderBy(k => k).ToList(); 
 
 	//--------------------Προσφορές (Offer Types)-------------------
     string N(string? s)
@@ -188,7 +188,7 @@
         .ToDictionary(g => g.Key, g => g.Count(), StringComparer.InvariantCulture);
 
     // Τελική λίστα
-    var allOfferTypes = offerTypeCounts.Keys.OrderBy(k => k).ToList();
+    var allOfferTypes = offerTypeCounts.Keys.OrderBy(k => k).ToList();  
 
     var carPages = Model.ChildrenOfType("carPage");
 
@@ -264,17 +264,17 @@
 								onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 							</div>
 							<div class="checkbox-columns">
-								<div class="checkbox-pair">
+								@* <div class="checkbox-pair">
 									@foreach (var key in allOfferTypes)
-									{
+									{ 
 										var name = offerTypeNames[key];   // Original display name
 										var count = offerTypeCounts[key]; // Count
 										<label>
 											<input type="checkbox" class="offerTypeCheckbox" value="@name" />
-											@name (@count)
+											@name (@count) 
 										</label>
-									}
-								</div>
+									} 
+								</div> *@
 
 								<div class="price-order-wrapper">
 									<select id="priceOrderSelect" class="form-select">
@@ -282,7 +282,7 @@
 									<option value="desc">Φθίνουσα τιμή</option>
 									</select>
 								</div>
-							</div>
+							</div> 
 						</div>  
 					</div>
 
@@ -296,19 +296,10 @@
 								@foreach (var normBrand in allBrands)
 								{
 									var displayName = brandDisplayNames[normBrand];
-									var count = brandCounts[normBrand];
-									//brandLogos.TryGetValue(normBrand, out var logoUrl);
 
 									<label>
 										<input type="checkbox" class="brandCheckbox" value="@normBrand" />
-										@* @if (!string.IsNullOrWhiteSpace(logoUrl))
-										{
-											<img src="@logoUrl" alt="@displayName logo" width="20" height="20" />
-										} *@
-										<span>
-											@displayName
-											(<span class="brand-count">@count</span>)
-										</span>
+										<span>@displayName</span>
 									</label>
 								}
 							</div>
@@ -379,14 +370,10 @@
 								@foreach (var normFuel in allFuels)
 								{
 									var displayNameFuels = fuelDisplayNames[normFuel];
-									var countF = fuelCounts[normFuel];
 
 									<label>
 										<input type="checkbox" class="fuelCheckbox" value="@normFuel" />
-										<span>
-											@displayNameFuels
-											(<span class="fuel-count">@countF</span>)
-										</span>
+										<span>@displayNameFuels</span>
 									</label>
 								}
 							</div>
@@ -437,14 +424,10 @@
 								@foreach (var normTransmission in allTransmissionTypes)
 								{
 									var displayNameTransmissions = transmissionTypelDisplayNames[normTransmission];
-									var countT = transmissionTypeCounts[normTransmission];
 
 									<label>
 										<input type="checkbox" class="transmissionCheckbox" value="@normTransmission" />
-										<span>
-											@displayNameTransmissions
-											(<span class="transmission-count">@countT</span>)
-										</span>
+										<span>@displayNameTransmissions</span>
 									</label>
 								}
 							</div>
@@ -461,14 +444,10 @@
 								@foreach (var normColor in allColors)
 								{
 									var displayNameColor = colorNames[normColor];
-									var countC = colorCounts[normColor];
 
 									<label>
 										<input type="checkbox" class="colorCheckbox" value="@normColor" />
-										<span>
-											@displayNameColor
-											(<span class="color-count">@countC</span>)
-										</span>
+										<span>@displayNameColor</span>
 									</label>
 								}
 							</div>
@@ -485,14 +464,10 @@
 								@foreach (var normType in allTypeOfCars)
 								{
 									var displayNameType = typeOfCarNames[normType];
-									var countType = typeOfCarCounts[normType];
 
 									<label>
 										<input type="checkbox" class="carTypeCheckbox" value="@normType" />
-										<span>
-											@displayNameType
-											(<span class="carType-count">@countType</span>)
-										</span>
+										<span>@displayNameType</span>
 									</label>
 								}
 							</div>
@@ -526,7 +501,7 @@
 						onkeydown="return !['-','+','e','E',',','.'].includes(event.key);"/>
 					</div>
 					<div class="checkbox-columns">
-						<div class="checkbox-pair">
+						@* <div class="checkbox-pair">
 							@foreach (var key in allOfferTypes)
 							{
 								var name = offerTypeNames[key];   // Original display name
@@ -536,7 +511,7 @@
 									@name (@count)
 								</label>
 							}
-						</div>
+						</div> *@
 
 						<div class="price-order-wrapper">
 							<select id="priceOrderSelect" class="form-select">
@@ -558,19 +533,10 @@
 						@foreach (var normBrand in allBrands)
 						{
 							var displayName = brandDisplayNames[normBrand];
-							var count = brandCounts[normBrand];
-							//brandLogos.TryGetValue(normBrand, out var logoUrl);
 
 							<label>
 								<input type="checkbox" class="brandCheckbox" value="@normBrand" />
-								@* @if (!string.IsNullOrWhiteSpace(logoUrl))
-								{
-									<img src="@logoUrl" alt="@displayName logo" width="20" height="20" />
-								} *@
-								<span>
-									@displayName
-									(<span class="brand-count">@count</span>)
-								</span>
+								<span>@displayName</span>
 							</label>
 						}
 					</div>
@@ -641,14 +607,10 @@
 						@foreach (var normFuel in allFuels)
 						{
 							var displayNameFuels = fuelDisplayNames[normFuel];
-							var countF = fuelCounts[normFuel];
 
 							<label>
 								<input type="checkbox" class="fuelCheckbox" value="@normFuel" />
-								<span>
-									@displayNameFuels
-									(<span class="fuel-count">@countF</span>)
-								</span>
+								<span>@displayNameFuels</span>
 							</label>
 						}
 					</div>
@@ -699,14 +661,10 @@
 						@foreach (var normTransmission in allTransmissionTypes)
 						{
 							var displayNameTransmissions = transmissionTypelDisplayNames[normTransmission];
-							var countT = transmissionTypeCounts[normTransmission];
 
 							<label>
 								<input type="checkbox" class="transmissionCheckbox" value="@normTransmission" />
-								<span>
-									@displayNameTransmissions
-									(<span class="transmission-count">@countT</span>)
-								</span>
+								<span>@displayNameTransmissions</span>
 							</label>
 						}
 					</div>
@@ -723,14 +681,10 @@
 						@foreach (var normColor in allColors)
 						{
 							var displayNameColor = colorNames[normColor];
-							var countC = colorCounts[normColor];
 
 							<label>
 								<input type="checkbox" class="colorCheckbox" value="@normColor" />
-								<span>
-									@displayNameColor
-									(<span class="color-count">@countC</span>)
-								</span>
+								<span>@displayNameColor</span>
 							</label>
 						}
 					</div>
@@ -747,14 +701,10 @@
 						@foreach (var normType in allTypeOfCars)
 						{
 							var displayNameType = typeOfCarNames[normType];
-							var countType = typeOfCarCounts[normType];
 
 							<label>
 								<input type="checkbox" class="carTypeCheckbox" value="@normType" />
-								<span>
-									@displayNameType
-									(<span class="carType-count">@countType</span>)
-								</span>
+								<span>@displayNameType</span>
 							</label>
 						}
 					</div>
@@ -791,12 +741,12 @@
 					.Where(b =>
 					{
 						var c = b.Content;
-						string T(string a) => (c.Value<string>(a) ?? "").Trim();
+						if (c == null) return false;
 
+						string T(string a) => (c.Value<string>(a) ?? "").Trim();
 						var model = T("model");
 
-						var hasModel = !string.IsNullOrWhiteSpace(model);
-						return hasModel;
+						return !string.IsNullOrWhiteSpace(model);
 					})
 					.ToList();
 
@@ -813,6 +763,7 @@
 						var cc = car.Value<string>("cc");
 						var hp = car.Value<string>("hp");
 						var typeOfDiscount = car.Value<string>("offer");
+						var isFrozen = car.Value<bool?>("froze") == true;
 						var typeOfFuel = car.Value<string>("fuel");
 						var transmission = car.Value<string>("transmissionType");
 						var color = car.Value<string>("color");
@@ -836,7 +787,7 @@
 							formattedPrice = price ?? "";
 						}
 						
-						<div class="cardCar" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
+						<div class="cardCar @(isFrozen ? "frozen" : "")" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
 							@if(isLoggedIn){
 								<!-- ❤️ FAVORITE BUTTON -->
 								<button 
@@ -848,14 +799,19 @@
 								</button>
 							}
 							
-							<a href="@targetUrl"
-								class="cardCarLink" 
-								data-car-id="@carID" 
-								style="text-decoration: none; color: inherit;">
+							@if (isFrozen)
+							{
+								@:<div class="cardCarLink disabled-card" aria-disabled="true">
+							}
+							else
+							{
+								@:<a href="@targetUrl" class="cardCarLink" data-car-id="@carID" style="text-decoration:none;color:inherit;">
+							}
+
 							
 								@if (typeOfDiscount == "True")
 								{
-									<span class="discount-badge">Offer</span>
+									<span class="discount-badge">Προσφορά</span>
 								}
 								@if(carPic != null)
 								{
@@ -881,7 +837,14 @@
 										<p class="typeOfCar" style="display:none">@typeOfCar</p>
 									</div>
 								</div>
-							</a>
+							 @if (isFrozen)
+							{
+								@:</div>
+							}
+							else
+							{
+								@:</a>
+							}
 						</div>
 					}
 				}
