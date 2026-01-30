@@ -788,7 +788,7 @@
 						}
 						
 						<div class="cardCar @(isFrozen ? "frozen" : "")" data-id="@carID" data-offer-type="@typeOfDiscount?.ToLowerInvariant()">
-							@if(isLoggedIn){
+							@if(isLoggedIn && !isFrozen){
 								<!-- ❤️ FAVORITE BUTTON -->
 								<button 
 									class="favorite-btn"
@@ -808,36 +808,35 @@
 								@:<a href="@targetUrl" class="cardCarLink" data-car-id="@carID" style="text-decoration:none;color:inherit;">
 							}
 
-							
-								@if (typeOfDiscount == "True")
-								{
-									<span class="discount-badge">Προσφορά</span>
-								}
-								@if(carPic != null)
-								{
-									<img src="@carPic?.Url()" class="card-img-top car-image" />
-								}
-								else 
-								{
-									<img src="@notAvailableImg?.Url()" class="card-img-top car-image" />
-								}
-								<div class="card-body d-flex flex-column justify-content-between text-center p-3">
-									<div>
-										<h4 class="maker-title fw-semibold mb-2">@maker <span class="card-title">@modelo</span></h4>
-										<p class="car-year">@yearRelease</p>
-										<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@formattedPrice €</p>
-										<p class="text-muted mb-0">
-											<i class="fa-solid fa-road"></i><span class="klm">&nbsp; @km </span>km &nbsp;&nbsp;
-											<i class="fa-solid fa-cube"></i><span class="cc">&nbsp; @cc</span>cc &nbsp;&nbsp;
-											<i class="fa-solid fa-gas-pump"></i><span class="fuel">&nbsp; @typeOfFuel</span>
-										</p>
-										<p class="transmission" style="display:none">@transmission</p>
-										<p class="typeOfColor" style="display:none">@color</p>
-										<p class="hp" style="display:none">@hp</p>
-										<p class="typeOfCar" style="display:none">@typeOfCar</p>
-									</div>
+							@if (typeOfDiscount == "True" && !isFrozen)
+							{
+								<span class="discount-badge">Προσφορά</span>
+							}
+							@if(carPic != null)
+							{
+								<img src="@carPic?.Url()" class="card-img-top car-image" />
+							}
+							else 
+							{
+								<img src="@notAvailableImg?.Url()" class="card-img-top car-image" />
+							}
+							<div class="card-body d-flex flex-column justify-content-between text-center p-3">
+								<div>
+									<h4 class="maker-title fw-semibold mb-2">@maker <span class="card-title">@modelo</span></h4>
+									<p class="car-year">@yearRelease</p>
+									<p class="card-text fw-bold mb-1" style="font-size: 1.25rem;">@formattedPrice €</p>
+									<p class="text-muted mb-0">
+										<i class="fa-solid fa-road"></i><span class="klm">&nbsp; @km </span>km &nbsp;&nbsp;
+										<i class="fa-solid fa-cube"></i><span class="cc">&nbsp; @cc</span>cc &nbsp;&nbsp;
+										<i class="fa-solid fa-gas-pump"></i><span class="fuel">&nbsp; @typeOfFuel</span>
+									</p>
+									<p class="transmission" style="display:none">@transmission</p>
+									<p class="typeOfColor" style="display:none">@color</p>
+									<p class="hp" style="display:none">@hp</p>
+									<p class="typeOfCar" style="display:none">@typeOfCar</p>
 								</div>
-							 @if (isFrozen)
+							</div>
+							@if (isFrozen)
 							{
 								@:</div>
 							}
