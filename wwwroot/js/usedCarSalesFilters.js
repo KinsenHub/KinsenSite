@@ -244,8 +244,10 @@ function filterCards(filters) {
     ];
 
     if (matches.every(Boolean)) {
+      showLoading();
       filteredCards.push(card);
       anyMatch = true;
+      hideLoading(800);
     }
   });
 
@@ -358,75 +360,75 @@ function filterCards(filters) {
 //   });
 // }
 
-function updateAvailableBrands(filters, filteredCards) {
-  const brandCheckboxes = document.querySelectorAll(".brandCheckbox");
+// function updateAvailableBrands(filters, filteredCards) {
+//   const brandCheckboxes = document.querySelectorAll(".brandCheckbox");
 
-  // helper: ίδιο normalization με το server
-  const norm = (s) => (s || "").replace(/[^0-9a-z]/gi, "").toUpperCase();
+//   // helper: ίδιο normalization με το server
+//   const norm = (s) => (s || "").replace(/[^0-9a-z]/gi, "").toUpperCase();
 
-  // Προετοιμασία: keys όλων των brands και map σε label
-  const brandCounts = {};
-  const labelByKey = {};
-  brandCheckboxes.forEach((cb) => {
-    const key = norm(cb.value);
-    brandCounts[key] = 0; // μηδενισμός
-    const label = cb.closest("label");
-    if (label) labelByKey[key] = label;
-  });
+//   // Προετοιμασία: keys όλων των brands και map σε label
+//   const brandCounts = {};
+//   const labelByKey = {};
+//   brandCheckboxes.forEach((cb) => {
+//     const key = norm(cb.value);
+//     brandCounts[key] = 0; // μηδενισμός
+//     const label = cb.closest("label");
+//     if (label) labelByKey[key] = label;
+//   });
 
-  const hasPriceFilter = filters.minPrice > 0 || filters.maxPrice < Infinity;
+//   const hasPriceFilter = filters.minPrice > 0 || filters.maxPrice < Infinity;
 
-  // Πηγή καρτών
-  const sourceCards = hasPriceFilter ? filteredCards : originalCardElements;
+//   // Πηγή καρτών
+//   const sourceCards = hasPriceFilter ? filteredCards : originalCardElements;
 
-  // Re-count ανά κάρτα (χωρίς nested loops)
-  sourceCards.forEach((card) => {
-    const titleEl = card.querySelector(".maker-title");
-    if (!titleEl) return;
+//   // Re-count ανά κάρτα (χωρίς nested loops)
+//   sourceCards.forEach((card) => {
+//     const titleEl = card.querySelector(".maker-title");
+//     if (!titleEl) return;
 
-    // maker = πρώτο text node πριν το <span class="card-title">
-    const makerRaw =
-      (titleEl.childNodes[0] && titleEl.childNodes[0].nodeValue) ||
-      titleEl.textContent ||
-      "";
-    const makerKey = norm(makerRaw.trim());
+//     // maker = πρώτο text node πριν το <span class="card-title">
+//     const makerRaw =
+//       (titleEl.childNodes[0] && titleEl.childNodes[0].nodeValue) ||
+//       titleEl.textContent ||
+//       "";
+//     const makerKey = norm(makerRaw.trim());
 
-    if (makerKey in brandCounts) {
-      brandCounts[makerKey] += 1;
-    }
-  });
+//     if (makerKey in brandCounts) {
+//       brandCounts[makerKey] += 1;
+//     }
+//   });
 
-  // visible set από τα counts
-  const visibleBrands = new Set(
-    Object.keys(brandCounts).filter((k) => brandCounts[k] > 0),
-  );
+//   // visible set από τα counts
+//   const visibleBrands = new Set(
+//     Object.keys(brandCounts).filter((k) => brandCounts[k] > 0),
+//   );
 
-  // Ενημέρωση UI (μόνο αριθμοί, όχι ονόματα)
-  brandCheckboxes.forEach((checkbox) => {
-    const key = norm(checkbox.value);
-    const label = labelByKey[key];
-    const count = brandCounts[key] || 0;
+//   // Ενημέρωση UI (μόνο αριθμοί, όχι ονόματα)
+//   brandCheckboxes.forEach((checkbox) => {
+//     const key = norm(checkbox.value);
+//     const label = labelByKey[key];
+//     const count = brandCounts[key] || 0;
 
-    if (label) {
-      const countEl = label.querySelector(".brand-count");
-      if (countEl) countEl.textContent = String(count);
+//     if (label) {
+//       const countEl = label.querySelector(".brand-count");
+//       if (countEl) countEl.textContent = String(count);
 
-      if (hasPriceFilter) {
-        if (visibleBrands.has(key)) {
-          checkbox.disabled = false;
-          label.style.opacity = "1";
-        } else {
-          checkbox.disabled = true;
-          checkbox.checked = false;
-          label.style.opacity = "0.5";
-        }
-      } else {
-        checkbox.disabled = false;
-        label.style.opacity = "1";
-      }
-    }
-  });
-}
+//       if (hasPriceFilter) {
+//         if (visibleBrands.has(key)) {
+//           checkbox.disabled = false;
+//           label.style.opacity = "1";
+//         } else {
+//           checkbox.disabled = true;
+//           checkbox.checked = false;
+//           label.style.opacity = "0.5";
+//         }
+//       } else {
+//         checkbox.disabled = false;
+//         label.style.opacity = "1";
+//       }
+//     }
+//   });
+// }
 
 function InitializeCounters(originalCardElements) {
   const brandCheckboxes = document.querySelectorAll(".brandCheckbox");
@@ -710,6 +712,7 @@ function closeAllFilterSections(root) {
 }
 
 function clearAllFilters() {
+  showLoading();
   const mobilePanel = document.getElementById("filtersSidebar");
   const isMobileOpen = !!(
     mobilePanel && mobilePanel.classList.contains("show")
@@ -827,14 +830,8 @@ function clearAllFilters() {
       currentPage = 1;
       paginateVisibleCars(cardsArray);
 
-      // 6) Counters
-      updateAvailableBrands?.(filters, cardsArray);
-      // updateAvailableOffers?.(filters, cardsArray);
+      hideLoading(800);
     }
-
-    // 6) Recompute counters & τρέξε κενό filter για συγχρονισμό UI
-    // InitializeCounters?.(Array.from(originalCardElements));
-    // filterCards?.(collectFilters?.() ?? {});
 
     // 7) Καθάρισε τυχόν leftover backdrops/scroll locks
     setTimeout(() => {

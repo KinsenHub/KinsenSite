@@ -39,7 +39,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     @RenderSection("head", required: false)
+  <style>
+    .global-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s ease;
+  }
 
+  .global-loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Spinner */
+  .spinner {
+    color: #39c0c3;
+    border-radius: 50%;
+    font-size:70px;
+  }
+
+  /* Optional: prevent scroll while loading */
+  body.loading {
+    overflow: hidden;
+  }
+
+  </style>
 </head>
 <body class="@ViewBag.BodyClass">
     
@@ -47,6 +77,9 @@
 
     <div class="layout-wrapper">
         <main class="main-content">
+          <div id="globalLoader" class="global-loader hidden">
+          <div class="spinner"><i class="fa-solid fa-spinner fa-spin"></i></div>
+          </div>
           @RenderBody()
         </main>
         @await Html.PartialAsync("~/Views/Footer.cshtml")
@@ -100,6 +133,43 @@
         });
       })();
 
+      //************* SPINNER ***************
+      let loader = document.getElementById("globalLoader");
+
+      function showLoading() {
+        if (!loader) return;
+
+        document.body.classList.add("loading");
+        loader.classList.remove("hidden");
+      }
+
+      function hideLoading(delay = 0) {
+        if (!loader) return;
+
+        setTimeout(() => {
+          loader.classList.add("hidden");
+          document.body.classList.remove("loading");
+        }, delay);
+      }
+
+      document.addEventListener("click", function (e) {
+        const link = e.target.closest("a");
+        if (!link) return;
+
+        const href = link.getAttribute("href");
+        if (!href || href.startsWith("#") || link.target === "_blank") return;
+
+        e.preventDefault();
+        showLoading();
+
+        setTimeout(() => {
+          window.location.href = href;
+        }, 250); 
+      });
+
+      window.addEventListener("pageshow", function () {
+        hideLoading(0);
+      });
     </script>
 </body>
 </html>

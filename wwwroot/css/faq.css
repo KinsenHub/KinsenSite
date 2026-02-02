@@ -22,6 +22,7 @@
   color: #001858;
   font-weight: 400;
   margin: 30px;
+  margin-bottom: 0;
 }
 
 .faq-info-grid-container {
@@ -100,6 +101,7 @@
 @media (min-width: 992px) {
   .faq-title {
     font-size: 2rem;
+    margin-bottom: 20px;
   }
 
   .faq-img-wrapper {
@@ -129,6 +131,7 @@
 @media (min-width: 1200px) {
   .faq-title {
     font-size: 2.1rem;
+    margin-bottom: 20px;
   }
 
   .faq-img-wrapper {
