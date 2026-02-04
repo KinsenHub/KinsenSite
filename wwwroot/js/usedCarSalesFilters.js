@@ -247,7 +247,7 @@ function filterCards(filters) {
       showLoading();
       filteredCards.push(card);
       anyMatch = true;
-      hideLoading(800);
+      hideLoading(450);
     }
   });
 
@@ -830,7 +830,7 @@ function clearAllFilters() {
       currentPage = 1;
       paginateVisibleCars(cardsArray);
 
-      hideLoading(800);
+      hideLoading(450);
     }
 
     // 7) Καθάρισε τυχόν leftover backdrops/scroll locks
@@ -1128,6 +1128,10 @@ async function syncFavoriteHearts() {
 }
 
 document.addEventListener("DOMContentLoaded", syncFavoriteHearts);
+
+window.addEventListener("pageshow", () => {
+  syncFavoriteHearts();
+});
 
 // 👂 ΑΚΟΥΕΙ ΟΛΟ ΤΟ SITE
 document.addEventListener("favorites:changed", syncFavoriteHearts);

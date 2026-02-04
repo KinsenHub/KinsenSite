@@ -107,20 +107,29 @@ public class CarApiVisitorController : UmbracoApiController
         public string? InterestCode { get; set; }
     }
 
-    private async Task<string> ToBase64ImgTag(string url, string alt, int maxWidth = 300)
+    private async Task<string> ToBase64ImgTag(string url, string alt, int width = 300)
     {
         try
         {
             using var http = new HttpClient();
             var bytes = await http.GetByteArrayAsync(url);
             var base64 = Convert.ToBase64String(bytes);
-            return $"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"{alt}\" " +
-                $"style=\"display:block;width:100%;max-width:{maxWidth}px;height:auto;margin:0 auto;border:0;outline:none;\" />";
+
+            return $@"
+            <img 
+            src='data:image/jpeg;base64,{base64}'
+            alt='{alt}'
+            width='{width}'
+            style='display:block;height:auto;border:0;outline:none;text-decoration:none;' />";
         }
         catch
         {
-            // fallback αν αποτύχει
-            return $"<img src=\"{url}\" alt=\"{alt}\" style=\"display:block;width:100%;max-width:{maxWidth}px;height:auto;margin:0 auto;border:0;outline:none;\" />";
+            return $@"
+            <img 
+            src='{url}'
+            alt='{alt}'
+            width='{width}'
+            style='display:block;height:auto;border:0;outline:none;text-decoration:none;' />";
         }
     }
 
@@ -171,38 +180,6 @@ public class CarApiVisitorController : UmbracoApiController
         var hp = car.Value<string>("hp");
         var imageUrl = car.Value<MediaWithCrops>("carPic")?.Url();
 
-        // ---- LOGGING ----
-        Console.WriteLine("=== VISITOR DEBUG START ===");
-
-        // 1. Όλα τα properties του block
-        foreach (var p in car.Properties)
-        {
-            Console.WriteLine($"Property: {p.Alias} => {p.GetValue()}");
-        }
-
-        // 2. Raw τιμή του carPic
-        var rawPic = car.Value("carPic");
-        Console.WriteLine("RAW carPic value = " + rawPic);
-
-        // 3. Type του raw carPic
-        Console.WriteLine("RAW carPic TYPE = " + rawPic?.GetType().FullName);
-
-        // 4. MediaWithCrops attempt
-        var mediaCrops = car.Value<MediaWithCrops>("carPic");
-        Console.WriteLine("MediaWithCrops found? " + (mediaCrops != null ? "YES" : "NO"));
-        Console.WriteLine("MediaWithCrops Url: " + (mediaCrops?.Url() ?? "null"));
-
-        // 5. IPublishedContent attempt
-        var mediaIPC = car.Value<IPublishedContent>("carPic");
-        Console.WriteLine("IPublishedContent found? " + (mediaIPC != null ? "YES" : "NO"));
-        Console.WriteLine("IPublishedContent Url: " + (mediaIPC?.Url() ?? "null"));
-
-        // 6. Strong typed attempts on crop URLs
-        Console.WriteLine("GetCropUrl(): " + (mediaCrops?.GetCropUrl() ?? "null"));
-        Console.WriteLine("MediaUrl():   " + (mediaCrops?.MediaUrl() ?? "null"));
-
-        Console.WriteLine("=== VISITOR DEBUG END ===");
-
         // ---------- Base64 embed (inline) ----------
         string imgTag = string.Empty;
 
@@ -245,7 +222,7 @@ public class CarApiVisitorController : UmbracoApiController
                         bytes = await imageHttp.GetByteArrayAsync(carUrl);
                     }
                 }
-                catch { /* optional: log */ }
+                catch { }
 
                 if (bytes != null && bytes.Length > 0)
                 {
@@ -261,185 +238,43 @@ public class CarApiVisitorController : UmbracoApiController
                     };
 
                     var b64 = Convert.ToBase64String(bytes);
-                    imgTag =
-                        $"<img src='data:{mime};base64,{b64}' alt='{maker} {model}' width='560' " +
-                        "style='display:block;width:100%;max-width:560px;height:auto;border:0;outline:none;text-decoration:none;' />";
+                    imgTag = $@" <img src='data:{mime};base64,{b64}' alt='{maker} {model}' width='240' height='180' style='display:block;border:0;outline:none;text-decoration:none;object-fit:contain;' />";                
                 }
                 else
                 {
-                    // Fallback: absolute URL
-                    imgTag =
-                        $"<img src='{carUrl}' alt='{maker} {model}' width='560' " +
-                        "style='display:block;width:100%;max-width:560px;height:auto;border:0;outline:none;text-decoration:none;' />";
+                    imgTag = $@"
+                <img 
+                    src='{carUrl}'
+                    alt='{maker} {model}'
+                        width='240'
+                        height='180'
+                    style='display:block;border:0;outline:none;text-decoration:none;object-fit:contain;' />";
                 }
             }
             else
             {
-                // PRODUCTION: remote image (όπως στο logo)
-                imgTag =
-                    $"<img src='{carUrl}' alt='{maker} {model}' width='560' " +
-                    "style='display:block;width:100%;max-width:560px;height:auto;border:0;outline:none;text-decoration:none;' />";
+                imgTag = $@"
+                <img
+                    src='{carUrl}'
+                    alt='{maker} {model}'
+                    width='190'
+                    height='160'
+                    style='display:block;border:0;outline:none;text-decoration:none;object-fit:contain;' />";
+
             }
         }
 
 
         //****************LOGO Kinsen******************
         const string logoUrl = "https://production-job-board-public.s3.amazonaws.com/logos/43021810-0cfb-466e-b00c-46c05fd4b394";
-        var logoTag = await ToBase64ImgTag(logoUrl, "Kinsen", 250);
+        var logoTag = await ToBase64ImgTag(logoUrl, "Kinsen", 280);
 
-
-        //*********Αφορά την εικόνα του αυτοκινήτου που στέλνεται στη KINSEN*********//
-        var carImageUrlAbs = (!string.IsNullOrWhiteSpace(imageUrl) && Uri.IsWellFormedUriString(imageUrl, UriKind.Absolute))
-            ? imageUrl
-            : (!string.IsNullOrWhiteSpace(imageUrl) ? $"{Request.Scheme}://{Request.Host}{imageUrl}" : "");
-
-        // Τι εικόνα θα βάλουμε τελικά στο email που πάει στη Sales
-        // var salesImageHtml = !string.IsNullOrEmpty(imgTag)
-        //     ? imgTag // προτιμάμε το ήδη παραγμένο Base64 (inline)
-        //     : (string.IsNullOrWhiteSpace(carImageUrlAbs) 
-        //         ? "" 
-        //         : $"<img src='{carImageUrlAbs}' alt='{maker} {model}' width='480' style='display:block;width:100%;max-width:480px;height:auto;border:0;outline:none;text-decoration:none;'/>");
 
         // ✅ Απόδοση “πλάνου πληρωμής”
         var planText = (request.PaymentPlan == "efapaks") ? "Εφάπαξ" : $"{request.PaymentPlan} Μήνες";
         var interestText = (request.InterestCode == "toko") ? "Με τόκο" : "Χωρίς τόκους";
         var planDisplay = $"{planText} · {interestText}";
 
-        // // ================== EMAIL προς Sales (μπορείς να κρατήσεις attachment όπως πριν ή και τίποτα) ==================
-        // var subject = $"Αίτημα Προσφοράς: {request.FirstName} {request.LastName} για {maker} {model}";
-
-        // var body = $@"
-        // <!DOCTYPE html>
-        // <html>
-        // <head>
-        // <meta charset='utf-8'>
-        // <meta name='viewport' content='width=device-width'>
-        // </head>
-
-        // <body style='margin:0;padding:0;background:#ffffff;'>
-
-        // <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'
-        //     style='border-collapse:collapse;background:#ffffff;'>
-        // <tr>
-        //     <td align='left' style='padding:0;margin:0;'>
-
-        //     <!-- OUTER FIXED WRAPPER -->
-        //     <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
-        //             style='border-collapse:collapse;width:600px;max-width:600px;margin:0;'>
-
-        //         <!-- HEADER : LOGO + TITLE -->
-        //         <tr>
-        //         <td align='left' style='padding:0;margin:0;'>
-        //             <table role='presentation' border='0' cellspacing='0' cellpadding='0'
-        //                 style='border-collapse:collapse;margin:0;'>
-                    
-        //             <!-- LOGO -->
-        //             <tr>
-        //                 <td valign='middle'
-        //                     style='padding:0 12px 0 0;margin:0;'>
-        //                 {logoTag}
-        //                 </td>
-        //             </tr>
-
-        //             <!-- TITLE -->
-        //             <tr>
-        //                 <td valign='middle'
-        //                     style='padding-top:30px;margin:20;'>
-        //                 <span style='font-family:Segoe UI,Roboto,Arial,sans-serif;
-        //                             font-size:22px;
-        //                             font-weight:400;
-        //                             color:#39c0c3;
-        //                             line-height:1;
-        //                             white-space:nowrap; margin-top:30px;'>
-        //                     Νέο αίτημα προσφοράς:
-        //                 </span>
-        //                 </td>
-        //             </tr>
-        //             </table>
-        //         </td>
-        //         </tr>
-
-        //         <!-- SPACER -->
-        //         <tr><td height='15' style='line-height:15px;font-size:0;'>&nbsp;</td></tr>
-
-        //         <!-- CUSTOMER INFO -->
-        //         <tr>
-        //         <td align='left'
-        //             style='font-family:Segoe UI,Roboto,Arial,sans-serif;
-        //                     font-size:14px;
-        //                     color:#000;
-        //                     padding:0;margin:0;'>
-        //             <p style='margin:0 0 6px 0;'><strong>Πελάτης:</strong> {request.FirstName} {request.LastName}</p>
-        //             <p style='margin:0 0 6px 0;'><strong>Email:</strong> {request.Email}</p>
-        //             <p style='margin:0 0 6px 0;'><strong>Κινητό:</strong> {request.Phone}</p>
-        //             <p style='margin:0;'><strong>Πλάνο Πληρωμής:</strong> {planDisplay}</p>
-        //         </td>
-        //         </tr>
-
-        //         <!-- DIVIDER -->
-        //         <tr>
-        //         <td style='padding:15px 0;'>
-        //             <hr style='border:none;border-top:1px solid #ddd;margin:0;'>
-        //         </td>
-        //         </tr>
-
-        //         <!-- CAR INFO -->
-        //         <tr><td align='center' style='padding:20px;'>
-        //             <table role='presentation' border='0' cellspacing='0' cellpadding='0' align='center'
-        //                 style='margin:15px auto;width:100%;max-width:600px;border:1px solid #ccc;border-radius:10px;overflow:hidden;background:#ffffff;'>
-        //                 <tr>
-        //                     <!-- Εικόνα αριστερά -->
-        //                     <td width='240' align='center' style='height:180px;'>
-        //                         {imgTag}
-        //                     </td>
-
-        //                     <!-- Στοιχεία δεξιά -->
-        //                     <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
-        //                     <div style='font-size:18px;font-weight:700;margin-bottom:6px;color:#023859;'>{maker} {model}</div>
-
-        //                     <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
-        //                         <tr>
-        //                         <!-- Αριστερή στήλη (3) -->
-        //                         <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-right:10px;'>
-        //                             • {(string.IsNullOrWhiteSpace(year) ? "-" : year)}<br>
-        //                             • {(string.IsNullOrWhiteSpace(cc) ? "-" : cc + " cc")}<br>
-        //                             • {(string.IsNullOrWhiteSpace(hp) ? "-" : hp + " hp")}
-        //                         </td>
-
-        //                         <!-- Δεξιά στήλη (3) -->
-        //                         <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-left:10px;'>
-        //                             • {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")}<br>
-        //                             • {(string.IsNullOrWhiteSpace(fuel) ? "-" : fuel)}<br>
-        //                             • {(string.IsNullOrWhiteSpace(color) ? "-" : color)}
-        //                         </td>
-        //                         </tr>
-        //                     </table>
-
-        //                     <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{FormatPriceGr(price)} €</div>
-        //                     </td>
-        //                 </tr>
-        //             </table>
-        //             </td></tr>
-        //     </table>
-
-        //     </td>
-        // </tr>
-        // </table>
-
-        // </body>
-        // </html>";
-
-        // var msg = new EmailMessage(
-        //     null,
-        //     new[] { "Eirini.Skliri@kinsen.gr" },
-        //     null, null,
-        //     new[] { request.Email },
-        //     subject,
-        //     body,
-        //     true,
-        //     null // attachments προαιρετικά
-        // );
-        // await _emailSender.SendAsync(msg, "Offer");
 
         // ================== CRM INTERACTION ======================
         var crmPayload = new
@@ -447,7 +282,7 @@ public class CarApiVisitorController : UmbracoApiController
             FlowId = 2401, 
             AccountId = 0,
             CustomFields = Array.Empty<object>(),
-            Title = $"Αίτημα προσφοράς – {maker} {model}",
+            Title = $"Αίτημα προσφοράς – {maker} {model} {(year?.ToString() ?? "-")}",
             Id = 0,
             StatusId = 0,
             Account = new
@@ -458,21 +293,16 @@ public class CarApiVisitorController : UmbracoApiController
                 Name = request.FirstName,
                 Surname = request.LastName,
                 CompanyName = "-",
-                
-                Address = new
-                {
-                    City = "",
-                    Address = "",
-                    PostalCode = "",
-                    CountryCode = "GR",
-                    County = ""
-                },
                 CustomerType = "Visitor"
             },
-            Comments = $@"Αίτημα προσφοράς από επισκέπτη
-                        Όνομα: {request.FirstName} {request.LastName}
-                        Email: {request.Email}
-                        Τηλέφωνο: {request.Phone}"
+            Comments = $@"
+            <b>Αίτημα προσφοράς από επισκέπτη</b> <br><br>
+            <b>Ονοματεπώνυμο:</b> {request.FirstName} {request.LastName} <br>
+            <b>Email:</b> {request.Email} <br>
+            <b>Τηλέφωνο:</b> {request.Phone} <br> 
+            <b>Αυτοκίνητο:</b> {maker} {model} ({year}) <br>
+            {FormatPriceGr(price)} € 
+            "
         };
 
         using var http = new HttpClient
@@ -498,7 +328,7 @@ public class CarApiVisitorController : UmbracoApiController
         var cookiesUrl = $"{Request.Scheme}://{Request.Host}/cookies";
         var termsUrl = $"{Request.Scheme}://{Request.Host}/terms";
         
-        var customerSubject = "Λάβαμε το αίτημά σας – Kinsen";
+        var customerSubject = "📩 Επιβεβαίωση αιτήματος";
         var customerBody =  $@"
         <!doctype html>
         <html xmlns='http://www.w3.org/1999/xhtml'>
@@ -510,21 +340,20 @@ public class CarApiVisitorController : UmbracoApiController
         <body style='margin:0;padding:0;background:#ffffff;color:#000000;'>
             <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' style='padding:8px 0 20px 0;background:#ffffff;'>
             <tr><td align='center'>
-
-                <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0' style='width:600px;background:#ffffff;'>
-
+                <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0' style='width:600px;background:#ffffff;margin:0 auto;'>
                     <tr>
                         <td align='center' style='padding:8px 24px 6px 24px;'>
-                            <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='margin:0 auto; margin-bottom:20px;'>
-                                <tr>
-                                    <td align='left' style='padding:10px; width:180'>{logoTag}</td>
-                                </tr>
+                            <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='margin:0 0 20px 0;'>
+                            <tr>
+                                <td align='center' style='padding:14px 10px;'>
+                                {logoTag}
+                                </td>
+                            </tr>
                             </table>
                         </td>
                     </tr>
-
                     <tr>
-                    <td align='center' style='padding:0 24px 2px 24px;'> <div style='font-size:18px;line-height:1.2;font-weight:400;color:#39c0c3;;margin:10px;text-align:left;'>Σας ευχαριστούμε για το ενδιαφέρον σας!</div> </td>
+                    <td align='center' style='padding:0 24px 2px 24px;'> <div style='font-size:18px;line-height:1.2;font-weight:400;color:#39c0c3;;margin:10px;text-align:center;'>Σας ευχαριστούμε για το ενδιαφέρον σας!</div> </td>
                     </tr>
 
                     <tr>
@@ -537,43 +366,48 @@ public class CarApiVisitorController : UmbracoApiController
                         </td>
                     </tr>
 
-                    <tr><td align='center' style='padding:20px;'>
-                        <table role='presentation' border='0' cellspacing='0' cellpadding='0' align='center'
-                            style='margin:15px auto;width:100%;max-width:600px;border:1px solid #ccc;border-radius:10px;overflow:hidden;background:#ffffff;'>
-                        <tr>
-                            <!-- Εικόνα αριστερά -->
-                            <td width='220' align='center' style='height:180px;'>
-                                {imgTag}
-                            </td>
-
-                            <!-- Στοιχεία δεξιά -->
-                            <td style='padding:12px;vertical-align:top;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
-                            <div style='font-size:18px;font-weight:700;margin-bottom:6px;color:#023859;'>{maker} {model}</div>
-
-                            <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
-                                <tr>
-                                <!-- Αριστερή στήλη (3) -->
-                                <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-right:10px;'>
-                                    • {(string.IsNullOrWhiteSpace(year) ? "-" : year)}<br>
-                                    • {(string.IsNullOrWhiteSpace(cc) ? "-" : cc + " cc")}<br>
-                                    • {(string.IsNullOrWhiteSpace(hp) ? "-" : hp + " hp")}
+                    <tr><td align='left' style='padding:20px 24px;'>
+                        <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;max-width:600px;border:1px solid #ccc;border-radius:10px;background:#ffffff;'>
+                            <tr>
+                                <!-- ΑΡΙΣΤΕΡΑ: ΦΩΤΟ -->
+                                <td width='160' valign='top' style='padding:12px;'>
+                                    {imgTag}
                                 </td>
 
-                                <!-- Δεξιά στήλη (3) -->
-                                <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-left:10px;'>
-                                    • {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")}<br>
-                                    • {(string.IsNullOrWhiteSpace(fuel) ? "-" : fuel)}<br>
-                                    • {(string.IsNullOrWhiteSpace(color) ? "-" : color)}
-                                </td>
-                                </tr>
-                            </table>
+                                <!-- ΔΕΞΙΑ: ΣΤΟΙΧΕΙΑ -->
+                                <td valign='top' text-align:'center' style='padding:12px;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
 
-                            <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>{FormatPriceGr(price)} €</div>
-                            </td>
-                        </tr>
+                                    <div style='font-size:18px;font-weight:700;margin-bottom:10px;color:#023859;'>
+                                        {maker} {model}
+                                    </div>
+
+                                    <div style='font-size:14px;line-height:1.7;color:#333;margin-top:5px;'>
+                                    <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'>
+                                        <tr>
+                                        <!-- ΑΡΙΣΤΕΡΗ ΣΤΗΛΗ -->
+                                        <td valign='top' style='padding-right:10px;'>
+                                            • {(string.IsNullOrWhiteSpace(year) ? "-" : year)}<br>
+                                            • {(string.IsNullOrWhiteSpace(cc) ? "-" : cc + " cc")}<br>
+                                            • {(string.IsNullOrWhiteSpace(hp) ? "-" : hp + " hp")}<br>
+                                        </td>
+
+                                        <!-- ΔΕΞΙΑ ΣΤΗΛΗ -->
+                                        <td valign='top' style='padding-left:10px;'>
+                                            • {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")}<br>
+                                            • {(string.IsNullOrWhiteSpace(fuel) ? '-' : fuel)}<br>
+                                            • {(string.IsNullOrWhiteSpace(color) ? '-' : color)}
+                                        </td>
+                                        </tr>
+                                    </table>
+                                    </div>
+
+                                    <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>
+                                        {FormatPriceGr(price)} €
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </td></tr>
-
                     <tr>
                         <td align='center' style='padding:10px 24px 20px 24px;'>
                             <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-weight:700;font-size:16px;line-height:1.7;color:#023859;margin:8px 0 10px 0;'>
@@ -595,16 +429,16 @@ public class CarApiVisitorController : UmbracoApiController
                             </div>
                         </td>
                     </tr>
-
                 </table>
-
             </td></tr>
             </table>
         </body>
         </html>";
 
+        var from = "KINSEN <no-reply@kinsen.gr>";
+
         var customerMsg = new EmailMessage(
-            null,
+            from,
             new[] { request.Email },
             null, null,
             new[] { "Eirini.Skliri@kinsen.gr" },
@@ -620,9 +454,3 @@ public class CarApiVisitorController : UmbracoApiController
         return Ok(new { ok = true });
     }
 }
-
-// Μοντέλο για το GetCarById
-// public class CarRequest
-// {
-//     public int Id { get; set; }
-// }

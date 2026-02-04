@@ -150,7 +150,7 @@
                     </div>
 
                     <div class="d-flex gap-8 justify-content-center mt-4">
-                        <button type="button" class="btn btn-lg saveBtn" style="background:#023859; color:white;" onclick="saveProfile()">Αποθήκευση</button>
+                        <button type="button" class="btn btn-lg saveBtn"  style="background:#023859; color:white;" onclick="saveProfile()">Αποθήκευση</button>
                     </div>
                     <div class="form-message d-flex gap-3 justify-content-center mt-4" id="formMsg" aria-live="polite"></div>
                 </form>
@@ -166,13 +166,12 @@ function showFormMsg(text, type) {
   const el = document.getElementById("formMsg");
   if (!el) return;
 
-  // καθάρισε παλιό timer
   if (msgTimer) clearTimeout(msgTimer);
 
   el.classList.remove("success", "error");
-  el.classList.add(type);
   el.textContent = text;
-  el.style.display = "block";
+  el.classList.add(type);
+  el.style.display = "flex";
 
   msgTimer = setTimeout(() => {
     el.style.display = "none";
@@ -183,7 +182,7 @@ function showFormMsg(text, type) {
 
 async function saveProfile() {
   const form = document.getElementById("profileForm");
-  const btn = document.getElementById("saveBtn");
+  const btn  = document.querySelector(".saveBtn"); // 👈 ΠΙΟ ΑΣΦΑΛΕΣ
   const formData = new FormData(form);
 
   try {
@@ -198,9 +197,15 @@ async function saveProfile() {
     const data = await res.json().catch(() => null);
 
     if (res.ok && data?.success) {
-      showFormMsg(data.message || "Οι αλλαγές αποθηκεύτηκαν με επιτυχία!", "success");
+      showFormMsg(
+        data.message || "Οι αλλαγές αποθηκεύτηκαν με επιτυχία!",
+        "success"
+      );
     } else {
-      showFormMsg(data?.message || "Κάτι πήγε λάθος. Δοκιμάστε ξανά.", "error");
+      showFormMsg(
+        data?.message || "Κάτι πήγε λάθος. Δοκιμάστε ξανά.",
+        "error"
+      );
     }
 
   } catch (e) {
@@ -210,6 +215,7 @@ async function saveProfile() {
     if (btn) btn.disabled = false;
   }
 }
+
 </script>
 
 

@@ -33,7 +33,7 @@ setTimeout(() => {
     priceText
       .replace(/\./g, "") // remove thousands dot
       .replace(",", ".") // decimal comma -> dot
-      .replace(/[^\d.]/g, "") // keep digits + dot
+      .replace(/[^\d.]/g, ""), // keep digits + dot
   );
 
   const formatEUR = (n) =>
@@ -52,7 +52,7 @@ setTimeout(() => {
 
   // carId για αποθήκευση
   const carId = Number(
-    document.querySelector("[data-car-id]")?.dataset.carId || 0
+    document.querySelector("[data-car-id]")?.dataset.carId || 0,
   );
 
   // κρατάμε σε μνήμη τι έχει διαλέξει ο χρήστης
@@ -79,7 +79,7 @@ setTimeout(() => {
         };
         sessionStorage.setItem(
           "installmentsByCar",
-          JSON.stringify(window.installmentsByCar)
+          JSON.stringify(window.installmentsByCar),
         );
       }
       return;
@@ -106,7 +106,7 @@ setTimeout(() => {
 
     // ✅ κόμμα στα δεκαδικά (el-GR)
     resultSpan.innerHTML = `<strong>${formatEUR(
-      perMonth
+      perMonth,
     )} €</strong> / μήνα (με ΦΠΑ)`;
 
     // αποθήκευση
@@ -119,7 +119,7 @@ setTimeout(() => {
       };
       sessionStorage.setItem(
         "installmentsByCar",
-        JSON.stringify(window.installmentsByCar)
+        JSON.stringify(window.installmentsByCar),
       );
     }
   };
@@ -193,7 +193,6 @@ async function updateCartBadgeFromServer() {
     const { count } = await CartAPI.count();
     const el = document.getElementById("offerCartCount");
     if (el) el.textContent = String(count);
-    console.log("[Cart][badge]", count);
   } catch (e) {
     console.warn("[Cart][badge] error:", e);
   }
@@ -208,8 +207,8 @@ function normalizeCar(c) {
     typeof c?.id === "number"
       ? c.id
       : /^\d+$/.test(String(c?.id ?? c?.Id ?? c?.carId ?? c?.carID ?? ""))
-      ? parseInt(String(c.id ?? c.Id ?? c.carId ?? c.carID), 10)
-      : null;
+        ? parseInt(String(c.id ?? c.Id ?? c.carId ?? c.carID), 10)
+        : null;
 
   const maker = String(c?.maker ?? c?.Maker ?? "").trim(); // <- maker (σωστό)
   const model = String(c?.model ?? c?.Model ?? "").trim();
@@ -301,7 +300,7 @@ function showToast(text, type = "info") {
 async function cartContains(id) {
   const r = await fetch(
     `/umbraco/api/cart/contains?id=${encodeURIComponent(id)}`,
-    { credentials: "same-origin" }
+    { credentials: "same-origin" },
   );
   if (!r.ok) return false;
   const data = await r.json().catch(() => ({}));
@@ -309,11 +308,9 @@ async function cartContains(id) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("✅ carDetails loaded");
-
   // Βρες ID (session/query/data-attr)
   const btnProbe = document.querySelector(
-    "#addToCartBtn button, .addToCartBtn"
+    "#addToCartBtn button, .addToCartBtn",
   );
   const id =
     (sessionStorage.getItem("selectedCarId") || "").trim() ||
@@ -328,7 +325,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     window.CURRENT_CAR = await fetchCarById(id);
-    console.log("✅ Loaded from API:", window.CURRENT_CAR);
   } catch (err) {
     console.error("❌ API error:", err);
     await updateCartBadgeFromServer();
@@ -364,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (window.CURRENT_CAR?.id ?? "").toString().trim() ||
           (sessionStorage.getItem("selectedCarId") || "").trim() ||
           (new URLSearchParams(location.search).get("id") || "").trim() ||
-          (btn.getAttribute("data-car-id") || "").trim()
+          (btn.getAttribute("data-car-id") || "").trim(),
       );
 
       if (!id) {
@@ -404,12 +400,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         perMonth: perMonthNum,
       };
 
-      console.log(
-        "👉 POST /umbraco/api/cart/add payload:",
-        payload,
-        JSON.stringify(payload)
-      );
-
       try {
         const already = await cartContains(id); // ή await CartAPI.contains(id)
         const cartMsg = document.getElementById("cartMsg");
@@ -439,16 +429,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const before = getCartBadgeCount();
         setCartBadgeCount(before + 1);
         window.dispatchEvent(
-          new CustomEvent("cart:updated", { detail: { count: before + 1 } })
+          new CustomEvent("cart:updated", { detail: { count: before + 1 } }),
         );
 
         // Κλήση στο API
         const res = await CartAPI.add(payload); // { count, items }
-        console.log("📦 server cart:", res);
 
         setCartBadgeCount(res.count);
         window.dispatchEvent(
-          new CustomEvent("cart:updated", { detail: { count: res.count } })
+          new CustomEvent("cart:updated", { detail: { count: res.count } }),
         );
 
         cartMsg.textContent = "Το αυτοκίνητο προστέθηκε στο καλάθι σου.";
@@ -477,13 +466,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         ) {
           showToast(
             "Το συγκεκριμένο αυτοκίνητο υπάρχει ήδη στο καλάθι σου.",
-            "warning"
+            "warning",
           );
           // αν ο server έστειλε count, συγχρόνισε
           if (typeof err.count === "number") {
             setCartBadgeCount(err.count);
             window.dispatchEvent(
-              new CustomEvent("cart:updated", { detail: { count: err.count } })
+              new CustomEvent("cart:updated", { detail: { count: err.count } }),
             );
           }
           return;
@@ -495,11 +484,82 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.dispatchEvent(
           new CustomEvent("cart:updated", {
             detail: { count: getCartBadgeCount() },
-          })
+          }),
         );
         console.error("❌ add error:", err);
       }
     },
-    true
+    true,
   );
 });
+
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".favBtn");
+  if (!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const carId = Number(btn.dataset.carId);
+  if (!carId) return;
+
+  try {
+    const r = await fetch("/umbraco/api/favorites/toggle", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ carId }),
+    });
+
+    if (!r.ok) throw new Error(await r.text());
+
+    const { isFavorite } = await r.json();
+
+    // ✅ UI update ΑΠΟΚΛΕΙΣΤΙΚΑ από server response
+    btn.classList.toggle("is-favorite", isFavorite);
+
+    const icon = btn.querySelector("i");
+    if (icon) {
+      icon.className = isFavorite ? "fa-solid fa-heart" : "fa-regular fa-heart";
+    }
+
+    // 🔔 ενημέρωση παντού
+    document.dispatchEvent(
+      new CustomEvent("favorites:changed", { detail: { carId, isFavorite } }),
+    );
+  } catch (err) {
+    console.error("Favorite toggle error:", err);
+  }
+});
+
+async function syncFavoriteHearts() {
+  try {
+    const r = await fetch("/umbraco/api/favorites/ids", {
+      credentials: "same-origin",
+    });
+    if (!r.ok) return;
+
+    const ids = await r.json(); // [12,45,88]
+
+    document.querySelectorAll(".favBtn").forEach((btn) => {
+      const id = Number(btn.dataset.carId);
+      const isFav = ids.includes(id);
+
+      btn.classList.toggle("is-favorite", isFav);
+
+      const icon = btn.querySelector("i");
+      if (icon) {
+        icon.className = isFav ? "fa-solid fa-heart" : "fa-regular fa-heart";
+      }
+    });
+  } catch (e) {
+    console.warn("syncFavoriteHearts failed", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", syncFavoriteHearts);
+
+window.addEventListener("pageshow", () => {
+  syncFavoriteHearts();
+});
+document.addEventListener("favorites:changed", syncFavoriteHearts);

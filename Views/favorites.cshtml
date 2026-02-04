@@ -119,6 +119,10 @@ async function loadFavorites() {
 
 document.addEventListener("DOMContentLoaded", loadFavorites);
 
+window.addEventListener("pageshow", () => {
+  loadFavorites();
+});
+
 // ❤️ Toggle / Remove
 document.addEventListener("click", async (e) => {
   const btn = e.target.closest(".favorite-btn");

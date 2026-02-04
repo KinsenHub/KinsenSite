@@ -38,25 +38,6 @@ namespace Kinsen.Web.Api
         [HttpGet("count")]
         public IActionResult Count() => Ok(new { count = GetCart().Count });
 
-        // [HttpPost("add")]
-        // public IActionResult Add([FromBody] CartItem item)
-        // {
-        //     if (item == null || string.IsNullOrWhiteSpace(item.Id))
-        //         return BadRequest("Invalid item");
-
-        //     item.Maker   = (item.Maker ?? item.Make ?? "").Trim();
-        //     item.Make    = null; // legacy
-        //     item.Model   = (item.Model ?? "").Trim();
-        //     item.AddedAt = item.AddedAt == 0 ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : item.AddedAt;
-
-        //     var cart = GetCart();
-        //     var idx = cart.FindIndex(x => x.Id == item.Id);
-        //     if (idx == -1) cart.Add(item); else cart[idx] = item;
-
-        //     SaveCart(cart);
-        //     return Ok(new { count = cart.Count, items = cart });
-        // }
-
         [HttpPost("add")]
         public IActionResult Add([FromBody] CartItem item)
         {

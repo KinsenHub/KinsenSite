@@ -20,13 +20,11 @@ async function renderCart() {
       cache: "no-store",
       credentials: "same-origin",
     });
-    console.log("[Cart] GET status:", r.status);
+
     if (!r.ok) throw new Error("API " + r.status);
     const items = await r.json();
-    console.log("[Cart] GET items:", items);
 
     if (!Array.isArray(items) || items.length === 0) {
-      console.log("[Cart] → EMPTY VIEW");
       totalEl && (totalEl.textContent = "0");
       footer?.classList.add("d-none");
       return;
@@ -207,233 +205,99 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-// ===== Helper validation για το modal του καλαθιού =====
-const __isValidEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s || "");
-const __normalizeGreekMobile = (s) => {
-  let d = (s || "").replace(/\D/g, "");
-  if (d.startsWith("0030")) d = d.slice(4);
-  else if (d.startsWith("30")) d = d.slice(2);
-  return d; // 69XXXXXXXX
-};
-const __isValidGreekMobile = (s) => /^69\d{8}$/.test(__normalizeGreekMobile(s));
-
-// ===== Άνοιγμα modal όταν πατηθεί "Ζήτα προσφορά" =====
 document.addEventListener("click", async (e) => {
-  const proceed = e.target.closest("#proceedBtn");
-  if (!proceed) return;
+  const btn = e.target.closest("#cartSubmitOfferBtn");
+  if (!btn) return;
 
   e.preventDefault();
 
-  // αν για κάποιο λόγο το καλάθι είναι άδειο, σταμάτα
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Αποστολή...`;
+
   try {
     const r = await fetch("/umbraco/api/cart/get", {
       cache: "no-store",
       credentials: "same-origin",
     });
-    if (!r.ok) throw new Error("API " + r.status);
+    if (!r.ok) throw new Error("Cart fetch failed");
+
     const items = await r.json();
     if (!Array.isArray(items) || items.length === 0) {
+      btn.disabled = false;
+      btn.textContent = originalText;
       alert("Το καλάθι είναι άδειο.");
       return;
     }
-  } catch (err) {
-    console.error("❌ proceedBtn error:", err);
-    return;
-  }
 
-  const modalEl = document.getElementById("#offerModalfromCart");
-  if (window.bootstrap && modalEl) {
-    (
-      bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl)
-    ).show();
-  }
-});
-
-const formEl = document.getElementById("offerForm");
-const modalEl = document.getElementById("offerModalfromCart");
-const statusEl = document.getElementById("offerStatus");
-
-// ===== Υποβολή προσφοράς από το modal του καλαθιού =====
-document.addEventListener("click", async (e) => {
-  const submitBtn = e.target.closest("#offerSubmitBtnCart");
-  if (!submitBtn) return;
-  e.preventDefault();
-
-  const firstName = document.getElementById("firstName")?.value.trim() || "";
-  const lastName = document.getElementById("lastName")?.value.trim() || "";
-  const email = document.getElementById("email")?.value.trim() || "";
-  const phone = document.getElementById("phone")?.value.trim() || "";
-
-  // helpers: __isValidEmail, __isValidGreekMobile, __normalizeGreekMobile πρέπει να υπάρχουν
-  const emailOk = __isValidEmail(email);
-  const phoneOk = __isValidGreekMobile(phone);
-  const normalizedPhone = phoneOk
-    ? `+30${__normalizeGreekMobile(phone)}`
-    : phone;
-
-  // Διόρθωση IDs στα invalid states (όχι co_email/co_phone)
-  document.getElementById("email")?.classList.toggle("is-invalid", !emailOk);
-  document.getElementById("phone")?.classList.toggle("is-invalid", !phoneOk);
-
-  if (!firstName || !lastName || !emailOk || !phoneOk) {
-    if (statusEl) {
-      statusEl.textContent = "Συμπληρώστε σωστά όλα τα πεδία.";
-      statusEl.className = "small text-danger";
-    }
-    return;
-  }
-
-  // πάρε τα items του καλαθιού
-  let items = [];
-  try {
-    const r = await fetch("/umbraco/api/cart/get", {
-      cache: "no-store",
-      credentials: "same-origin",
-    });
-    if (!r.ok) throw new Error("API " + r.status);
-    items = await r.json();
-  } catch (err) {
-    console.error("❌ get items error:", err);
-    if (statusEl) {
-      statusEl.textContent = "Αποτυχία φόρτωσης καλαθιού.";
-      statusEl.className = "small text-danger";
-    }
-    return;
-  }
-
-  const carIds = [
-    ...new Set(
-      (items || [])
-        .map((x) => Number(x.carId ?? x.id ?? 0))
-        .filter((n) => Number.isInteger(n) && n > 0),
-    ),
-  ];
-
-  if (carIds.length === 0) {
-    if (statusEl) {
-      statusEl.textContent = "Δεν βρέθηκαν έγκυρα IDs οχημάτων στο καλάθι.";
-      statusEl.className = "small text-danger";
-    }
-    return;
-  }
-
-  const payload = {
-    firstName,
-    lastName,
-    email,
-    phone: normalizedPhone,
-    cars: items.map((x) => ({
-      id: String(x.id ?? ""),
-      maker: x.maker ?? "",
-      model: x.model ?? "",
-      priceText: x.priceText ?? "",
-      img: x.img ?? "",
-      year: typeof x.year === "number" ? x.year : null,
-      km: typeof x.km === "number" ? x.km : null,
-      fuel: x.fuel ?? "",
-      cc: typeof x.cc === "number" ? x.cc : null,
-      hp: typeof x.hp === "number" ? x.hp : null,
-      color: x.color ?? "",
-    })),
-  };
-
-  const original = submitBtn.textContent;
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Αποστολή`;
-  if (statusEl) statusEl.textContent = "";
-
-  setTimeout(async () => {
-    try {
-      const r = await fetch("/umbraco/api/modaloffermemberapi/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: "same-origin",
-      });
-
-      if (!r.ok) throw new Error(await r.text());
-      const res = await r.json(); // { ok: true }
-
-      const successNote = document.getElementById("offerSuccessNote");
-      if (successNote) {
-        successNote.style.display = "block";
-        successNote.classList.add("offer-success-note");
-      }
-
-      // ⏳ δώσε χρόνο να το διαβάσει
-      await new Promise((r) => setTimeout(r, 2000));
-
-      // 🔥 διακριτικό fade out
-      if (successNote) {
-        successNote.classList.add("fade-out");
-      }
-
-      await new Promise((r) => setTimeout(r, 800));
-
-      // animation στο modal
-      modalEl
-        .querySelector(".modal-content")
-        ?.style.setProperty("animation", "modalFadeOut 0.25s ease-in");
-
-      // ✅ Κλείσιμο modal
-      await waitModalHidden(modalEl);
-
-      // reset
-      document.getElementById("offerForm")?.reset();
-      if (modalEl) {
-        modalEl.addEventListener("show.bs.modal", () => {
-          const note = document.getElementById("offerSuccessNote");
-          if (note) note.style.display = "none";
-          note.classList.remove("offer-success-note");
-        });
-      }
-
-      // καθάρισε καλάθι
-      await fetch("/umbraco/api/cart/clear", { method: "POST" });
-
-      // ενημέρωσε badge + UI
-      window.dispatchEvent(
-        new CustomEvent("cart:updated", { detail: { count: 0 } }),
-      );
-      await window.updateCartBadgeFromServer?.();
-      await window.renderCart?.();
-    } catch (err) {
-      console.error("❌ submit offer error:", err);
-      if (statusEl) {
-        statusEl.style.display = "block";
-        statusEl.textContent = "Κάτι πήγε στραβά. Προσπαθήστε ξανά.";
-        statusEl.className = "small mt-2 text-danger";
-      }
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = original;
-      clearUiOverlays();
-    }
-  }, 1000);
-});
-
-// Ασφάλεια να μη γίνει submit με reload
-document.addEventListener("submit", (e) => {
-  if (e.target?.id === "offerForm") e.preventDefault();
-});
-
-window.addEventListener("beforeunload", () => {
-  sessionStorage.removeItem("selectedCarId");
-});
-
-// Ειναι μετα την αποστολή της προσφοράς να μην μαυριζει η οθονη στον χρηστη και παγωνουν ολα
-function waitModalHidden(modalEl) {
-  return new Promise((resolve) => {
-    if (!modalEl || !window.bootstrap || !bootstrap.Modal) return resolve();
-    const onHidden = () => {
-      modalEl.removeEventListener("hidden.bs.modal", onHidden);
-      resolve();
+    const payload = {
+      cars: items.map((x) => ({
+        maker: x.maker ?? "",
+        model: x.model ?? "",
+        priceText: x.priceText ?? "",
+        img: x.img ?? "",
+        year: typeof x.year === "number" ? x.year : null,
+        km: typeof x.km === "number" ? x.km : null,
+        fuel: x.fuel ?? "",
+        cc: typeof x.cc === "number" ? x.cc : null,
+        hp: typeof x.hp === "number" ? x.hp : null,
+        color: x.color ?? "",
+      })),
     };
-    modalEl.addEventListener("hidden.bs.modal", onHidden, { once: true });
-    const inst = bootstrap.Modal.getOrCreateInstance(modalEl);
-    inst.hide();
-  });
-}
+
+    const send = await fetch("/umbraco/api/modaloffermemberapi/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(payload),
+    });
+
+    if (!send.ok) throw new Error(await send.text());
+
+    // ✅ SUCCESS message μέσα στο κουμπί
+    btn.innerHTML = `✓ Θα ενημερωθείτε σύντομα με email`;
+    btn.classList.add("btn-success");
+
+    // ✅ καθάρισε καλάθι (backend)
+    await CartAPI.clear();
+
+    // ✅ ενημέρωσε cart icon
+    window.dispatchEvent(
+      new CustomEvent("cart:updated", { detail: { count: 0 } }),
+    );
+
+    // ✅ ΚΑΘΑΡΙΣΕ UI ΚΑΛΑΘΙΟΥ
+    const hasItems = document.getElementById("cartHasItems");
+    const emptyBox = document.getElementById("cartEmpty");
+
+    // κρύψε ΟΛΟ το section με τα αυτοκίνητα
+    if (hasItems) hasItems.classList.add("d-none");
+
+    // δείξε το empty state
+    if (emptyBox) emptyBox.classList.remove("d-none");
+
+    // ❌ ΜΗΝ ξαναστείλει
+    btn.style.display = "none";
+
+    // ⏳ κράτα το μήνυμα 2.5 sec και γύρνα στο default
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }, 3000);
+  } catch (err) {
+    console.error("❌ Offer error:", err);
+
+    // ❌ ERROR state μέσα στο κουμπί
+    btn.innerHTML = `✗ Αποτυχία. Ξανά δοκιμή`;
+    btn.classList.add("btn-danger");
+
+    setTimeout(() => {
+      btn.classList.remove("btn-danger");
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }, 2500);
+  }
+});
 
 // Fail-safe καθάρισμα από τυχόν overlays/backdrops/lock scroll που έμειναν
 function clearUiOverlays() {

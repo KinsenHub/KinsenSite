@@ -41,6 +41,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 500);
 });
 
+const requestOfferBtn = document.querySelector(".requestOfferBtn");
+const carId =
+  parseInt(sessionStorage.getItem("selectedCarId") || "0", 10) ||
+  parseInt(new URLSearchParams(location.search).get("id") || "0", 10) ||
+  parseInt(document.querySelector("[data-car-id]")?.dataset.carId || "0", 10);
+
+if (!carId) {
+  console.error("❌ Δεν βρέθηκε έγκυρο CarId");
+} else if (localStorage.getItem(`offer_sent_${carId}`)) {
+  lockOfferButton();
+}
+
 (function () {
   const API_BASE = "/umbraco/api/CarApiVisitor";
   if (window.__offerBtnBound) return;
@@ -74,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector(".custom-dropdown-button");
       if (ddBtn) {
         ddBtn.textContent = label;
-        ddBtn.dataset.plan = val; // 👈 κρατάμε την επιλογή εδώ
+        ddBtn.dataset.plan = val;
       }
       return;
     }
@@ -83,19 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const statusEl = document.getElementById("offerStatus");
 
     if (!btn) return;
-
-    const carId =
-      parseInt(sessionStorage.getItem("selectedCarId") || "0", 10) ||
-      parseInt(new URLSearchParams(location.search).get("id") || "0", 10) ||
-      parseInt(
-        document.querySelector("[data-car-id]")?.dataset.carId || "0",
-        10,
-      );
-
-    if (!carId) {
-      console.error("❌ Δεν βρέθηκε έγκυρο CarId");
-      return;
-    }
 
     const firstName = document.getElementById("firstName")?.value.trim() || "";
     const lastName = document.getElementById("lastName")?.value.trim() || "";
@@ -170,60 +169,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
 
-        // ============================
-        // 2️⃣ FETCH → CRM (INTERACTION)
-        // ============================
-        // const crmPayload = {
-        //   FlowId: 2401,
-        //   AccountId: 0,
-        //   Id: 0,
-        //   StatusId: 0,
-        //   Title: `Αίτημα προσφοράς – ${maker} ${model}`,
-        //   Comments:
-        //     `Αίτημα προσφοράς από επισκέπτη\n` +
-        //     `Όνομα: ${firstName} ${lastName}\n` +
-        //     `Email: ${email}\n` +
-        //     `Τηλέφωνο: ${phone}\n\n` +
-        //     `Όχημα: ${maker} ${model}\n` +
-        //     `Τιμή: ${priceText}\n` +
-        //     `Πλάνο: ${paymentPlan}`,
-
-        //   Account: {
-        //     Email: email,
-        //     AFM: "",
-        //     PhoneNumber: normalizedPhone,
-        //     Name: firstName,
-        //     Surname: lastName,
-        //     CompanyName: "",
-        //     CustomerType: "Visitor",
-        //     Address: {
-        //       City: "",
-        //       Address: "",
-        //       PostalCode: "",
-        //       CountryCode: "GR",
-        //       County: "",
-        //     },
-        //   },
-
-        //   CustomFields: [],
-        // };
-
-        // const crmRes = await fetch(
-        //   "https://kineticsuite.saracakis.gr/api/InteractionAPI/CreateInteraction",
-        //   {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify(crmPayload),
-        //   },
-        // );
-
-        // if (!crmRes.ok) {
-        //   console.error("CRM ERROR:", await crmRes.text());
-        // }
-
         const successNote = document.getElementById("offerSuccessNote");
         if (successNote) {
           successNote.style.display = "block";
+          localStorage.setItem(`offer_sent_${carId}`, "true");
+          lockOfferButton();
         }
 
         // ⏳ χρόνος να διαβαστεί
@@ -249,6 +199,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // reset
         document.getElementById("offerForm")?.reset();
+
+        if (localStorage.getItem(`offer_sent_${carId}`)) {
+          e.preventDefault();
+          lockOfferButton();
+          return;
+        }
 
         if (modalEl) {
           modalEl.addEventListener("show.bs.modal", () => {
@@ -276,6 +232,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target?.id === "offerForm") e.preventDefault();
   });
 })();
+
+function lockOfferButton() {
+  const btn = document.querySelector(".requestOfferBtn");
+  if (!btn) return;
+
+  btn.textContent = "Το email εστάλη";
+  btn.disabled = true;
+  btn.style.cursor = "not-allowed";
+  btn.style.opacity = "0.7";
+  btn.style.pointerEvents = "none";
+  btn.style.fontWeight = "300";
+}
 
 // Ειναι μετα την αποστολή της προσφοράς να μην μαυριζει η οθονη στον χρηστη και παγωνουν ολα
 function waitModalHidden(modalEl) {

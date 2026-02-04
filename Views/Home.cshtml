@@ -319,51 +319,74 @@ function selectCategory(type) {
 document.addEventListener("DOMContentLoaded", () => {
 
   const track = document.querySelector(".tesla-track");
+  if (!track) return;
 
-  if (!track) {
-    console.error("TESLA CAROUSEL: δεν βρέθηκε track");
-    return;
-  }
-
-  // ✅ GUARD – ΣΤΑΜΑΤΑ ΤΟ ΔΙΠΛΟ INIT
   if (track.dataset.inited === "true") return;
   track.dataset.inited = "true";
 
-  // ⛔ ΠΑΙΡΝΟΥΜΕ ΜΟΝΟ ΤΙΣ ORIGINAL ΚΑΡΤΕΣ
-  const cards = Array.from(track.querySelectorAll(".tesla-card:not(.clone)"));
-  console.log(cards);
-  const prev  = document.querySelector(".tesla-arrow.prev");
-  const next  = document.querySelector(".tesla-arrow.next");
+  const prev = document.querySelector(".tesla-arrow.prev");
+  const next = document.querySelector(".tesla-arrow.next");
 
-  if (!cards.length || !prev || !next) {
-    console.error("TESLA CAROUSEL: λείπουν στοιχεία");
-    return;
-  }
+  const originalCards = Array.from(track.children);
+  const realCount = originalCards.length;
+
+  if (!realCount || !prev || !next) return;
 
   const gap = 24;
   let index = 0;
   let isAnimating = false;
 
   const cardWidth = () =>
-    cards[0].getBoundingClientRect().width + gap;
+    originalCards[0].getBoundingClientRect().width + gap;
 
-  const realCardsCount = cards?.length;
   const wrapper = track.closest(".tesla-carousel-wrapper");
-    function updateArrowsVisibility(){
-        if (window.innerWidth >= 2500 && realCardsCount >= 4) {
-        wrapper?.classList.remove("hide-arrows");
-        } 
-        else {
-        wrapper?.classList.add("hide-arrows");
-        console.log(wrapper);
-        console.log("mpike");
-        }
-    }
- updateArrowsVisibility();
-  window.addEventListener("resize", updateArrowsVisibility);
 
-  function move() {
-    track.style.transition = "transform 0.6s ease";
+  // =========================
+  // ❌ ΧΩΡΙΣ INFINITE (≤3)
+  // =========================
+  if (realCount < 4) {
+
+    // ❌ ΚΡΥΨΕ ΒΕΛΑΚΙΑ
+    prev.style.display = "none";
+    next.style.display = "none";
+
+    // ❌ ΚΑΜΙΑ ΚΙΝΗΣΗ
+    track.style.transform = "none";
+    track.style.transition = "none";
+
+    // προαιρετικό: καθάρισε inline gap issues
+    track.style.justifyContent = "center";
+
+    // ❌ ΜΗΝ ΣΥΝΔΕΕΙΣ EVENTS
+    return;
+    }
+
+  // =========================
+  // ✅ INFINITE (≥4)
+  // =========================
+
+  index = realCount;
+
+  originalCards.forEach(card => {
+    const clone = card.cloneNode(true);
+    clone.classList.add("clone");
+    track.appendChild(clone);
+  });
+
+  originalCards.slice().reverse().forEach(card => {
+    const clone = card.cloneNode(true);
+    clone.classList.add("clone");
+    track.prepend(clone);
+  });
+
+  track.style.transform =
+    `translateX(-${index * cardWidth()}px)`;
+
+  function move(withTransition = true) {
+    track.style.transition = withTransition
+      ? "transform 0.6s ease"
+      : "none";
+
     track.style.transform =
       `translateX(-${index * cardWidth()}px)`;
   }
@@ -373,41 +396,44 @@ document.addEventListener("DOMContentLoaded", () => {
     isAnimating = true;
 
     index++;
-    move();
+    move(true);
 
-    if (index === realCardsCount) {
-      setTimeout(() => {
-        track.style.transition = "none";
-        index = 0;
-        track.style.transform = "translateX(0)";
-        isAnimating = false;
-      }, 600);
-    } else {
-      setTimeout(() => isAnimating = false, 600);
-    }
+    setTimeout(() => {
+      if (index >= realCount * 2) {
+        index = realCount;
+        move(false);
+      }
+      isAnimating = false;
+    }, 600);
   });
 
   prev.addEventListener("click", () => {
     if (isAnimating) return;
     isAnimating = true;
 
-    if (index === 0) {
-      track.style.transition = "none";
-      index = realCardsCount;
-      track.style.transform =
-        `translateX(-${index * cardWidth()}px)`;
-    }
+    index--;
+    move(true);
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        track.style.transition = "transform 0.6s ease";
-        index--;
-        track.style.transform =
-          `translateX(-${index * cardWidth()}px)`;
-        setTimeout(() => isAnimating = false, 600);
-      });
-    });
+    setTimeout(() => {
+      if (index < realCount) {
+        index = realCount * 2 - 1;
+        move(false);
+      }
+      isAnimating = false;
+    }, 600);
   });
+
+  // arrows visibility (όπως είχες)
+  function updateArrowsVisibility() {
+    if (window.innerWidth >= 2500 && realCount >= 4) {
+      wrapper?.classList.remove("hide-arrows");
+    } else {
+      wrapper?.classList.add("hide-arrows");
+    }
+  }
+
+  updateArrowsVisibility();
+  window.addEventListener("resize", updateArrowsVisibility);
 });
 
 </script>
