@@ -23,51 +23,47 @@ namespace KinsenOfficial.Controllers
             _logger = logger;
         }
 
-        [HttpPost("login")] // Κάνει POST στο /umbraco/api/member/login
-
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        { // Δέχεται δεδομένα JSON ([FromBody]) με email & password
-            var member = await _memberManager.FindByEmailAsync(request.Email); // Ψάχνει τον χρήστη με βάση το email
-            if (member == null) // Αν δεν υπάρχει ο χρήστης
+        {
+            if (string.IsNullOrWhiteSpace(request.Email) ||
+                string.IsNullOrWhiteSpace(request.Password))
             {
-                return Unauthorized(new { success = false, message = "Ο χρήστης δεν υπάρχει." });
+                return BadRequest(new { success = false, message = "Συμπλήρωσε email και κωδικό." });
             }
 
-            if (!member.IsApproved) // Αν ο λογαριασμός είναι μη εγκεκριμένος, μπλοκάρει την είσοδο.
-            {
-                return Unauthorized(new { success = false, message = "Μη εγκεκριμένος λογαριασμός." });
-            }
-
-            // Αν ο λογαριασμός είναι μη εγκεκριμένος, μπλοκάρει την είσοδο.
-            var isValidPassword = await _memberManager.CheckPasswordAsync(member, request.Password);
-            if (!isValidPassword)
+            var member = await _memberManager.FindByEmailAsync(request.Email);
+            if (member == null)
             {
                 return Unauthorized(new { success = false, message = "Λάθος email ή κωδικός." });
             }
 
-            // Αν όλα είναι ΟΚ, κάνει sign in το χρήστη
-            // false: αμα κλεισει ο browser, αποσυνδέει τον χρήστη
-            await _memberSignInManager.SignInAsync(member, request.RememberMe);
+            if (!member.IsApproved)
+            {
+                return Unauthorized(new { success = false, message = "Μη εγκεκριμένος λογαριασμός." });
+            }
 
-            // Παίρνει τον τρέχον χρήστη και επιστρέφει το group/ρόλο του
-            var currentMember = await _memberManager.GetCurrentMemberAsync();
-            var roles = await _memberManager.GetRolesAsync(currentMember);
+            // ✅ Ο ΣΩΣΤΟΣ ΤΡΟΠΟΣ LOGIN
+            var result = await _memberSignInManager.PasswordSignInAsync(
+                member.UserName,      // ⚠️ ΟΧΙ email
+                request.Password,
+                request.RememberMe,
+                lockoutOnFailure: false
+            );
+
+            if (!result.Succeeded)
+            {
+                return Unauthorized(new { success = false, message = "Λάθος email ή κωδικός." });
+            }
+
+            var roles = await _memberManager.GetRolesAsync(member);
             var groupName = roles.FirstOrDefault() ?? "Visitor";
 
-            Response.Cookies.Append("JustRegistered", "true", new CookieOptions
-            {
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddMinutes(5), 
-                HttpOnly = false
-            });
-
-            // Επιστρέφει JSON απάντηση με επιτυχία και group (π.χ. για αποθήκευση στο localStorage).
             return Ok(new
             {
                 success = true,
                 message = "Login successful!",
                 group = groupName
-                // email = model.Email
             });
         }
 

@@ -337,69 +337,75 @@ public class CarApiVisitorController : UmbracoApiController
             <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
             <title>Kinsen</title>
         </head>
-        <body style='margin:0;padding:0;background:#ffffff;color:#000000;'>
-            <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' style='padding:8px 0 20px 0;background:#ffffff;'>
-            <tr><td align='center'>
-                <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0' style='width:600px;background:#ffffff;margin:0 auto;'>
+         <body style='margin:0;padding:0;background:#ffffff;color:#000000;'>
+
+            <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' style='background:#ffffff;padding:0;'>
+                <tr>
+                <td align='center'>
+                    <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
+                        style='width:600px;max-width:600px;background:#ffffff;margin:0 auto;'>
                     <tr>
-                        <td align='center' style='padding:8px 24px 6px 24px;'>
-                            <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='margin:0 0 20px 0;'>
-                            <tr>
-                                <td align='center' style='padding:14px 10px;'>
-                                {logoTag}
-                                </td>
-                            </tr>
-                            </table>
+                        <td align='center' style='padding:0;'>
+                        {logoTag}
                         </td>
                     </tr>
+                            
                     <tr>
-                    <td align='center' style='padding:0 24px 2px 24px;'> <div style='font-size:18px;line-height:1.2;font-weight:400;color:#39c0c3;;margin:10px;text-align:center;'>Σας ευχαριστούμε για το ενδιαφέρον σας!</div> </td>
+                    <td align='center' style='padding:0 24px 10px 24px;'> 
+                        <div style='font-size:18px;line-height:1.3;font-weight:400;color:#39c0c3;;margin:10px;text-align:center;'>
+                        Σας ευχαριστούμε για το ενδιαφέρον σας!
+                        </div> 
+                    </td>
                     </tr>
 
                     <tr>
-                        <td align='left' style='padding:0 24px 5px 24px;'>
+                        <td align='left' style='padding:15px 30px;'>
                             <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;font-size:14px;line-height:1.7;color:#000000;font-weight:400;'>
                                 <div style='margin-bottom:5px;'>Αγαπητέ/ή <b> {request.FirstName} {request.LastName}</b></div>
-                                Λάβαμε το αίτημά σας για προσφορά. Θα επικοινωνήσουμε μαζί σας το συντομότερο δυνατόν. 
-                                *Οι προσφορές ισχύουν για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής.
+                                Λάβαμε το αίτημά σας για προσφορά. Θα επικοινωνήσουμε μαζί σας το συντομότερο δυνατόν. <br>
+                                <span style='font-size:12px;color:#555555;'>
+                                    *Οι προσφορές ισχύουν για δέκα (10) ημερολογιακές ημέρες από την ημερομηνία παραλαβής.
+                                </span>
                             </div>
                         </td>
                     </tr>
 
-                    <tr><td align='left' style='padding:20px 24px;'>
-                        <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;max-width:600px;border:1px solid #ccc;border-radius:10px;background:#ffffff;'>
-                            <tr>
+                    <tr>
+                    <td align='center' style='padding:20px 20px 10px 20px;'>    
+                        <table role='presentation' border='0' cellspacing='0' cellpadding='0' align='center'
+                            style='margin:15px auto;width:100%;max-width:600px;border:1px solid #ddd;
+                            border-radius:10px;overflow:hidden;background:#ffffff;'>                            
+                        <tr>
                                 <!-- ΑΡΙΣΤΕΡΑ: ΦΩΤΟ -->
-                                <td width='160' valign='top' style='padding:12px;'>
-                                    {imgTag}
-                                </td>
+                            <td width='240' align='center' style='height:180px;'>
+                                {imgTag}
+                            </td>
 
                                 <!-- ΔΕΞΙΑ: ΣΤΟΙΧΕΙΑ -->
-                                <td valign='top' text-align:'center' style='padding:12px;font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
+                                 <td style='padding:12px;vertical-align:top;
+                                    font-family:Segoe UI,Roboto,Arial,sans-serif;color:#000000;'>
 
-                                    <div style='font-size:18px;font-weight:700;margin-bottom:10px;color:#023859;'>
-                                        {maker} {model}
+                                    <div style='font-size:18px;font-weight:700;margin-bottom:6px;color:#023859;'>  
+                                    {maker} {model}
                                     </div>
 
-                                    <div style='font-size:14px;line-height:1.7;color:#333;margin-top:5px;'>
-                                    <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0'>
+                                    <table role='presentation' border='0' cellspacing='0' cellpadding='0' style='width:100%;'>
                                         <tr>
                                         <!-- ΑΡΙΣΤΕΡΗ ΣΤΗΛΗ -->
-                                        <td valign='top' style='padding-right:10px;'>
+                                        <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-right:10px;'>       
                                             • {(string.IsNullOrWhiteSpace(year) ? "-" : year)}<br>
                                             • {(string.IsNullOrWhiteSpace(cc) ? "-" : cc + " cc")}<br>
                                             • {(string.IsNullOrWhiteSpace(hp) ? "-" : hp + " hp")}<br>
                                         </td>
 
                                         <!-- ΔΕΞΙΑ ΣΤΗΛΗ -->
-                                        <td valign='top' style='padding-left:10px;'>
+                                        <td valign='top' style='width:50%;font-size:13px;color:#333;line-height:1.5;padding-left:10px;'>
                                             • {(string.IsNullOrWhiteSpace(km) ? "-" : km + " km")}<br>
                                             • {(string.IsNullOrWhiteSpace(fuel) ? '-' : fuel)}<br>
                                             • {(string.IsNullOrWhiteSpace(color) ? '-' : color)}
                                         </td>
                                         </tr>
                                     </table>
-                                    </div>
 
                                     <div style='font-size:16px;font-weight:600;color:#007c91;margin-top:15px;'>
                                         {FormatPriceGr(price)} €

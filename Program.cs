@@ -1,6 +1,5 @@
-using System;
 using Microsoft.AspNetCore.StaticFiles;
-using KinsenOfficial;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +14,7 @@ builder.Services.AddControllers()
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(o =>
 {
-    o.IdleTimeout = TimeSpan.FromHours(1);   // διάστημα αδράνειας session
+    o.IdleTimeout = TimeSpan.FromHours(2); ;   // διάστημα αδράνειας session
     o.Cookie.Name = ".Kinsen.Session";
     o.Cookie.HttpOnly = true;
     o.Cookie.IsEssential = true;
@@ -31,6 +30,15 @@ builder.CreateUmbracoBuilder()
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient(); // για imports/autos κ.λπ.
+
+builder.Services.Configure<CookieAuthenticationOptions>(
+    "UmbracoMembers",
+    options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(1); // ⏱️ TEST
+        options.SlidingExpiration = false;
+        options.LoginPath = "/login";
+    });
 
 var app = builder.Build();
 

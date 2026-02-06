@@ -257,6 +257,7 @@ document.addEventListener("click", async (e) => {
     // ✅ SUCCESS message μέσα στο κουμπί
     btn.innerHTML = `✓ Θα ενημερωθείτε σύντομα με email`;
     btn.classList.add("btn-success");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // ✅ καθάρισε καλάθι (backend)
     await CartAPI.clear();
@@ -295,7 +296,7 @@ document.addEventListener("click", async (e) => {
       btn.classList.remove("btn-danger");
       btn.disabled = false;
       btn.textContent = originalText;
-    }, 2500);
+    }, 3500);
   }
 });
 
