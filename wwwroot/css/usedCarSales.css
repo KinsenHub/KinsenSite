@@ -355,7 +355,7 @@ label {
   display: none !important;
 }
 
-.favorite-btn {
+.favBtn {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -377,25 +377,19 @@ label {
   transition: all 0.2s ease;
 }
 
-.favorite-btn i {
-  font-size: 18px;
-  color: #999;
-  transition: color 0.2s ease;
-}
-
 /* hover */
-.favorite-btn:hover {
+.favBtn:hover {
   transform: scale(1.05);
 }
-.favorite-btn:hover i {
+.favBtn:hover i {
   color: #023859;
 }
 
 /* active (favorited) */
-.favorite-btn.is-favorite i {
+.favBtn.is-favorite i {
   color: #023859;
 }
-.favorite-btn.is-favorite {
+.favBtn.is-favorite {
   background: #fff;
 }
 

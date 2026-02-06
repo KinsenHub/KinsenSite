@@ -95,7 +95,7 @@ async function loadFavorites() {
 
     grid.innerHTML = cars.map(c => `
       <div class="favorite-card" data-id="${c.id}">
-        <button class="favorite-btn" data-car-id="${c.id}" title="Αφαίρεση από αγαπημένα">
+        <button class="favBtn" data-car-id="${c.id}" title="Αφαίρεση από αγαπημένα">
           <i class="fa-solid fa-heart"></i>
         </button>
 
@@ -124,7 +124,7 @@ window.addEventListener("pageshow", () => {
 });
 
 // ❤️ Toggle / Remove
-document.addEventListener("click", async (e) => {
+@* document.addEventListener("click", async (e) => {
   const btn = e.target.closest(".favorite-btn");
   if (!btn) return;
 
@@ -159,7 +159,7 @@ document.addEventListener("click", async (e) => {
   } catch (err) {
     console.error("Favorite toggle error:", err);
   }
-});
+}); *@
  
 </script>
 

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("contactForm");
   const btn = document.getElementById("contactSubmit");
-  const status = document.getElementById("formMsg");
+  const status = document.getElementById("formMsgContact");
   if (!form || !btn) return;
 
   // Μην επιτρέπεις ΠΟΤΕ native submit (sandbox issue)

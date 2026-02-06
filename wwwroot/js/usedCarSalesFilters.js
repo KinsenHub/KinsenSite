@@ -1057,81 +1057,81 @@ function setCookie(name, value, minutes) {
 
 // ---------------Favorites button--------------------
 
-function getFavorites() {
-  try {
-    return JSON.parse(localStorage.getItem("favoriteCars")) || [];
-  } catch {
-    return [];
-  }
-}
+// function getFavorites() {
+//   try {
+//     return JSON.parse(localStorage.getItem("favoriteCars")) || [];
+//   } catch {
+//     return [];
+//   }
+// }
 
-function saveFavorites(arr) {
-  localStorage.setItem("favoriteCars", JSON.stringify(arr));
-}
+// function saveFavorites(arr) {
+//   localStorage.setItem("favoriteCars", JSON.stringify(arr));
+// }
 
-document.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".favorite-btn");
-  if (!btn) return;
+// document.addEventListener("click", async (e) => {
+//   const btn = e.target.closest(".favBtn");
+//   if (!btn) return;
 
-  e.preventDefault();
-  e.stopPropagation();
+//   e.preventDefault();
+//   e.stopPropagation();
 
-  const carId = btn.dataset.carId;
-  if (!carId) return;
+//   const carId = btn.dataset.carId;
+//   if (!carId) return;
 
-  try {
-    const r = await fetch("/umbraco/api/favorites/toggle", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify({ carId }),
-    });
+//   try {
+//     const r = await fetch("/umbraco/api/favorites/toggle", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       credentials: "same-origin",
+//       body: JSON.stringify({ carId }),
+//     });
 
-    if (!r.ok) throw new Error(await r.text());
+//     if (!r.ok) throw new Error(await r.text());
 
-    const { isFavorite } = await r.json();
+//     const { isFavorite } = await r.json();
 
-    // 🔁 UI update ΜΟΝΟ από server response
-    btn.classList.toggle("is-favorite", isFavorite);
-    btn.querySelector("i").className = isFavorite
-      ? "fa-solid fa-heart"
-      : "fa-regular fa-heart";
+//     // 🔁 UI update ΜΟΝΟ από server response
+//     btn.classList.toggle("is-favorite", isFavorite);
+//     btn.querySelector("i").className = isFavorite
+//       ? "fa-solid fa-heart"
+//       : "fa-regular fa-heart";
 
-    // 🔥 ΕΚΠΟΜΠΗ EVENT
-    document.dispatchEvent(new CustomEvent("favorites:changed"));
-  } catch (err) {
-    console.error("Favorite toggle error:", err);
-  }
-});
+//     // 🔥 ΕΚΠΟΜΠΗ EVENT
+//     document.dispatchEvent(new CustomEvent("favorites:changed"));
+//   } catch (err) {
+//     console.error("Favorite toggle error:", err);
+//   }
+// });
 
-async function syncFavoriteHearts() {
-  try {
-    const r = await fetch("/umbraco/api/favorites/ids", {
-      credentials: "same-origin",
-    });
-    if (!r.ok) return;
+// async function syncFavoriteHearts() {
+//   try {
+//     const r = await fetch("/umbraco/api/favorites/ids", {
+//       credentials: "same-origin",
+//     });
+//     if (!r.ok) return;
 
-    const ids = await r.json(); // [12,45,88]
+//     const ids = await r.json(); // [12,45,88]
 
-    document.querySelectorAll(".favorite-btn").forEach((btn) => {
-      const id = Number(btn.dataset.carId);
-      const isFav = ids.includes(id);
+//     document.querySelectorAll(".favBtn").forEach((btn) => {
+//       const id = Number(btn.dataset.carId);
+//       const isFav = ids.includes(id);
 
-      btn.classList.toggle("is-favorite", isFav);
-      btn.querySelector("i").className = isFav
-        ? "fa-solid fa-heart"
-        : "fa-regular fa-heart";
-    });
-  } catch (e) {
-    console.warn("syncFavoriteHearts failed", e);
-  }
-}
+//       btn.classList.toggle("is-favorite", isFav);
+//       btn.querySelector("i").className = isFav
+//         ? "fa-solid fa-heart"
+//         : "fa-regular fa-heart";
+//     });
+//   } catch (e) {
+//     console.warn("syncFavoriteHearts failed", e);
+//   }
+// }
 
-document.addEventListener("DOMContentLoaded", syncFavoriteHearts);
+// document.addEventListener("DOMContentLoaded", syncFavoriteHearts);
 
-window.addEventListener("pageshow", () => {
-  syncFavoriteHearts();
-});
+// window.addEventListener("pageshow", () => {
+//   syncFavoriteHearts();
+// });
 
-// 👂 ΑΚΟΥΕΙ ΟΛΟ ΤΟ SITE
-document.addEventListener("favorites:changed", syncFavoriteHearts);
+// // 👂 ΑΚΟΥΕΙ ΟΛΟ ΤΟ SITE
+// document.addEventListener("favorites:changed", syncFavoriteHearts);
