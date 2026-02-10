@@ -56,79 +56,65 @@
 
 @*-------------------------------------------------*@
 <script>
-    document.addEventListener("DOMContentLoaded", function () { //Βεβαιώνεται ότι το DOM φορτώθηκε πριν τρέξει ο κώδικας
+document.addEventListener("DOMContentLoaded", function () {
 
-        const loginForm = document.querySelector(".loginForm");
-        const loginBtn = document.querySelector(".btn-primary");
-    
-        if (loginForm && loginBtn) {
-            loginBtn.addEventListener("click", async function (event) {
-                event.preventDefault(); // 👈 Χωρίς αυτό, η σελίδα θα έκανε refresh
-                /* Σε μια <form>, όταν πατήσεις submit (είτε με Enter είτε με submit button), ο browser στέλνει τα δεδομένα 
-                στον server και φορτώνει εκ νέου τη σελίδα – αυτό είναι η προεπιλεγμένη συμπεριφορά.
-                Με την event.preventDefault() Θέλουμε να χειριστούμε εμείς την αποστολή (π.χ. μέσω fetch() ή axios)
-                Θέλουμε single-page behavior (χωρίς ανανέωση)
-                Θέλουμε να κάνουμε έλεγχο εγκυρότητας (validation) πρώτα */
-                
+    const loginBtn = document.querySelector(".btn-primary");
 
-                const email = document.getElementById("email").value.trim();
-                const password = document.getElementById("password").value;
-                const rememberMe = document.getElementById("rememberMe").checked;
-                const loginMessage = document.getElementById("loginMessage");
+    if (!loginBtn) return;
 
-                try { // ------------Fetch προς API---------------
-                    /* Κάνει POST request στο custom API controller /umbraco/api/member/login
-                    Στέλνει JSON body με email & password */
-                    const response = await fetch("@Url.Content("~/umbraco/api/member/login")", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email, password, rememberMe })
-                    });
+    loginBtn.addEventListener("click", async function (event) {
+        event.preventDefault();
 
-                    const data = await response.json();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const rememberMe = document.getElementById("rememberMe")?.checked ?? false;
 
-                    if (data.success) {
-                        @* loginMessage.style.color = "green";
-                        loginMessage.textContent = "Συνδεθήκατε επιτυχώς!"; *@
-                        showLoginMessage("Συνδεθήκατε επιτυχώς!", "green", 3000);
-                        localStorage.setItem("loggedInEmail", email);
-                        localStorage.setItem("loggedInGroup", data.group);
-                        setTimeout(() => {
-                            window.location.href = "/home"; 
-                        }, 1000);
-                        localStorage.clear();
-                    } else {
-                        @* loginMessage.style.color = "red";
-                        loginMessage.textContent = data.message || "Λάθος στοιχεία."; *@
-                        showLoginMessage(data.message || "Λάθος στοιχεία.", "red", 3000);
-                    }
-
-                } catch (error) {
-                    @* loginMessage.style.color = "red";
-                    loginMessage.textContent = "Σφάλμα κατά τη σύνδεση."; *@
-                    showLoginMessage("Σφάλμα κατά τη σύνδεση.", "red", 3000);
-                    console.error("Login Error", error);
-                }
-            });
+        if (!email || !password) {
+            showLoginMessage("Συμπλήρωσε email και κωδικό.", "red");
+            return;
         }
-        else {
-            console.log("Δεν πραγματοποιήθηκε το Login");
+
+        try {
+            const response = await fetch("/umbraco/api/member/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include", 
+                body: JSON.stringify({ email, password, rememberMe })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                showLoginMessage(data.message || "Λάθος στοιχεία.", "red");
+                return;
+            }
+
+            showLoginMessage("Συνδεθήκατε επιτυχώς!", "green", 1500);
+
+            // ⬅️ ΑΦΗΝΟΥΜΕ το Umbraco cookie να κάνει τη δουλειά του
+            setTimeout(() => {
+                window.location.href = "/home";
+            }, 800);
+
+        } catch (err) {
+            console.error("Login error:", err);
+            showLoginMessage("Σφάλμα κατά τη σύνδεση.", "red");
         }
     });
+});
 
-    function showLoginMessage(text, color = "red", timeout = 3000) {
-        const loginMessage = document.getElementById("loginMessage");
+function showLoginMessage(text, color = "red", timeout = 3000) {
+    const el = document.getElementById("loginMessage");
+    if (!el) return;
 
-        if (!loginMessage) return;
+    el.textContent = text;
+    el.style.color = color;
+    el.style.display = "block";
 
-        loginMessage.style.color = color;
-        loginMessage.textContent = text;
-        loginMessage.style.display = "block";
-
-        // ⏱️ εξαφάνιση μετά από 3"
-        setTimeout(() => {
-            loginMessage.textContent = "";
-            loginMessage.style.display = "none";
-        }, timeout);
-    }
+    setTimeout(() => {
+        el.textContent = "";
+        el.style.display = "none";
+    }, timeout);
+}
 </script>
+

@@ -81,7 +81,7 @@ async function loadFavorites() {
   if (!grid) return;
 
   try {
-    const r = await fetch("/umbraco/api/favorites/get", { credentials: "same-origin" });
+    const r = await fetch("/umbraco/api/FavoritesCustomer/GetIds", { credentials: "include" });
     if (!r.ok) throw new Error(await r.text());
 
     const cars = await r.json();
@@ -122,44 +122,6 @@ document.addEventListener("DOMContentLoaded", loadFavorites);
 window.addEventListener("pageshow", () => {
   loadFavorites();
 });
-
-// ❤️ Toggle / Remove
-@* document.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".favorite-btn");
-  if (!btn) return;
-
-  e.preventDefault();
-  e.stopPropagation();
-
-  const carId = Number(btn.dataset.carId);
-  if (!carId) return;
-
-  try {
-    const r = await fetch("/umbraco/api/favorites/toggle", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify({ carId }),
-    });
-
-    if (!r.ok) throw new Error(await r.text());
-
-    const { isFavorite } = await r.json();
-
-    // αν αφαιρέθηκε από favorites page -> remove card
-    if (!isFavorite) {
-      btn.closest(".favorite-card")?.remove();
-
-      const grid = document.getElementById("favoritesList");
-      if (grid && !grid.querySelector(".favorite-card")) {
-        showEmptyState(); // ✅ εδώ θα φύγει ΚΑΙ ο τίτλος
-      }
-    }
-
-  } catch (err) {
-    console.error("Favorite toggle error:", err);
-  }
-}); *@
  
 </script>
 

@@ -1,84 +1,91 @@
-using Microsoft.AspNetCore.Mvc; //Για την δημιουργία Web API controller
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks; // Για async κλήσεις
-using Umbraco.Cms.Core.Security; // παρέχουν τα 
-using Umbraco.Cms.Web.Common.Security; // IMemberManager και IMemberSignInManager.
-using Umbraco.Cms.Core.Models.Membership;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Core.Services;
 
-namespace KinsenOfficial.Controllers
+namespace Kinsen.Web.Api
 {
-    [ApiController] // Λέει στο ASP.NET ότι αυτός ο controller εξυπηρετεί API (JSON)
-    [Route("umbraco/api/member")] // το URL για αυτό το controller
-    public class MemberAuthController : ControllerBase
+    [Route("umbraco/api/member")]
+    public class MemberAuthController : UmbracoApiController
     {
-        private readonly IMemberSignInManager _memberSignInManager; // Κάνει login/logout
-        private readonly IMemberManager _memberManager; //Διαχειρίζεται τα μέλη (εύρεση, έλεγχος κωδικού, ρόλοι κ.λπ.)
+        private readonly IMemberSignInManager _signInManager;
+        private readonly IMemberManager _memberManager;
+        private readonly IMemberService _memberService;
         private readonly ILogger<MemberAuthController> _logger;
 
-
-        public MemberAuthController(IMemberSignInManager memberSignInManager, IMemberManager memberManager, ILogger<MemberAuthController> logger)
-        { //👉 Ο constructor παίρνει τις υπηρεσίες από το dependency injection system του Umbraco.
-            _memberSignInManager = memberSignInManager;
+        public MemberAuthController(
+            IMemberSignInManager signInManager,
+            IMemberManager memberManager,
+            IMemberService memberService,
+            ILogger<MemberAuthController> logger)
+        {
+            _signInManager = signInManager;
             _memberManager = memberManager;
+            _memberService = memberService;
             _logger = logger;
         }
 
+        // =========================
+        // LOGIN
+        // =========================
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Email) ||
+            _logger.LogWarning("🔐 LOGIN HIT | Email={Email}", request?.Email);
+
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Password))
             {
-                return BadRequest(new { success = false, message = "Συμπλήρωσε email και κωδικό." });
+                return BadRequest("Missing credentials");
             }
 
-            var member = await _memberManager.FindByEmailAsync(request.Email);
-            if (member == null)
-            {
-                return Unauthorized(new { success = false, message = "Λάθος email ή κωδικός." });
-            }
+            var memberIdentity = await _memberManager.FindByEmailAsync(request.Email);
+            if (memberIdentity == null)
+                return Unauthorized("Invalid credentials");
 
-            if (!member.IsApproved)
-            {
-                return Unauthorized(new { success = false, message = "Μη εγκεκριμένος λογαριασμός." });
-            }
+            var umbMember = _memberService.GetByKey(memberIdentity.Key);
+            if (umbMember == null || !umbMember.IsApproved)
+                return Unauthorized("Member not approved");
 
-            // ✅ Ο ΣΩΣΤΟΣ ΤΡΟΠΟΣ LOGIN
-            var result = await _memberSignInManager.PasswordSignInAsync(
-                member.UserName,      // ⚠️ ΟΧΙ email
+            // ✅ ΤΟ ΜΟΝΟ ΣΩΣΤΟ LOGIN
+            var result = await _signInManager.PasswordSignInAsync(
+                memberIdentity.UserName,   // ΟΧΙ email
                 request.Password,
                 request.RememberMe,
                 lockoutOnFailure: false
             );
 
             if (!result.Succeeded)
-            {
-                return Unauthorized(new { success = false, message = "Λάθος email ή κωδικός." });
-            }
+                return Unauthorized("Invalid credentials");
 
-            var roles = await _memberManager.GetRolesAsync(member);
-            var groupName = roles.FirstOrDefault() ?? "Visitor";
+            // 🔍 επιβεβαίωση
+            var current = await _memberManager.GetCurrentMemberAsync();
+            _logger.LogWarning(
+                "LOGIN OK | CurrentMember={Member}",
+                current != null ? $"Id={current.Id}" : "NULL"
+            );
 
-            return Ok(new
-            {
-                success = true,
-                message = "Login successful!",
-                group = groupName
-            });
+            return Ok(new { success = true });
         }
 
+        // =========================
+        // LOGOUT
+        // =========================
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await _memberSignInManager.SignOutAsync();
-            return Ok(new { success = true, message = "Logout successful!" });
+            await _signInManager.SignOutAsync();
+            _logger.LogWarning("🚪 LOGOUT OK");
+            return Ok(new { success = true });
         }
+    }
 
-        public class LoginRequest
-        {
-            public string Email { get; set; }
-            public string Password { get; set; }
-            public bool RememberMe { get; set; }
-        }
+    public class LoginRequest
+    {
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+        public bool RememberMe { get; set; }
     }
 }

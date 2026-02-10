@@ -3,25 +3,35 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1) Controllers (μία φορά) + JSON options
-builder.Services.AddControllers()
-    .AddJsonOptions(o =>
-    {
-        o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-    });
+builder.Services.AddControllers();
 
-// 2) Session & Cache (για καλάθι κ.λπ.)
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(o =>
 {
-    o.IdleTimeout = TimeSpan.FromHours(2); ;   // διάστημα αδράνειας session
+    o.IdleTimeout = TimeSpan.FromHours(2);
     o.Cookie.Name = ".Kinsen.Session";
     o.Cookie.HttpOnly = true;
     o.Cookie.IsEssential = true;
-    // o.Cookie.SameSite = SameSiteMode.Lax; // προαιρετικό (default Lax)
 });
 
-// 3) Umbraco
+builder.Services.Configure<CookieAuthenticationOptions>(
+    "UmbracoMembers", 
+    options =>
+    {
+        options.Cookie.Name = "KinsenMemberAuth";
+        options.Cookie.HttpOnly = true;
+
+        // Για localhost + fetch
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+        options.LoginPath = "/login";
+    });
+
+// Umbraco
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
@@ -29,54 +39,28 @@ builder.CreateUmbracoBuilder()
     .Build();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddHttpClient(); // για imports/autos κ.λπ.
-
-builder.Services.Configure<CookieAuthenticationOptions>(
-    "UmbracoMembers",
-    options =>
-    {
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(1); // ⏱️ TEST
-        options.SlidingExpiration = false;
-        options.LoginPath = "/login";
-    });
 
 var app = builder.Build();
 
-// 4) Static files (με custom content types αν χρειάζεται)
-var provider = new FileExtensionContentTypeProvider();
-provider.Mappings[".mp4"] = "video/mp4";
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    ContentTypeProvider = provider
-});
-
-// 5) Boot Umbraco
+app.UseStaticFiles();
 await app.BootUmbracoAsync();
 
-// 6) Pipeline σειρά: Routing → (Auth) → (AuthZ) → Session → Umbraco
 app.UseRouting();
-
-// (προαιρετικά — συνήθως τα προσθέτει και το Umbraco, αλλά δεν βλάπτει)
 app.UseAuthentication();
 app.UseAuthorization();
-
-// ΠΡΟΣΟΧΗ: Session ΠΡΙΝ τα Umbraco endpoints
 app.UseSession();
 
 app.UseUmbraco()
-   .WithMiddleware(u =>
-   {
-       u.UseBackOffice();
-       u.UseWebsite();
-   })
-   .WithEndpoints(u =>
-   {
-       u.UseBackOfficeEndpoints();
-       u.UseWebsiteEndpoints();
-
-       // για τα [ApiController]
-       u.EndpointRouteBuilder.MapControllers();
-   });
+    .WithMiddleware(u =>
+    {
+        u.UseBackOffice();
+        u.UseWebsite();
+    })
+    .WithEndpoints(u =>
+    {
+        u.UseBackOfficeEndpoints();
+        u.UseWebsiteEndpoints();
+        u.EndpointRouteBuilder.MapControllers();
+    });
 
 await app.RunAsync();

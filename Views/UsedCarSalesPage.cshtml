@@ -192,23 +192,31 @@
 
     var carPages = Model.ChildrenOfType("carPage");
 
-    // Κατάσταση χρήστη
-    var isLoggedIn = Context?.User?.Identity?.IsAuthenticated ?? false;
+    var isLoggedIn = User?.Identity?.IsAuthenticated ?? false;
 
-	// Έλεγχος εαν ανήκει στο GroupAdmins που αφορά το κουμπί Import/Export !!
-	var isAdminMember = false;
+    // Πάρε τον current member με async (ΧΩΡΙΣ Wait)
+    var currentMember = isLoggedIn ? await MemberManager.GetCurrentMemberAsync() : null;
 
-    if (User?.Identity?.IsAuthenticated ?? false)
+    // default values για να μπορείς να τα εμφανίσεις μετά
+    var id = "";
+    var key = Guid.Empty;
+    var userName = "";
+    var email = "";
+
+    if (currentMember != null)
     {
-        var memberTask = MemberManager.GetCurrentMemberAsync();
-        memberTask.Wait();
-        var member = memberTask.Result;
+        id = currentMember.Id.ToString();
+        key = currentMember.Key;
+        userName = currentMember.UserName;
+        email = currentMember.Email;
+    }
 
-        if (member != null)
-        {
-            var roles = MemberService.GetAllRoles(member.UserName);
-            isAdminMember = roles.Contains("GroupAdmins");
-        }
+    // Admin role check
+    var isAdminMember = false;
+    if (currentMember != null)
+    {
+        var roles = MemberService.GetAllRoles(currentMember.UserName);
+        isAdminMember = roles.Contains("GroupAdmins");
     }
 }
 

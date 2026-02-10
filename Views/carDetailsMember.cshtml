@@ -148,107 +148,109 @@
 					});
 
 					document.getElementById('carDetailsContainer').innerHTML = `	
-					<div class="w-100 mt-5 d-flex justify-content-center">
-						<div id="carouselExampleDark"
-							class="carousel carousel-dark slide shadow-lg custom-carousel"
-							data-bs-ride="carousel">
-							<button 
-								class="favBtn"
-								type="button"
-								data-car-id="@carID"
-								aria-label="Προσθήκη στα αγαπημένα">
-								<i class="fa-regular fa-heart"></i>
-							</button>
-							<div class="carousel-indicators">
-							${indicatorsHtml}
-							</div>
-
-							<div class="carousel-inner">
-							${slidesHtml}
-							</div>
-
-							<button class="carousel-control-prev"
+						<div class="w-100 mt-5 d-flex justify-content-center">
+							<div id="carouselExampleDark"
+								class="carousel carousel-dark slide shadow-lg custom-carousel"
+								data-bs-ride="carousel">
+								<button 
+									class="favBtn"
 									type="button"
-									data-bs-target="#carouselExampleDark"
-									data-bs-slide="prev">
-							<span class="carousel-control-prev-icon"></span>
-							</button>
-
-							<button class="carousel-control-next"
-									type="button"
-									data-bs-target="#carouselExampleDark"
-									data-bs-slide="next">
-							<span class="carousel-control-next-icon"></span>
-							</button>
-						</div>
-					</div>
-
-					<div class="offer-box">
-						<div class="price-section">
-						<span class="car-title">${data.maker} ${data.model}<br></span>
-							<span class="price-label">Τιμή αγοράς:</span>
-							<span class="price-value">${formattedPrice} €</span>
-							<span class="vat-label">με τον ΦΠΑ</span>
-						</div>
-						<div class="prokatavoli_label">Προκαταβολή (€):</div>
-						<input
-							type="text"
-							class="form-control"
-							id="inputProkatavoli"
-							name="prokatavoli"
-							inputmode="numeric"
-							maxlength="5"
-							pattern="^[1-9]\d{2,4}$"
-							placeholder="π.χ. 100"
-							required
-							oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,5);"
-						/>
-						<div class="upologismos_label">Υπολογισμός σε Δόσεις:</div>
-							<div class="btn-group">
-								<button class="custom-dropdown-button dropdown-toggle"
-									type="button"
-									data-bs-toggle="dropdown"
-									aria-expanded="false"
-									data-plan="efapaks">
-									Εφάπαξ χωρίς Τόκους
+									data-car-id="${carID}"
+									aria-label="Προσθήκη στα αγαπημένα">
+									<i class="fa-regular fa-heart"></i>
 								</button>
-								<ul class="dropdown-menu">
-									<li><button class="dropdown-item" type="button" value="efapaks">Εφάπαξ χωρίς Τόκους</button></li>
-									<li><button class="dropdown-item" type="button" value="6">6 Μήνες</button></li>
-									<li><button class="dropdown-item" type="button" value="12">12 Μήνες</button></li>
-									<li><button class="dropdown-item" type="button" value="24">24 Μήνες</button></li>
-									<li><button class="dropdown-item" type="button" value="36">36 Μήνες</button></li>
-									<li><button class="dropdown-item" type="button" value="48">48 Μήνες</button></li>
-								</ul>
+								<div class="carousel-indicators">
+								${indicatorsHtml}
+								</div>
+
+								<div class="carousel-inner">
+								${slidesHtml}
+								</div>
+
+								<button class="carousel-control-prev"
+										type="button"
+										data-bs-target="#carouselExampleDark"
+										data-bs-slide="prev">
+								<span class="carousel-control-prev-icon"></span>
+								</button>
+
+								<button class="carousel-control-next"
+										type="button"
+										data-bs-target="#carouselExampleDark"
+										data-bs-slide="next">
+								<span class="carousel-control-next-icon"></span>
+								</button>
 							</div>
-							<div class="installment-result">
-								Μηνιαία Δόση: <span id="installmentValue">-</span>
-							</div>
-							<div class="offer-button-container">	
-								<button class="addToCartBtn"> Προσθήκη στο Καλάθι </button>
-							</div>
-							<div
-							id="cartMsg"
-							class="cartMsg d-flex justify-content-center mt-3"
-							aria-live="polite"
-							></div>
 						</div>
+
+						<div class="offer-box">
+							<div class="price-section">
+							<span class="car-title">${data.maker} ${data.model}<br></span>
+								<span class="price-label">Τιμή αγοράς:</span>
+								<span class="price-value">${formattedPrice} €</span>
+								<span class="vat-label">με τον ΦΠΑ</span>
+							</div>
+							<div class="prokatavoli_label">Προκαταβολή (€):</div>
+							<input
+								type="text"
+								class="form-control"
+								id="inputProkatavoli"
+								name="prokatavoli"
+								inputmode="numeric"
+								maxlength="5"
+								pattern="^[1-9]\d{2,4}$"
+								placeholder="π.χ. 100"
+								required
+								oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,5);"
+							/>
+							<div class="upologismos_label">Υπολογισμός σε Δόσεις:</div>
+								<div class="btn-group">
+									<button class="custom-dropdown-button dropdown-toggle"
+										type="button"
+										data-bs-toggle="dropdown"
+										aria-expanded="false"
+										data-plan="efapaks">
+										Εφάπαξ χωρίς Τόκους
+									</button>
+									<ul class="dropdown-menu">
+										<li><button class="dropdown-item" type="button" value="efapaks">Εφάπαξ χωρίς Τόκους</button></li>
+										<li><button class="dropdown-item" type="button" value="6">6 Μήνες</button></li>
+										<li><button class="dropdown-item" type="button" value="12">12 Μήνες</button></li>
+										<li><button class="dropdown-item" type="button" value="24">24 Μήνες</button></li>
+										<li><button class="dropdown-item" type="button" value="36">36 Μήνες</button></li>
+										<li><button class="dropdown-item" type="button" value="48">48 Μήνες</button></li>
+									</ul>
+								</div>
+								<div class="installment-result">
+									Μηνιαία Δόση: <span id="installmentValue">-</span>
+								</div>
+								<div class="offer-button-container">	
+									<button class="addToCartBtn"> Προσθήκη στο Καλάθι </button>
+								</div>
+								<div
+								id="cartMsg"
+								class="cartMsg d-flex justify-content-center mt-3"
+								aria-live="polite"
+								></div>
+							</div>
+						
+						<section class="car-specs-section">
+							<p>Στοιχεία αυτοκινήτου</p>
+							<div class="specs-grid">
+								<div><strong>Μάρκα:&nbsp;</strong> ${data.maker}</div>
+								<div><strong>Μοντέλο:&nbsp;</strong> ${data.model}</div>
+								<div><strong>Κατηγορία:&nbsp;</strong> ${data.typeOfCar}</div>
+								<div><strong>Χρώμα:&nbsp;</strong> ${data.color}</div>
+								<div><strong>Καύσιμο:&nbsp;</strong> ${data.fuel}</div>
+								<div><strong>Κιβώτιο:&nbsp;</strong> ${data.transmissionType}</div>
+								<div><strong>Χιλιόμετρα:&nbsp;</strong> ${data.km} km</div>
+								<div><strong>Ιπποδύναμη:&nbsp;</strong> ${data.hp} hp</div>
+								<div><strong>Κυβικά:&nbsp;</strong> ${data.cc} cc</div>
+							</div>
+						</section>
+					`;
+					if (typeof syncFavoriteHearts === "function") syncFavoriteHearts();
 					
-					<section class="car-specs-section">
-						<p>Στοιχεία αυτοκινήτου</p>
-						<div class="specs-grid">
-							<div><strong>Μάρκα:&nbsp;</strong> ${data.maker}</div>
-							<div><strong>Μοντέλο:&nbsp;</strong> ${data.model}</div>
-							<div><strong>Κατηγορία:&nbsp;</strong> ${data.typeOfCar}</div>
-							<div><strong>Χρώμα:&nbsp;</strong> ${data.color}</div>
-							<div><strong>Καύσιμο:&nbsp;</strong> ${data.fuel}</div>
-							<div><strong>Κιβώτιο:&nbsp;</strong> ${data.transmissionType}</div>
-							<div><strong>Χιλιόμετρα:&nbsp;</strong> ${data.km} km</div>
-							<div><strong>Ιπποδύναμη:&nbsp;</strong> ${data.hp} hp</div>
-							<div><strong>Κυβικά:&nbsp;</strong> ${data.cc} cc</div>
-						</div>
-					</section>
-				`; 
 			})
 			.catch(error => {
 				console.error("API ERROR:", error); 
@@ -318,7 +320,6 @@
 			icon.classList.add("fa-regular");
 		}
 
-		localStorage.setItem('favorites', JSON.stringify(favs));
 	});
 
 </script>
