@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 using System.Text.Json.Nodes;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Models.Email;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace KinsenOfficial.Controllers
 {
@@ -71,6 +74,9 @@ namespace KinsenOfficial.Controllers
         private readonly ILogger<CarStockWriteController> _logger;
         private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
+        private readonly IMemberService _memberService;
+        private readonly IEmailSender _emailSender;
+        private readonly MemberManager _memberManager;
 
 
         // appsettings.json (χρησιμοποίησε ΜΟΝΟ GUID)
@@ -94,7 +100,10 @@ namespace KinsenOfficial.Controllers
             IDataTypeService dataTypeService,
             ILogger<CarStockWriteController> logger,
             IUmbracoContextFactory umbracoContextFactory,
-            IPublishedContentQuery publishedContentQuery)
+            IPublishedContentQuery publishedContentQuery,
+            IMemberService memberService,
+            IEmailSender emailSender,
+            MemberManager memberManager)
         {
             _cfg = cfg;
             _contentService = contentService;
@@ -103,27 +112,21 @@ namespace KinsenOfficial.Controllers
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
             _publishedContentQuery = publishedContentQuery;
+            _memberService = memberService;
+            _emailSender = emailSender;
+            _memberManager = memberManager;
         }
         
         [HttpPost("cars-updated")]
         [AllowAnonymous]
         [IgnoreAntiforgeryToken]
         [Consumes("application/json")]
-        public IActionResult CarsUpdated([FromBody] List<CarStockCar>? carsPayload)
+        public async Task<IActionResult> CarsUpdated([FromBody] List<CarStockCar>? carsPayload)
         {
-            var priceDroppedCars = new List<(CarDto Car, decimal OldPriceD, decimal NewPriceD)>();
-            var priceIncreasedCars = new List<(CarDto Car, decimal OldPriceI, decimal NewPriceI)>();
+            var priceDroppedCars = new List<(CarDto Car, decimal OldPrice, decimal NewPrice)>();
 
             if (carsPayload == null || carsPayload.Count == 0)
                 return BadRequest("No cars in payload.");
-
-            _logger.LogInformation("Incoming carsPayload count = {Count}", carsPayload.Count);
-
-            foreach (var car in carsPayload)
-            {
-                _logger.LogInformation("Payload Car → ID:{Id}, Maker:{Maker}, Model:{Model}",
-                    car.CarId, car.Maker, car.Model);
-            }
 
             static string NormalizeName(string? value)
             {
@@ -132,84 +135,60 @@ namespace KinsenOfficial.Controllers
                 return char.ToUpper(value[0]) + value.Substring(1);
             }
 
-            // ✔ Μετατροπή payload -> CarDto
             var newCars = carsPayload
-            .Where(c => c?.CarId > 0)
-            .Select(s => new CarDto
-            {
-                CarId = s.CarId ?? 0,
-                Maker = NormalizeName(s.Maker),
-                Model = NormalizeName(s.Model),
+                .Where(c => c?.CarId > 0)
+                .Select(s => new CarDto
+                {
+                    CarId = s.CarId ?? 0,
+                    Maker = NormalizeName(s.Maker),
+                    Model = NormalizeName(s.Model),
+                    YearRelease = s.YearRelease ?? 0,
+                    Price = s.Price.HasValue
+                        ? Math.Round(s.Price.Value, 0, MidpointRounding.AwayFromZero)
+                        : 0m,
+                    Km = s.Km ?? 0,
+                    Cc = s.Cc ?? 0,
+                    Hp = s.Hp ?? 0,
+                    Fuel = s.Fuel ?? "",
+                    TransmissionType = s.TransmissionType ?? "",
+                    Color = NormalizeName(s.Color),
+                    Offer = s.Offer ?? false,
+                    Froze = s.Froze ?? false,
+                    Delete = s.Delete ?? false,
+                    TypeOfCar = s.TypeOfCar ?? "",
+                    CarPic = ""
+                })
+                .ToList();
 
-                YearRelease = s.YearRelease ?? 0,
-                Price = s.Price.HasValue ? Math.Round(s.Price.Value, 0, MidpointRounding.AwayFromZero) : 0m,
-                Km = s.Km ?? 0,
-                Cc = s.Cc ?? 0,
-                Hp = s.Hp ?? 0,
-
-                Fuel = s.Fuel ?? "",
-                TransmissionType = s.TransmissionType ?? "",
-                Color = NormalizeName(s.Color),
-                Offer = s.Offer ?? false,
-                Froze = s.Froze ?? false,
-                Delete = s.Delete ?? false,
-                TypeOfCar = s.TypeOfCar ?? "",
-                CarPic = ""
-            })
-            .ToList();
-
-            // ✔ Φόρτωση σελίδας
             var page = _contentService.GetById(UsedCarSalesPageKey);
             if (page == null)
                 return NotFound("usedCarSalesPage not found.");
 
             var existingCars = LoadExistingCarsFromBlock(page, BlockPropertyAlias, includeOffer: true);
-
-            _logger.LogInformation("EXISTING CARS IN CONTENT = {Count}", existingCars.Count);
-
-            // ✔ Index υπάρχοντα ανά CarId
             var existingMap = existingCars.ToDictionary(c => c.CarId);
-
-            // ✔ Για να μείνει το return ίδιο, κρατάμε carsToAdd μόνο για τα πραγματικά νέα
             var carsToAdd = new List<CarDto>();
 
             foreach (var incoming in newCars)
             {
                 if (incoming.Delete)
                 {
-                    if (existingMap.Remove(incoming.CarId))
-                    {
-                        _logger.LogWarning("DELETED carId={CarId} from carCardBlock", incoming.CarId);
-                    }
-
-                    continue; 
+                    existingMap.Remove(incoming.CarId);
+                    continue;
                 }
 
-                // 🔁 UPDATE
                 if (existingMap.TryGetValue(incoming.CarId, out var existing))
                 {
-                    // 🔻 ΕΛΕΓΧΟΣ ΠΤΩΣΗΣ ΤΙΜΗΣ (ΜΟΝΟ αν είναι αυστηρά μικρότερη)
+                    // 🔻 ΜΟΝΟ ΑΝ ΠΕΣΕΙ Η ΤΙΜΗ
                     if (incoming.Price < existing.Price)
                     {
                         _logger.LogInformation(
-                            "PRICE DROP detected for CarId={CarId} | Old={OldPriceD} | New={NewPriceD}",
+                            "PRICE DROP detected for CarId={CarId} | Old={OldPrice} | New={NewPrice}",
                             incoming.CarId, existing.Price, incoming.Price
                         );
 
                         priceDroppedCars.Add((incoming, existing.Price, incoming.Price));
                     }
-                    // 🔻 ΕΛΕΓΧΟΣ ΑΥΞΗΣΗΣ ΤΙΜΗΣ (ΜΟΝΟ αν είναι αυστηρά μεγαλύτερη)
-                    if (incoming.Price > existing.Price)
-                    {
-                        _logger.LogInformation(
-                            "PRICE INCREASE detected for CarId={CarId} | Old={OldPriceI} | New={NewPriceI}",
-                            incoming.CarId, existing.Price, incoming.Price
-                        );
 
-                        priceIncreasedCars.Add((incoming, existing.Price, incoming.Price));
-                    }
-
-                    // ⛔ ΔΕΝ ΠΕΙΡΑΖΟΥΜΕ ΦΩΤΟ / PHOTOS
                     incoming.CarPic = existing.CarPic;
                     incoming.TenPhotosForUsedCarSales = existing.TenPhotosForUsedCarSales;
 
@@ -217,26 +196,64 @@ namespace KinsenOfficial.Controllers
                 }
                 else
                 {
-                    // ➕ NEW
                     existingMap.Add(incoming.CarId, incoming);
                     carsToAdd.Add(incoming);
                 }
             }
 
-            _logger.LogInformation("CARS TO ADD (new only) = {Count}", carsToAdd.Count);
-
-            // ✔ Τελικό merged (με updates + adds)
             var merged = existingMap.Values.ToList();
-            _logger.LogInformation("FINAL MERGED CAR COUNT = {Total}", merged.Count);
 
-            // ✔ Αντικατάσταση block list
-            ReplaceBlockListWithCarsToAlias(page,BlockPropertyAlias, merged);
+            ReplaceBlockListWithCarsToAlias(page, BlockPropertyAlias, merged);
 
-            //SyncCarouselCarsFromCarCardBlock();
+            // ================================
+            // 🔔 PRICE DROP EMAIL LOGIC
+            // ================================
 
-            // ✅ ΑΚΡΙΒΩΣ ΟΠΩΣ ΤΟ ΘΕΣ
-            return Ok(new { ok = true, added = carsToAdd.Count });
+            if (priceDroppedCars.Any())
+            {
+                var allMembers = _memberService.GetAllMembers();
+
+                foreach (var member in allMembers)
+                {
+                    var favJson = member.GetValue<string>("favoriteCars");
+
+                    if (string.IsNullOrWhiteSpace(favJson))
+                        continue;
+
+                    List<int>? favoriteIds;
+
+                    try
+                    {
+                        favoriteIds = JsonSerializer.Deserialize<List<int>>(favJson);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    if (favoriteIds == null || !favoriteIds.Any())
+                        continue;
+
+                    var matchedCars = priceDroppedCars
+                        .Where(d => favoriteIds.Contains(d.Car.CarId))
+                        .ToList();
+
+                    if (!matchedCars.Any())
+                        continue;
+
+                    // 🔥 ΕΔΩ ΠΑΙΡΝΟΥΜΕ ΤΟ USERNAME ΣΩΣΤΑ
+                    var identityMember = await _memberManager.FindByIdAsync(member.Key.ToString());
+                    if (identityMember == null) continue;
+
+                    var userName = identityMember.UserName ?? "";
+
+                    await SendPriceDropEmail(member, userName, matchedCars);
+                }
+            }
+
+            return Ok(new{ ok = true, added = carsToAdd.Count });
         }
+
         
         private static string Fold(string? s)
         {
@@ -641,6 +658,154 @@ namespace KinsenOfficial.Controllers
             {
                 return StatusCode(500, $"BlockList JSON parse error: {ex.Message}");
             }
+        }
+
+
+        // ΑΠΟ ΕΔΩ ΚΑΙ ΚΑΤΩ ΑΦΟΡΑ ΤΟ EMAIL ΠΟΥ ΣΤΕΛΝΕΤΑΙ ΣΤΟ MEMBER ΓΙΑ ΕΚΠΤΩΣΗ ΤΙΜΗΣ ΑΥΤΟΚΙΝΗΤΟΥ
+        private async Task<string> ToBase64ImgTag(string url, string alt, int width = 300)
+        {
+            try
+            {
+                using var http = new HttpClient();
+                var bytes = await http.GetByteArrayAsync(url);
+                var base64 = Convert.ToBase64String(bytes);
+
+                return $@"
+                <img 
+                src='data:image/jpeg;base64,{base64}'
+                alt='{alt}'
+                width='{width}'
+                style='display:block;height:auto;border:0;outline:none;text-decoration:none;' />";
+            }
+            catch
+            {
+                return $@"
+                <img 
+                src='{url}'
+                alt='{alt}'
+                width='{width}'
+                style='display:block;height:auto;border:0;outline:none;text-decoration:none;' />";
+            }
+        }
+        
+        private async Task SendPriceDropEmail(IMember member, string firstName, List<(CarDto Car, decimal OldPrice, decimal NewPrice)> cars)
+        {
+            //****************LOGO Kinsen******************
+            const string logoUrl = "https://production-job-board-public.s3.amazonaws.com/logos/43021810-0cfb-466e-b00c-46c05fd4b394";
+            var logoTag = await ToBase64ImgTag(logoUrl, "Kinsen", 280);
+
+
+            var email = member.Email;
+            if (string.IsNullOrWhiteSpace(email)) return;
+
+            var userName = member.GetValue<string>("userName") ?? "";
+            var lastName  = member.GetValue<string>("lastName") ?? "";
+
+            var carsHtml = string.Join("",
+            cars.Select(c => $@"
+            <table role='presentation' border='0' cellspacing='0' cellpadding='0' align='center'
+                    style='margin:10px auto;width:100%;max-width:520px;
+                            border:1px solid #e6e6e6;border-radius:14px;
+                            background:#ffffff;'>
+                <tr>
+                <td style='padding:14px 14px 12px 14px;
+                            font-family:Segoe UI,Roboto,Arial,sans-serif;
+                            text-align:center;'>
+
+                    <div style='font-size:18px;font-weight:500;color:#023859;margin-bottom:6px;'>
+                    {c.Car.Maker} {c.Car.Model}
+                    </div>
+
+                    <div style='font-size:14px;color:#333;'>
+                    Από <span style='text-decoration:line-through;color:#777;'>{c.OldPrice:N0} €</span>
+                    ➜ <span style='color:#d10000;font-weight:900;'>{c.NewPrice:N0} €</span>
+                    </div>
+
+                </td>
+                </tr>
+            </table>
+            "));
+
+            var subject = "🔥 Έκπτωση σε αγαπημένο σας αυτοκίνητο!";
+            var body = $@"
+            <!doctype html>
+            <html xmlns='http://www.w3.org/1999/xhtml'>
+            <head>
+            <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+            <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+            <title>Kinsen</title>
+            </head>
+
+            <body style='margin:0;padding:0;background:#ffffff;color:#000000;'>
+            <table role='presentation' width='100%' border='0' cellspacing='0' cellpadding='0' style='background:#ffffff;'>
+                <tr>
+                <td align='center' style='padding:0 12px;'>
+
+                    <table role='presentation' width='600' border='0' cellspacing='0' cellpadding='0'
+                        style='width:600px;max-width:600px;background:#ffffff;margin:0 auto;'>
+
+                    <!-- LOGO (πάνω-πάνω) -->
+                    <tr>
+                        <td align='center' style='padding:18px 0 8px 0;'>
+                        {logoTag}
+                        </td>
+                    </tr>
+
+                    <!-- TITLE -->
+                    <tr>
+                        <td align='center' style='padding:6px 18px 6px 18px;'>
+                        <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                                    font-size:22px;font-weight:800;line-height:1.2;
+                                    color:#39c0c3;text-align:center;'>
+                            Έχουμε καλά νέα για εσάς!
+                        </div>
+                        </td>
+                    </tr>
+
+                    <!-- TEXT -->
+                    <tr>
+                        <td align='center' style='padding:6px 22px 14px 22px;'>
+                        <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
+                                    font-size:14px;line-height:1.6;color:#000000;text-align:center;'>
+                            Αγαπητέ/ή <b>{firstName} {lastName}</b>,<br/>
+                            Το αγαπημένο σας αυτοκίνητο είναι σε προσφορά!<br/>
+                            <span style='color:#023859;font-weight:700;'>Μην το χάσετε!</span>
+                        </div>
+                        </td>
+                    </tr>
+
+                    <!-- CARS -->
+                    <tr>
+                        <td align='center' style='padding:0 18px 12px 18px;'>
+                        {carsHtml}
+                        </td>
+                    </tr>
+
+                    </table>
+
+                </td>
+                </tr>
+            </table>
+            </body>
+            </html>";
+
+            var from = "KINSEN <no-reply@kinsen.gr>";
+
+            var msg = new EmailMessage(
+                from,
+                to: new[] { email },
+                cc: null,
+                bcc: null,
+                replyTo: new[] { "sales@kinsen.gr" },
+                subject,
+                body,
+                true,
+                attachments: null
+            );
+
+            try { await _emailSender.SendAsync(msg, "PriceDropNotification"); }
+            catch {}
+
         }    
     }
 
