@@ -111,6 +111,9 @@ namespace KinsenOfficial.Controllers
         [Consumes("application/json")]
         public IActionResult CarsUpdated([FromBody] List<CarStockCar>? carsPayload)
         {
+            var priceDroppedCars = new List<(CarDto Car, decimal OldPriceD, decimal NewPriceD)>();
+            var priceIncreasedCars = new List<(CarDto Car, decimal OldPriceI, decimal NewPriceI)>();
+
             if (carsPayload == null || carsPayload.Count == 0)
                 return BadRequest("No cars in payload.");
 
@@ -179,12 +182,33 @@ namespace KinsenOfficial.Controllers
                         _logger.LogWarning("DELETED carId={CarId} from carCardBlock", incoming.CarId);
                     }
 
-                    continue; // ΤΕΛΟΣ για αυτό το car
+                    continue; 
                 }
 
                 // 🔁 UPDATE
                 if (existingMap.TryGetValue(incoming.CarId, out var existing))
                 {
+                    // 🔻 ΕΛΕΓΧΟΣ ΠΤΩΣΗΣ ΤΙΜΗΣ (ΜΟΝΟ αν είναι αυστηρά μικρότερη)
+                    if (incoming.Price < existing.Price)
+                    {
+                        _logger.LogInformation(
+                            "PRICE DROP detected for CarId={CarId} | Old={OldPriceD} | New={NewPriceD}",
+                            incoming.CarId, existing.Price, incoming.Price
+                        );
+
+                        priceDroppedCars.Add((incoming, existing.Price, incoming.Price));
+                    }
+                    // 🔻 ΕΛΕΓΧΟΣ ΑΥΞΗΣΗΣ ΤΙΜΗΣ (ΜΟΝΟ αν είναι αυστηρά μεγαλύτερη)
+                    if (incoming.Price > existing.Price)
+                    {
+                        _logger.LogInformation(
+                            "PRICE INCREASE detected for CarId={CarId} | Old={OldPriceI} | New={NewPriceI}",
+                            incoming.CarId, existing.Price, incoming.Price
+                        );
+
+                        priceIncreasedCars.Add((incoming, existing.Price, incoming.Price));
+                    }
+
                     // ⛔ ΔΕΝ ΠΕΙΡΑΖΟΥΜΕ ΦΩΤΟ / PHOTOS
                     incoming.CarPic = existing.CarPic;
                     incoming.TenPhotosForUsedCarSales = existing.TenPhotosForUsedCarSales;
