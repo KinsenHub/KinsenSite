@@ -1,7 +1,6 @@
 function updateHeart(btn, isFavorite) {
-  console.log(isFavorite);
   const icon = btn.querySelector("i");
-  // if (!icon) return;
+  if (!icon) return;
 
   if (isFavorite) {
     icon.classList.remove("fa-regular");
@@ -19,7 +18,6 @@ function updateHeart(btn, isFavorite) {
 // ==========================
 document.addEventListener("click", async (e) => {
   const btn = e.target.closest(".favBtn");
-  console.log(btn);
   if (!btn) return;
 
   e.preventDefault();
@@ -51,7 +49,6 @@ document.addEventListener("favorites:changed", syncFavoriteHearts);
 // INITIAL SYNC
 // ==========================
 async function syncFavoriteHearts() {
-  console.log("syncFavoriteHearts");
   try {
     const r = await fetch("/umbraco/api/FavoritesCustomer/GetIds", {
       credentials: "include",

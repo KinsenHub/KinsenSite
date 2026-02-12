@@ -16,6 +16,7 @@ using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Web.Common.Security;
+using System.Globalization;
 
 namespace KinsenOfficial.Controllers
 {
@@ -700,6 +701,7 @@ namespace KinsenOfficial.Controllers
 
             var userName = member.GetValue<string>("userName") ?? "";
             var lastName  = member.GetValue<string>("lastName") ?? "";
+            var gr = CultureInfo.GetCultureInfo("el-GR");
 
             var carsHtml = string.Join("",
             cars.Select(c => $@"
@@ -717,8 +719,8 @@ namespace KinsenOfficial.Controllers
                     </div>
 
                     <div style='font-size:14px;color:#333;'>
-                    Από <span style='text-decoration:line-through;color:#777;'>{c.OldPrice:N0} €</span>
-                    ➜ <span style='color:#d10000;font-weight:900;'>{c.NewPrice:N0} €</span>
+                    Από <span style='text-decoration:line-through;color:#777;'>{c.OldPrice.ToString("N0", gr)} €</span>
+                    ➜ <span style='color:#d10000;font-weight:900;'>{c.NewPrice.ToString("N0", gr)} €</span>
                     </div>
 
                 </td>
@@ -755,7 +757,7 @@ namespace KinsenOfficial.Controllers
                     <tr>
                         <td align='center' style='padding:6px 18px 6px 18px;'>
                         <div style='font-family:Segoe UI,Roboto,Arial,sans-serif;
-                                    font-size:22px;font-weight:800;line-height:1.2;
+                                    font-size:22px;font-weight:400;line-height:1.2;
                                     color:#39c0c3;text-align:center;'>
                             Έχουμε καλά νέα για εσάς!
                         </div>

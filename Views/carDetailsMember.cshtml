@@ -48,7 +48,7 @@
 					|| (fromCookie && fromCookie.trim())
 					|| (fromName && fromName.trim());
 
-		console.log('[MEMBER] carID (resolved):', carID);
+		//console.log('[MEMBER] carID (resolved):', carID);
 
 		if (!carID) {
 			console.warn('[MEMBER] carID is missing or empty');
@@ -74,7 +74,7 @@
 		}
 		history.replaceState({ carId: carID }, '', location.pathname);
 
-		console.log("carID from Razor:", carID); 
+		//console.log("carID from Razor:", carID); 
 
 		@* const payload = { id: Number(carID) };  *@
 		fetch("/umbraco/api/CarApiMember/getcarbyid", {
@@ -94,7 +94,7 @@
 			})
 			
 			.then(data => {
-				console.log("API RESPONSE:", data);
+				//console.log("API RESPONSE:", data);
 				
 				try { sessionStorage.setItem('selectedCarId', carID); } catch {}
 					document.cookie = `selectedCarId=${encodeURIComponent(carID)}; Max-Age=${30*60}; Path=/; SameSite=Lax; Secure`;
