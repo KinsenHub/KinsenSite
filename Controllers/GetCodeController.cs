@@ -89,7 +89,7 @@ public class GetCodeController : ControllerBase
         const string logoUrl = "https://production-job-board-public.s3.amazonaws.com/logos/43021810-0cfb-466e-b00c-46c05fd4b394";
         var logoTag = await ToBase64ImgTag(logoUrl, "Kinsen", 250);
 
-        var subject = "Ανάκτηση Κωδικού – Kinsen";
+        var subject = "Ανάκτηση Κωδικού";
         var body = $@"
         <!DOCTYPE html>
         <html>
@@ -220,9 +220,11 @@ public class GetCodeController : ControllerBase
             </body>
             </html>";
 
+            var from = "KINSEN <no-reply@kinsen.gr>";
+
         // ✅ Στέλνουμε ΑΠΕΥΘΕΙΑΣ στο email που έγραψε ο χρήστης
         var msg = new EmailMessage(
-            null,                   
+            from,                   
             new[] { email },
             null, null,             
             null,                   
