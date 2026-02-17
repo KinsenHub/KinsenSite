@@ -77,7 +77,7 @@ function validatePassword() {
   } else {
     showMsg(
       `Ο κωδικός πρέπει να έχει: 10+ χαρακτήρες, 1 κεφαλαίο και 1 αριθμό`,
-      "error"
+      "error",
     );
     isNewPasswordValid = false;
   }
@@ -181,3 +181,33 @@ async function submitNewPassword() {
     }
   }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Πιάνουμε όλα τα blocks που έχουν password + eye button
+  const blocks = document.querySelectorAll(".new-pass");
+
+  blocks.forEach((block) => {
+    const passwordInput = block.querySelector(
+      'input[type="password"], input[type="text"]',
+    );
+    const toggleButton = block.querySelector(".toggle-btn");
+    const toggleIcon = toggleButton
+      ? toggleButton.querySelector(".icon i")
+      : null;
+
+    if (!passwordInput || !toggleButton || !toggleIcon) return;
+
+    toggleButton.addEventListener("click", function () {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+
+      if (isPassword) {
+        toggleIcon.classList.remove("fa-eye");
+        toggleIcon.classList.add("fa-eye-slash");
+      } else {
+        toggleIcon.classList.remove("fa-eye-slash");
+        toggleIcon.classList.add("fa-eye");
+      }
+    });
+  });
+});
