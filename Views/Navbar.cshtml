@@ -58,7 +58,7 @@
         <img src="~/media/kinsen_vertical.png" alt="Kinsen Hellas Logo" class="navbar-logoInner" style="display:none;"/>
       </a>
       <ul class="nx-left">
-        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq" && x.Name() != "userSettings" && x.Name() != "getcode" && x.Name() != "forgotPassword" && x.Name() != "favorites" && x.Name() != "oldOrders"))
+        @foreach (var item in selection.Where(x => x.Name() != "Login" && x.Name() != "carDetails" && x.Name() != "carDetailsMember" && x.Name() != "carDetailsVisitor" && x.Name() != "shoppingCartContent" && x.Name() != "Faq" && x.Name() != "userSettings" && x.Name() != "getcode" /*&& x.Name() != "forgotPassword"*/ && x.Name() != "favorites" && x.Name() != "oldOrders"))
         {
           var menuTitle = item.Value("menuTitle") as string ?? item.Name();
           var iconClass = item.Value<string>("menuIcon");
